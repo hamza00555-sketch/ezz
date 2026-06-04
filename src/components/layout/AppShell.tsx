@@ -2,8 +2,11 @@
 
 import { BottomNav } from './BottomNav';
 import { QuickAddButton } from './QuickAddButton';
+import { useSupabaseInit } from '@/hooks/useSupabaseInit';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
+  useSupabaseInit();
+
   return (
     <div
       className="app-bg"

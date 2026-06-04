@@ -472,6 +472,7 @@ const mockAnnouncements: Announcement[] = [
 interface AppState {
   currentUserId: string;
   currentFamilyGroupId: string;
+  isLoaded: boolean;
 
   familyGroups: FamilyGroup[];
   members: FamilyMember[];
@@ -492,6 +493,10 @@ interface AppState {
   activeTab: string;
   isQuickAddOpen: boolean;
   activeQuickForm: string | null;
+
+  // Supabase sync
+  loadFromSupabase: (userId: string, familyGroupId: string) => Promise<void>;
+  setCurrentUser: (userId: string, familyGroupId: string) => void;
 
   // Actions
   setCurrentFamilyGroup: (id: string) => void;
@@ -525,9 +530,10 @@ function generateId(): string {
   return Math.random().toString(36).substr(2, 9);
 }
 
-export const useAppStore = create<AppState>((set) => ({
+export const useAppStore = create<AppState>((set, get) => ({
   currentUserId: CURRENT_USER_ID,
   currentFamilyGroupId: FAMILY_GROUP_ID,
+  isLoaded: false,
 
   familyGroups: mockFamilyGroups,
   members: mockMembers,
@@ -548,114 +554,152 @@ export const useAppStore = create<AppState>((set) => ({
   isQuickAddOpen: false,
   activeQuickForm: null,
 
+  setCurrentUser: (userId, familyGroupId) =>
+    set({ currentUserId: userId, currentFamilyGroupId: familyGroupId }),
+
+  loadFromSupabase: async (userId, familyGroupId) => {
+    const { fetchFamilyData } = await import('@/lib/supabase/db');
+    const data = await fetchFamilyData(familyGroupId);
+    if (!data) return;
+    set({
+      currentUserId: userId,
+      currentFamilyGroupId: familyGroupId,
+      familyGroups: [data.familyGroup],
+      members: data.members,
+      tasks: data.tasks,
+      requests: data.requests,
+      homeItems: data.homeItems,
+      documents: data.documents,
+      maintenance: data.maintenance,
+      shortages: data.shortages,
+      recipes: data.recipes,
+      mealPlans: data.mealPlans,
+      wishItems: data.wishItems,
+      wallets: data.wallets,
+      expenses: data.expenses,
+      announcements: data.announcements,
+      isLoaded: true,
+    });
+  },
+
   setCurrentFamilyGroup: (id) => set({ currentFamilyGroupId: id }),
   setActiveTab: (tab) => set({ activeTab: tab }),
   setQuickAddOpen: (open) => set({ isQuickAddOpen: open }),
   setActiveQuickForm: (form) => set({ activeQuickForm: form, isQuickAddOpen: false }),
 
-  addTask: (taskData) =>
+  addTask: (taskData) => {
+    const localId = `task-${generateId()}`;
+    const now = new Date().toISOString();
     set((state) => ({
-      tasks: [
-        ...state.tasks,
-        {
-          ...taskData,
-          id: `task-${generateId()}`,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-      ],
-    })),
+      tasks: [...state.tasks, { ...taskData, id: localId, createdAt: now, updatedAt: now }],
+    }));
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      import('@/lib/supabase/db').then(({ dbAddTask }) =>
+        dbAddTask(taskData).then(({ data }) => {
+          if (data?.id && data.id !== localId) {
+            set((s) => ({ tasks: s.tasks.map((t) => t.id === localId ? { ...t, id: data.id } : t) }));
+          }
+        })
+      );
+    }
+  },
 
-  updateTaskStatus: (taskId, status) =>
+  updateTaskStatus: (taskId, status) => {
     set((state) => ({
       tasks: state.tasks.map((t) =>
         t.id === taskId ? { ...t, status, updatedAt: new Date().toISOString() } : t
       ),
-    })),
+    }));
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      import('@/lib/supabase/db').then(({ dbUpdateTaskStatus }) => dbUpdateTaskStatus(taskId, status));
+    }
+  },
 
-  addRequest: (reqData) =>
+  addRequest: (reqData) => {
+    const localId = `req-${generateId()}`;
+    const now = new Date().toISOString();
     set((state) => ({
-      requests: [
-        ...state.requests,
-        {
-          ...reqData,
-          id: `req-${generateId()}`,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-      ],
-    })),
+      requests: [...state.requests, { ...reqData, id: localId, createdAt: now, updatedAt: now }],
+    }));
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      import('@/lib/supabase/db').then(({ dbAddRequest }) => dbAddRequest(reqData));
+    }
+  },
 
-  updateRequestStatus: (reqId, status) =>
+  updateRequestStatus: (reqId, status) => {
     set((state) => ({
       requests: state.requests.map((r) =>
         r.id === reqId ? { ...r, status, updatedAt: new Date().toISOString() } : r
       ),
-    })),
+    }));
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      import('@/lib/supabase/db').then(({ dbUpdateRequestStatus }) => dbUpdateRequestStatus(reqId, status));
+    }
+  },
 
-  addShortage: (itemData) =>
+  addShortage: (itemData) => {
+    const localId = `sh-${generateId()}`;
+    const now = new Date().toISOString();
     set((state) => ({
-      shortages: [
-        ...state.shortages,
-        {
-          ...itemData,
-          id: `sh-${generateId()}`,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-      ],
-    })),
+      shortages: [...state.shortages, { ...itemData, id: localId, createdAt: now, updatedAt: now }],
+    }));
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      import('@/lib/supabase/db').then(({ dbAddShortage }) => dbAddShortage(itemData));
+    }
+  },
 
-  toggleShortageStatus: (id) =>
+  toggleShortageStatus: (id) => {
+    const current = get().shortages.find((s) => s.id === id);
+    const newStatus = current?.status === 'missing' ? 'provided' : 'missing';
     set((state) => ({
       shortages: state.shortages.map((s) =>
-        s.id === id
-          ? {
-              ...s,
-              status: s.status === 'missing' ? 'provided' : 'missing',
-              updatedAt: new Date().toISOString(),
-            }
-          : s
+        s.id === id ? { ...s, status: newStatus, updatedAt: new Date().toISOString() } : s
       ),
-    })),
+    }));
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      import('@/lib/supabase/db').then(({ dbToggleShortageStatus }) => dbToggleShortageStatus(id, newStatus));
+    }
+  },
 
-  addWishItem: (itemData) =>
+  addWishItem: (itemData) => {
+    const localId = `wish-${generateId()}`;
+    const now = new Date().toISOString();
     set((state) => ({
-      wishItems: [
-        ...state.wishItems,
-        {
-          ...itemData,
-          id: `wish-${generateId()}`,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-      ],
-    })),
+      wishItems: [...state.wishItems, { ...itemData, id: localId, createdAt: now, updatedAt: now }],
+    }));
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      import('@/lib/supabase/db').then(({ dbAddWishItem }) => dbAddWishItem(itemData));
+    }
+  },
 
-  addExpense: (expData) =>
-    set((state) => {
-      const newExpense: Expense = {
-        ...expData,
-        id: `exp-${generateId()}`,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      return {
-        expenses: [...state.expenses, newExpense],
-        wallets: state.wallets.map((w) =>
-          w.id === expData.walletId
-            ? { ...w, spent: w.spent + expData.amount, updatedAt: new Date().toISOString() }
-            : w
-        ),
-      };
-    }),
+  addExpense: (expData) => {
+    const localId = `exp-${generateId()}`;
+    const now = new Date().toISOString();
+    set((state) => ({
+      expenses: [...state.expenses, { ...expData, id: localId, createdAt: now, updatedAt: now }],
+      wallets: state.wallets.map((w) =>
+        w.id === expData.walletId
+          ? { ...w, spent: w.spent + expData.amount, updatedAt: now }
+          : w
+      ),
+    }));
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      import('@/lib/supabase/db').then(({ dbAddExpense }) => dbAddExpense(expData));
+    }
+  },
 
-  confirmAnnouncement: (annId, memberId) =>
+  confirmAnnouncement: (annId, memberId) => {
     set((state) => ({
       announcements: state.announcements.map((a) =>
         a.id === annId && !a.confirmedBy.includes(memberId)
           ? { ...a, confirmedBy: [...a.confirmedBy, memberId], updatedAt: new Date().toISOString() }
           : a
       ),
-    })),
+    }));
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      import('@/lib/supabase/db').then(({ dbConfirmAnnouncement }) =>
+        dbConfirmAnnouncement(annId, memberId)
+      );
+    }
+  },
 }));

@@ -20,12 +20,17 @@ export default function OnboardingPage() {
     setLoading(true);
     setError('');
     try {
-      // Demo: just redirect
       if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
         router.push('/dashboard');
         return;
       }
-      // TODO: Supabase implementation
+      const { createClient } = await import('@/lib/supabase/client');
+      const sb = createClient();
+      const { data: { user } } = await sb.auth.getUser();
+      if (!user) throw new Error('يرجى تسجيل الدخول أولاً');
+
+      const { dbCreateFamilyGroup } = await import('@/lib/supabase/db');
+      await dbCreateFamilyGroup(user.id, homeName.trim(), emoji);
       router.push('/dashboard');
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'حدث خطأ');
@@ -43,10 +48,16 @@ export default function OnboardingPage() {
         router.push('/dashboard');
         return;
       }
-      // TODO: Supabase implementation
+      const { createClient } = await import('@/lib/supabase/client');
+      const sb = createClient();
+      const { data: { user } } = await sb.auth.getUser();
+      if (!user) throw new Error('يرجى تسجيل الدخول أولاً');
+
+      const { dbJoinFamilyGroup } = await import('@/lib/supabase/db');
+      await dbJoinFamilyGroup(user.id, inviteCode.trim());
       router.push('/dashboard');
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'الكود غير صحيح');
+      setError(err instanceof Error ? err.message : 'الكود غير صحيح أو منتهي');
     } finally {
       setLoading(false);
     }
