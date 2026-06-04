@@ -1,20 +1,23 @@
 'use client';
 
-import { cn } from '@/lib/utils';
-
-const avatarColors = [
-  { bg: '#FEF3C7', text: '#92400E' },
-  { bg: '#DBEAFE', text: '#1E40AF' },
-  { bg: '#D1FAE5', text: '#065F46' },
-  { bg: '#FCE7F3', text: '#9D174D' },
-  { bg: '#EDE9FE', text: '#5B21B6' },
-  { bg: '#FEE2E2', text: '#991B1B' },
+const avatarPalette = [
+  { bg: 'rgba(199,231,123,0.18)', text: '#C7E77B' },
+  { bg: 'rgba(125,211,252,0.15)', text: '#7DD3FC' },
+  { bg: 'rgba(134,239,172,0.15)', text: '#86EFAC' },
+  { bg: 'rgba(249,168,212,0.15)', text: '#F9A8D4' },
+  { bg: 'rgba(167,130,255,0.15)', text: '#A782FF' },
+  { bg: 'rgba(253,186,116,0.15)', text: '#FDBA74' },
 ];
 
 function getColor(name: string) {
-  const idx = name.charCodeAt(0) % avatarColors.length;
-  return avatarColors[idx];
+  return avatarPalette[name.charCodeAt(0) % avatarPalette.length];
 }
+
+const sizeDimensions: Record<string, { size: number; font: number; radius: number }> = {
+  sm: { size: 28, font: 11, radius: 10 },
+  md: { size: 36, font: 13, radius: 12 },
+  lg: { size: 48, font: 16, radius: 16 },
+};
 
 interface MemberAvatarProps {
   name: string;
@@ -22,21 +25,19 @@ interface MemberAvatarProps {
   className?: string;
 }
 
-export function MemberAvatar({ name, size = 'md', className }: MemberAvatarProps) {
+export function MemberAvatar({ name, size = 'md' }: MemberAvatarProps) {
   const color = getColor(name);
-  const sizeClasses = {
-    sm: 'w-7 h-7 text-xs',
-    md: 'w-9 h-9 text-sm',
-    lg: 'w-12 h-12 text-base',
-  };
+  const dim = sizeDimensions[size];
   return (
     <div
-      className={cn(
-        'rounded-full flex items-center justify-center font-bold flex-shrink-0',
-        sizeClasses[size],
-        className
-      )}
-      style={{ background: color.bg, color: color.text }}
+      style={{
+        width: dim.size, height: dim.size,
+        borderRadius: dim.radius,
+        background: color.bg,
+        color: color.text,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: dim.font, fontWeight: 700, flexShrink: 0,
+      }}
     >
       {name.charAt(0)}
     </div>

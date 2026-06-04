@@ -10,11 +10,11 @@ import {
 import { useAppStore } from '@/store/appStore';
 
 const menuItems = [
-  { href: '/more/family', icon: Users, label: 'العائلة والأفراد', description: 'إدارة أفراد العائلة والصلاحيات', color: '#7C3AED', bg: '#F5F3FF' },
-  { href: '/more/calendar', icon: Calendar, label: 'التقويم', description: 'مواعيد وصيانة وضمانات', color: '#2563EB', bg: '#EFF6FF' },
-  { href: '/more/expenses', icon: Wallet, label: 'المصاريف', description: 'محافظ وميزانيات يدوية', color: '#16A34A', bg: '#ECFDF5' },
-  { href: '/more/wishes', icon: Lightbulb, label: 'الأفكار والـ Wish List', description: 'احتياجات وأفكار مستقبلية', color: '#D97706', bg: '#FFFBEB' },
-  { href: '/more/announcements', icon: Megaphone, label: 'الإعلانات العائلية', description: 'رسائل مثبتة ومهمة', color: '#0891B2', bg: '#ECFEFF' },
+  { href: '/more/family',        icon: Users,     label: 'العائلة والأفراد',      description: 'إدارة أفراد العائلة والصلاحيات',  color: '#A782FF', bg: 'rgba(167,130,255,0.12)' },
+  { href: '/more/calendar',      icon: Calendar,  label: 'التقويم',               description: 'مواعيد وصيانة وضمانات',           color: 'var(--info)',    bg: 'var(--info-soft)'    },
+  { href: '/more/expenses',      icon: Wallet,    label: 'المصاريف',              description: 'محافظ وميزانيات يدوية',           color: 'var(--success)', bg: 'var(--success-soft)' },
+  { href: '/more/wishes',        icon: Lightbulb, label: 'الأفكار والـ Wish List', description: 'احتياجات وأفكار مستقبلية',        color: 'var(--warning)', bg: 'var(--warning-soft)' },
+  { href: '/more/announcements', icon: Megaphone, label: 'الإعلانات العائلية',    description: 'رسائل مثبتة ومهمة',              color: 'var(--bronze)',  bg: 'rgba(176,141,87,0.12)' },
 ];
 
 export default function MorePage() {
@@ -37,7 +37,7 @@ export default function MorePage() {
     <AppShell>
       <PageHeader title="المزيد" />
 
-      <div className="p-4 flex flex-col gap-3">
+      <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
         {menuItems.map((item) => {
           const Icon = item.icon;
           const badge = badges[item.href];
@@ -45,30 +45,40 @@ export default function MorePage() {
             <Link
               key={item.href}
               href={item.href}
-              className="flex items-center gap-3.5 p-4 rounded-2xl active:scale-[0.98] transition-transform"
-              style={{ background: '#FFFFFF', border: '1px solid var(--border)' }}
+              className="active:scale-[0.98] transition-transform"
+              style={{
+                display: 'flex', alignItems: 'center', gap: 14,
+                padding: 16, borderRadius: 20,
+                background: 'var(--surface-card)',
+                border: '1px solid var(--border-soft)',
+                textDecoration: 'none',
+              }}
             >
-              <div className="p-3 rounded-xl flex-shrink-0" style={{ background: item.bg }}>
-                <Icon size={22} color={item.color} />
+              <div style={{ padding: 12, borderRadius: 16, flexShrink: 0, background: item.bg }}>
+                <Icon size={22} color={item.color} strokeWidth={1.8} />
               </div>
-              <div className="flex-1">
-                <p className="font-semibold text-sm" style={{ color: '#1C1917' }}>
+              <div style={{ flex: 1 }}>
+                <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>
                   {item.label}
                 </p>
-                <p className="text-xs mt-0.5" style={{ color: '#78716C' }}>
+                <p style={{ fontSize: 12, marginTop: 2, color: 'var(--text-muted)' }}>
                   {item.description}
                 </p>
               </div>
-              <div className="flex items-center gap-2">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 {badge !== undefined && badge > 0 && (
                   <span
-                    className="text-[10px] font-bold px-2 py-0.5 rounded-full min-w-[22px] text-center"
-                    style={{ background: item.bg, color: item.color }}
+                    style={{
+                      fontSize: 10, fontWeight: 700,
+                      padding: '2px 8px', borderRadius: 10,
+                      minWidth: 22, textAlign: 'center',
+                      background: item.bg, color: item.color,
+                    }}
                   >
                     {badge}
                   </span>
                 )}
-                <ChevronLeft size={16} color="#A8A29E" />
+                <ChevronLeft size={16} color="var(--text-muted)" />
               </div>
             </Link>
           );
@@ -77,18 +87,24 @@ export default function MorePage() {
         {/* Settings */}
         <Link
           href="/more/settings"
-          className="flex items-center gap-3.5 p-4 rounded-2xl active:scale-[0.98] transition-transform mt-2"
-          style={{ background: '#F5F5F4', border: '1px solid var(--border)' }}
+          className="active:scale-[0.98] transition-transform"
+          style={{
+            display: 'flex', alignItems: 'center', gap: 14,
+            padding: 16, borderRadius: 20, marginTop: 6,
+            background: 'rgba(255,255,255,0.04)',
+            border: '1px solid var(--border-soft)',
+            textDecoration: 'none',
+          }}
         >
-          <div className="p-3 rounded-xl flex-shrink-0" style={{ background: '#E7E5E4' }}>
-            <Settings size={22} color="#78716C" />
+          <div style={{ padding: 12, borderRadius: 16, flexShrink: 0, background: 'rgba(255,255,255,0.07)' }}>
+            <Settings size={22} color="var(--text-secondary)" strokeWidth={1.8} />
           </div>
-          <div className="flex-1">
-            <p className="font-semibold text-sm" style={{ color: '#57534E' }}>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-secondary)' }}>
               الإعدادات
             </p>
           </div>
-          <ChevronLeft size={16} color="#A8A29E" />
+          <ChevronLeft size={16} color="var(--text-muted)" />
         </Link>
       </div>
     </AppShell>

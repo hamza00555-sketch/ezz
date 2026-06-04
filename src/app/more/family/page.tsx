@@ -6,7 +6,12 @@ import { AppShell } from '@/components/layout/AppShell';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { MemberAvatar } from '@/components/shared/MemberAvatar';
 import { useAppStore } from '@/store/appStore';
-import { roleLabels, roleColors } from '@/lib/utils';
+import { roleLabels } from '@/lib/utils';
+
+const roleStyle: Record<string, { bg: string; color: string }> = {
+  admin:  { bg: 'rgba(199,231,123,0.15)', color: 'var(--accent-strong)' },
+  member: { bg: 'rgba(255,255,255,0.07)', color: 'var(--text-muted)'    },
+};
 
 export default function FamilyPage() {
   const { members, tasks, currentFamilyGroupId, currentUserId } = useAppStore();
@@ -26,76 +31,72 @@ export default function FamilyPage() {
         title="العائلة والأفراد"
         subtitle={`${familyMembers.length} أفراد`}
         action={
-          <Link href="/more" className="p-2">
-            <ChevronRight size={20} color="#78716C" />
+          <Link href="/more" style={{ padding: 8, display: 'block' }}>
+            <ChevronRight size={20} color="var(--text-muted)" />
           </Link>
         }
       />
 
-      <div className="p-4 flex flex-col gap-3">
+      <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
         {familyMembers.map((member) => {
           const activeTasks = getActiveTasks(member.id);
           const isCurrentUser = member.id === currentUserId;
+          const rStyle = roleStyle[member.role] ?? roleStyle.member;
           return (
             <div
               key={member.id}
-              className="p-4 rounded-2xl"
               style={{
-                background: '#FFFFFF',
-                border: `1px solid ${isCurrentUser ? '#FED7AA' : 'var(--border)'}`,
+                padding: 16, borderRadius: 20,
+                background: 'var(--surface-card)',
+                border: `1px solid ${isCurrentUser ? 'rgba(199,231,123,0.25)' : 'var(--border-soft)'}`,
               }}
             >
-              <div className="flex items-center gap-3">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <MemberAvatar name={member.name} size="lg" />
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="font-bold text-base" style={{ color: '#1C1917' }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <p style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>
                       {member.name}
                     </p>
                     {isCurrentUser && (
-                      <span
-                        className="text-[10px] px-2 py-0.5 rounded-full font-medium"
-                        style={{ background: '#FED7AA', color: '#92400E' }}
-                      >
+                      <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, fontWeight: 600, background: 'rgba(199,231,123,0.15)', color: 'var(--accent-strong)' }}>
                         أنت
                       </span>
                     )}
                   </div>
-                  <span
-                    className={`text-xs px-2 py-0.5 rounded-full font-medium mt-1 inline-block ${roleColors[member.role]}`}
-                  >
+                  <span style={{ display: 'inline-block', marginTop: 4, fontSize: 11, padding: '2px 10px', borderRadius: 10, fontWeight: 600, background: rStyle.bg, color: rStyle.color }}>
                     {roleLabels[member.role]}
                   </span>
                 </div>
-                <div className="text-center">
-                  <p className="text-2xl font-black" style={{ color: activeTasks > 0 ? '#C8922A' : '#A8A29E' }}>
+                <div style={{ textAlign: 'center' }}>
+                  <p style={{ fontSize: 24, fontWeight: 900, lineHeight: 1, color: activeTasks > 0 ? 'var(--warning)' : 'var(--text-muted)' }}>
                     {activeTasks}
                   </p>
-                  <p className="text-[10px]" style={{ color: '#78716C' }}>
+                  <p style={{ fontSize: 10, marginTop: 2, color: 'var(--text-muted)' }}>
                     مهمة نشطة
                   </p>
                 </div>
               </div>
 
               {/* Permissions */}
-              <div className="flex flex-wrap gap-1.5 mt-3">
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 14 }}>
                 {member.permissions.canManageTasks && (
-                  <span className="text-[10px] px-2 py-1 rounded-lg" style={{ background: '#EFF6FF', color: '#2563EB' }}>
+                  <span style={{ fontSize: 10, padding: '4px 10px', borderRadius: 10, background: 'var(--info-soft)', color: 'var(--info)' }}>
                     إدارة المهام
                   </span>
                 )}
                 {member.permissions.canManageHome && (
-                  <span className="text-[10px] px-2 py-1 rounded-lg" style={{ background: '#ECFDF5', color: '#059669' }}>
+                  <span style={{ fontSize: 10, padding: '4px 10px', borderRadius: 10, background: 'var(--success-soft)', color: 'var(--success)' }}>
                     إدارة البيت
                   </span>
                 )}
                 {member.permissions.canManageFinance && (
-                  <span className="text-[10px] px-2 py-1 rounded-lg" style={{ background: '#FFF7ED', color: '#C8922A' }}>
+                  <span style={{ fontSize: 10, padding: '4px 10px', borderRadius: 10, background: 'rgba(176,141,87,0.15)', color: 'var(--bronze)' }}>
                     إدارة المصاريف
                   </span>
                 )}
                 {member.permissions.canInviteMembers && (
-                  <span className="text-[10px] px-2 py-1 rounded-lg" style={{ background: '#F5F3FF', color: '#7C3AED' }}>
+                  <span style={{ fontSize: 10, padding: '4px 10px', borderRadius: 10, background: 'rgba(167,130,255,0.12)', color: '#A782FF' }}>
                     دعوة أفراد
                   </span>
                 )}

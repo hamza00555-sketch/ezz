@@ -21,13 +21,13 @@ export default function AnnouncementsPage() {
       <PageHeader
         title="الإعلانات"
         action={
-          <Link href="/more" className="p-2">
-            <ChevronRight size={20} color="#78716C" />
+          <Link href="/more" style={{ padding: 8, display: 'block' }}>
+            <ChevronRight size={20} color="var(--text-muted)" />
           </Link>
         }
       />
 
-      <div className="p-4 flex flex-col gap-3">
+      <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
         {items.length === 0 ? (
           <EmptyState icon="📢" title="لا توجد إعلانات" description="انشر إعلاناً مهماً لأفراد العائلة" />
         ) : (
@@ -41,54 +41,50 @@ export default function AnnouncementsPage() {
             return (
               <div
                 key={ann.id}
-                className="p-4 rounded-2xl"
                 style={{
-                  background: ann.isPinned ? 'linear-gradient(135deg, #FFF7ED, #FFFBEB)' : '#FFFFFF',
-                  border: `1px solid ${ann.isPinned ? '#FED7AA' : 'var(--border)'}`,
+                  padding: 16, borderRadius: 20,
+                  background: ann.isPinned
+                    ? 'linear-gradient(135deg, rgba(176,141,87,0.14), rgba(176,141,87,0.07))'
+                    : 'var(--surface-card)',
+                  border: `1px solid ${ann.isPinned ? 'rgba(176,141,87,0.30)' : 'var(--border-soft)'}`,
                 }}
               >
-                <div className="flex items-start gap-3">
-                  <div
-                    className="p-2.5 rounded-xl flex-shrink-0"
-                    style={{ background: ann.isPinned ? '#FED7AA' : '#F5F5F4' }}
-                  >
-                    <Megaphone size={18} color={ann.isPinned ? '#C8922A' : '#78716C'} />
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                  <div style={{ padding: 10, borderRadius: 14, flexShrink: 0, background: ann.isPinned ? 'rgba(176,141,87,0.20)' : 'rgba(255,255,255,0.07)' }}>
+                    <Megaphone size={18} color={ann.isPinned ? 'var(--bronze)' : 'var(--text-muted)'} strokeWidth={1.8} />
                   </div>
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between gap-2">
-                      <p className="font-bold text-sm" style={{ color: '#1C1917' }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+                      <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>
                         {ann.title}
                       </p>
                       {ann.isPinned && (
-                        <span
-                          className="text-[10px] px-2 py-0.5 rounded-full font-medium flex-shrink-0"
-                          style={{ background: '#FED7AA', color: '#92400E' }}
-                        >
+                        <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, fontWeight: 600, flexShrink: 0, background: 'rgba(176,141,87,0.20)', color: 'var(--bronze)' }}>
                           📌 مثبت
                         </span>
                       )}
                     </div>
-                    <p className="text-sm mt-1.5 leading-relaxed" style={{ color: '#57534E' }}>
+                    <p style={{ fontSize: 13, marginTop: 6, lineHeight: 1.6, color: 'var(--text-secondary)' }}>
                       {ann.message}
                     </p>
-                    <div className="flex items-center gap-3 mt-2">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 10 }}>
                       {publisher && (
-                        <div className="flex items-center gap-1.5">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                           <MemberAvatar name={publisher.name} size="sm" />
-                          <span className="text-xs" style={{ color: '#78716C' }}>
+                          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
                             {publisher.name}
                           </span>
                         </div>
                       )}
-                      <span className="text-xs" style={{ color: '#A8A29E' }}>
+                      <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
                         {formatRelativeArabic(ann.createdAt)}
                       </span>
                     </div>
 
                     {ann.requiresConfirmation && (
-                      <div className="flex items-center gap-2 mt-2">
-                        <Users size={12} color="#78716C" />
-                        <span className="text-xs" style={{ color: '#78716C' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
+                        <Users size={12} color="var(--text-muted)" />
+                        <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
                           {ann.confirmedBy.length}/{totalAudience} أكدوا القراءة
                         </span>
                       </div>
@@ -99,18 +95,22 @@ export default function AnnouncementsPage() {
                 {ann.requiresConfirmation && !confirmed && ann.status === 'active' && (
                   <button
                     onClick={() => confirmAnnouncement(ann.id, currentUserId)}
-                    className="mt-3 w-full py-2.5 rounded-xl text-sm font-medium flex items-center justify-center gap-2"
-                    style={{ background: '#C8922A', color: '#FFFFFF' }}
+                    style={{
+                      marginTop: 14, width: '100%',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                      padding: '11px 0', borderRadius: 14,
+                      background: 'rgba(176,141,87,0.22)',
+                      border: '1px solid rgba(176,141,87,0.35)',
+                      color: 'var(--bronze)', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                    }}
+                    className="active:scale-[0.98]"
                   >
                     <Check size={16} />
                     تأكيد القراءة
                   </button>
                 )}
-                {confirmed && (
-                  <div
-                    className="mt-3 py-2 rounded-xl text-sm font-medium flex items-center justify-center gap-2"
-                    style={{ background: '#D1FAE5', color: '#065F46' }}
-                  >
+                {confirmed && ann.requiresConfirmation && (
+                  <div style={{ marginTop: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '10px 0', borderRadius: 14, background: 'var(--success-soft)', color: 'var(--success)', fontSize: 13, fontWeight: 600 }}>
                     <Check size={16} />
                     قرأت هذا الإعلان
                   </div>

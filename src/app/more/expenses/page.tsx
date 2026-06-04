@@ -10,7 +10,7 @@ import { useAppStore } from '@/store/appStore';
 import { formatArabicDate, formatCurrency } from '@/lib/utils';
 
 export default function ExpensesPage() {
-  const { wallets, expenses, members, currentFamilyGroupId, currentUserId } = useAppStore();
+  const { wallets, expenses, members, currentFamilyGroupId } = useAppStore();
   const myWallets = wallets.filter((w) => w.familyGroupId === currentFamilyGroupId);
   const myExpenses = expenses
     .filter((e) => e.familyGroupId === currentFamilyGroupId)
@@ -25,128 +25,132 @@ export default function ExpensesPage() {
       <PageHeader
         title="المصاريف"
         action={
-          <Link href="/more" className="p-2">
-            <ChevronRight size={20} color="#78716C" />
+          <Link href="/more" style={{ padding: 8, display: 'block' }}>
+            <ChevronRight size={20} color="var(--text-muted)" />
           </Link>
         }
       />
 
-      <div className="p-4 flex flex-col gap-4">
-        {/* Monthly summary */}
+      <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {/* Monthly hero */}
         <div
-          className="p-4 rounded-2xl"
-          style={{ background: 'linear-gradient(135deg, #C8922A, #A37520)' }}
+          style={{
+            padding: 20, borderRadius: 24,
+            background: 'linear-gradient(135deg, rgba(176,141,87,0.30) 0%, rgba(176,141,87,0.14) 60%, rgba(28,32,39,0.80) 100%)',
+            border: '1px solid rgba(176,141,87,0.30)',
+          }}
         >
-          <p className="text-white/80 text-sm mb-1">إجمالي الشهر</p>
-          <p className="text-white text-3xl font-black">{formatCurrency(totalSpent)}</p>
-          <p className="text-white/70 text-sm">من {formatCurrency(totalBudget)}</p>
-          <div className="mt-3 h-2 rounded-full" style={{ background: 'rgba(255,255,255,0.3)' }}>
+          <p style={{ fontSize: 13, color: 'rgba(245,242,234,0.70)', marginBottom: 4 }}>إجمالي الشهر</p>
+          <p style={{ fontSize: 32, fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1 }}>
+            {formatCurrency(totalSpent)}
+          </p>
+          <p style={{ fontSize: 13, color: 'rgba(245,242,234,0.60)', marginTop: 4 }}>
+            من {formatCurrency(totalBudget)}
+          </p>
+          <div style={{ marginTop: 16, height: 6, borderRadius: 6, background: 'rgba(255,255,255,0.15)' }}>
             <div
-              className="h-2 rounded-full transition-all"
               style={{
+                height: 6, borderRadius: 6, transition: 'width 0.4s ease',
                 width: `${Math.min(totalPct, 100)}%`,
-                background: totalPct > 90 ? '#FCA5A5' : '#FFFFFF',
+                background: totalPct > 90 ? 'var(--danger)' : 'var(--accent-strong)',
               }}
             />
           </div>
-          <p className="text-white/70 text-xs mt-1">{totalPct}% من الميزانية</p>
+          <p style={{ fontSize: 12, color: 'rgba(245,242,234,0.60)', marginTop: 6 }}>{totalPct}% من الميزانية</p>
         </div>
 
         {/* Wallets */}
-        <div>
-          <p className="text-sm font-bold mb-2" style={{ color: '#1C1917' }}>المحافظ</p>
-          <div className="grid grid-cols-1 gap-2">
-            {myWallets.map((wallet) => {
-              const pct = wallet.monthlyBudget > 0
-                ? Math.round((wallet.spent / wallet.monthlyBudget) * 100)
-                : 0;
-              const remaining = wallet.monthlyBudget - wallet.spent;
-              const isOver = remaining < 0;
-              return (
-                <div
-                  key={wallet.id}
-                  className="p-3.5 rounded-2xl"
-                  style={{
-                    background: '#FFFFFF',
-                    border: `1px solid ${isOver ? '#FECACA' : 'var(--border)'}`,
-                  }}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="font-semibold text-sm" style={{ color: '#1C1917' }}>
-                      {wallet.name}
-                    </p>
-                    <p
-                      className="text-xs font-bold"
-                      style={{ color: isOver ? '#DC2626' : '#16A34A' }}
-                    >
-                      {isOver ? 'تجاوز' : 'متبقي'} {formatCurrency(Math.abs(remaining))}
-                    </p>
+        {myWallets.length > 0 && (
+          <div>
+            <p style={{ fontSize: 13, fontWeight: 700, marginBottom: 10, color: 'var(--text-primary)' }}>المحافظ</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {myWallets.map((wallet) => {
+                const pct = wallet.monthlyBudget > 0
+                  ? Math.round((wallet.spent / wallet.monthlyBudget) * 100)
+                  : 0;
+                const remaining = wallet.monthlyBudget - wallet.spent;
+                const isOver = remaining < 0;
+                return (
+                  <div
+                    key={wallet.id}
+                    style={{
+                      padding: 14, borderRadius: 20,
+                      background: 'var(--surface-card)',
+                      border: `1px solid ${isOver ? 'rgba(249,112,102,0.30)' : 'var(--border-soft)'}`,
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                      <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>
+                        {wallet.name}
+                      </p>
+                      <p style={{ fontSize: 12, fontWeight: 700, color: isOver ? 'var(--danger)' : 'var(--success)' }}>
+                        {isOver ? 'تجاوز' : 'متبقي'} {formatCurrency(Math.abs(remaining))}
+                      </p>
+                    </div>
+                    <div style={{ height: 5, borderRadius: 5, marginBottom: 8, background: 'rgba(255,255,255,0.08)' }}>
+                      <div
+                        style={{
+                          height: 5, borderRadius: 5, transition: 'width 0.4s ease',
+                          width: `${Math.min(pct, 100)}%`,
+                          background: pct > 90 ? 'var(--danger)' : pct > 70 ? 'var(--warning)' : 'var(--success)',
+                        }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{formatCurrency(wallet.spent)}</span>
+                      <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>من {formatCurrency(wallet.monthlyBudget)} ({pct}%)</span>
+                    </div>
                   </div>
-                  <div className="h-1.5 rounded-full mb-1.5" style={{ background: '#F5F5F4' }}>
-                    <div
-                      className="h-1.5 rounded-full transition-all"
-                      style={{
-                        width: `${Math.min(pct, 100)}%`,
-                        background: pct > 90 ? '#DC2626' : pct > 70 ? '#D97706' : '#16A34A',
-                      }}
-                    />
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-xs" style={{ color: '#78716C' }}>
-                      {formatCurrency(wallet.spent)}
-                    </span>
-                    <span className="text-xs" style={{ color: '#A8A29E' }}>
-                      من {formatCurrency(wallet.monthlyBudget)} ({pct}%)
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Recent transactions */}
         <div>
-          <p className="text-sm font-bold mb-2" style={{ color: '#1C1917' }}>آخر المعاملات</p>
+          <p style={{ fontSize: 13, fontWeight: 700, marginBottom: 10, color: 'var(--text-primary)' }}>آخر المعاملات</p>
           {myExpenses.length === 0 ? (
             <EmptyState icon="💳" title="لا توجد معاملات" description="أضف أول مصروف" />
           ) : (
-            <div className="flex flex-col gap-2">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {myExpenses.slice(0, 20).map((exp) => {
                 const wallet = myWallets.find((w) => w.id === exp.walletId);
                 const addedBy = members.find((m) => m.id === exp.addedBy);
                 return (
                   <div
                     key={exp.id}
-                    className="flex items-center gap-3 p-3.5 rounded-2xl"
-                    style={{ background: '#FFFFFF', border: '1px solid var(--border)' }}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 12,
+                      padding: 14, borderRadius: 20,
+                      background: 'var(--surface-card)',
+                      border: '1px solid var(--border-soft)',
+                    }}
                   >
-                    <div className="flex-1">
-                      <p className="font-medium text-sm" style={{ color: '#1C1917' }}>
+                    <div style={{ flex: 1 }}>
+                      <p style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)' }}>
                         {exp.category}
                       </p>
-                      <div className="flex items-center gap-2 mt-0.5">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
                         {wallet && (
-                          <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: '#F5F5F4', color: '#78716C' }}>
+                          <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, background: 'rgba(255,255,255,0.07)', color: 'var(--text-muted)' }}>
                             {wallet.name}
                           </span>
                         )}
-                        <span className="text-xs" style={{ color: '#A8A29E' }}>
+                        <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
                           {formatArabicDate(exp.date)}
                         </span>
                         {addedBy && (
-                          <span className="text-xs" style={{ color: '#A8A29E' }}>
+                          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
                             · {addedBy.name}
                           </span>
                         )}
                       </div>
                       {exp.notes && (
-                        <p className="text-xs mt-0.5" style={{ color: '#78716C' }}>
-                          {exp.notes}
-                        </p>
+                        <p style={{ fontSize: 11, marginTop: 4, color: 'var(--text-muted)' }}>{exp.notes}</p>
                       )}
                     </div>
-                    <p className="font-bold text-base" style={{ color: '#DC2626' }}>
+                    <p style={{ fontSize: 16, fontWeight: 700, color: 'var(--danger)', flexShrink: 0 }}>
                       -{exp.amount.toLocaleString('ar-SA')}
                     </p>
                   </div>

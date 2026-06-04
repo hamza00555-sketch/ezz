@@ -1,13 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { ChevronRight, Lightbulb, Link2, MapPin } from 'lucide-react';
+import { ChevronRight, Link2, MapPin } from 'lucide-react';
 import { AppShell } from '@/components/layout/AppShell';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { MemberAvatar } from '@/components/shared/MemberAvatar';
 import { useAppStore } from '@/store/appStore';
-import { wishStatusLabels, wishStatusColors, priorityLabels, priorityColors } from '@/lib/utils';
+import { wishStatusLabels, priorityLabels } from '@/lib/utils';
 
 const typeIcons: Record<string, string> = {
   idea: '💡',
@@ -21,6 +21,22 @@ const typeLabels: Record<string, string> = {
   need: 'احتياج',
   link: 'رابط',
   fix: 'إصلاح',
+};
+
+const wishStatusStyle: Record<string, { bg: string; color: string }> = {
+  idea:      { bg: 'rgba(199,231,123,0.12)', color: 'var(--accent-strong)' },
+  studying:  { bg: 'var(--info-soft)',        color: 'var(--info)'          },
+  approved:  { bg: 'var(--success-soft)',     color: 'var(--success)'       },
+  done:      { bg: 'rgba(255,255,255,0.07)',  color: 'var(--text-muted)'    },
+  postponed: { bg: 'rgba(167,130,255,0.12)', color: '#A782FF'               },
+  cancelled: { bg: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)'    },
+};
+
+const priorityStyle: Record<string, { color: string }> = {
+  urgent: { color: 'var(--danger)'   },
+  high:   { color: 'var(--warning)'  },
+  medium: { color: 'var(--text-muted)' },
+  low:    { color: 'var(--text-muted)' },
 };
 
 export default function WishesPage() {
@@ -40,13 +56,13 @@ export default function WishesPage() {
       <PageHeader
         title="الأفكار والـ Wish List"
         action={
-          <Link href="/more" className="p-2">
-            <ChevronRight size={20} color="#78716C" />
+          <Link href="/more" style={{ padding: 8, display: 'block' }}>
+            <ChevronRight size={20} color="var(--text-muted)" />
           </Link>
         }
       />
 
-      <div className="p-4">
+      <div style={{ padding: '16px' }}>
         {items.length === 0 ? (
           <EmptyState
             icon="💡"
@@ -54,58 +70,58 @@ export default function WishesPage() {
             description="سجّل أفكارك واحتياجاتك المستقبلية للبيت"
           />
         ) : (
-          <div className="flex flex-col gap-5">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             {statusOrder.map((status) => {
               const group = grouped[status];
               if (!group || group.length === 0) return null;
+              const sStyle = wishStatusStyle[status] ?? wishStatusStyle.idea;
               return (
                 <div key={status}>
-                  <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: '#78716C' }}>
+                  <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', marginBottom: 10, color: sStyle.color }}>
                     {wishStatusLabels[status as keyof typeof wishStatusLabels]} ({group.length})
                   </p>
-                  <div className="flex flex-col gap-2">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {group.map((item) => {
                       const creator = members.find((m) => m.id === item.createdBy);
+                      const isDone = ['done', 'cancelled'].includes(item.status);
+                      const pStyle = priorityStyle[item.priority] ?? priorityStyle.medium;
                       return (
                         <div
                           key={item.id}
-                          className="p-3.5 rounded-2xl"
                           style={{
-                            background: ['done', 'cancelled'].includes(item.status) ? '#F9FAFB' : '#FFFFFF',
-                            border: '1px solid var(--border)',
-                            opacity: ['done', 'cancelled'].includes(item.status) ? 0.65 : 1,
+                            padding: 14, borderRadius: 20,
+                            background: 'var(--surface-card)',
+                            border: '1px solid var(--border-soft)',
+                            opacity: isDone ? 0.6 : 1,
                           }}
                         >
-                          <div className="flex items-start gap-3">
-                            <span className="text-xl flex-shrink-0 mt-0.5">{typeIcons[item.type]}</span>
-                            <div className="flex-1">
-                              <div className="flex items-start justify-between gap-2">
-                                <p
-                                  className="font-semibold text-sm"
-                                  style={{ color: '#1C1917', textDecoration: item.status === 'done' ? 'line-through' : 'none' }}
-                                >
+                          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                            <span style={{ fontSize: 22, flexShrink: 0, marginTop: 2 }}>
+                              {typeIcons[item.type]}
+                            </span>
+                            <div style={{ flex: 1 }}>
+                              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+                                <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', textDecoration: item.status === 'done' ? 'line-through' : 'none' }}>
                                   {item.title}
                                 </p>
-                                <span
-                                  className={`text-[10px] px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${wishStatusColors[item.status as keyof typeof wishStatusColors]}`}
-                                >
+                                <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, fontWeight: 600, flexShrink: 0, background: sStyle.bg, color: sStyle.color }}>
                                   {wishStatusLabels[item.status as keyof typeof wishStatusLabels]}
                                 </span>
                               </div>
                               {item.description && (
-                                <p className="text-xs mt-0.5" style={{ color: '#78716C' }}>
+                                <p style={{ fontSize: 12, marginTop: 4, color: 'var(--text-muted)' }}>
                                   {item.description}
                                 </p>
                               )}
-                              <div className="flex flex-wrap items-center gap-2 mt-1.5">
-                                <span className="text-xs" style={{ color: '#A8A29E' }}>
+                              <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, marginTop: 8 }}>
+                                <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
                                   {typeLabels[item.type]}
                                 </span>
-                                <span className={`text-xs font-medium ${priorityColors[item.priority]}`}>
+                                <span style={{ fontSize: 11, fontWeight: 600, color: pStyle.color }}>
                                   {priorityLabels[item.priority]}
                                 </span>
                                 {item.location && (
-                                  <span className="flex items-center gap-0.5 text-xs" style={{ color: '#78716C' }}>
+                                  <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'var(--text-muted)' }}>
                                     <MapPin size={10} />{item.location}
                                   </span>
                                 )}
@@ -114,16 +130,16 @@ export default function WishesPage() {
                                     href={item.link}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center gap-0.5 text-xs text-blue-500"
+                                    style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'var(--info)', textDecoration: 'none' }}
                                   >
                                     <Link2 size={10} />رابط
                                   </a>
                                 )}
                               </div>
                               {creator && (
-                                <div className="flex items-center gap-1.5 mt-2">
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10 }}>
                                   <MemberAvatar name={creator.name} size="sm" />
-                                  <span className="text-xs" style={{ color: '#A8A29E' }}>
+                                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
                                     {creator.name}
                                   </span>
                                 </div>

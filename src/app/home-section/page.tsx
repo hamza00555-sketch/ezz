@@ -7,10 +7,7 @@ import { Tabs } from '@/components/shared/Tabs';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { useAppStore } from '@/store/appStore';
 import { formatArabicDate } from '@/lib/utils';
-import {
-  Package, FileText, Wrench, MapPin, Calendar, AlertTriangle,
-  ShieldCheck, ChevronLeft
-} from 'lucide-react';
+import { Package, Wrench, MapPin, Calendar, AlertTriangle, ShieldCheck } from 'lucide-react';
 
 type HomeTab = 'items' | 'documents' | 'maintenance';
 
@@ -66,7 +63,7 @@ export default function HomeSectionPage() {
       <PageHeader title="البيت" />
       <Tabs tabs={tabs} active={activeTab} onChange={(k) => setActiveTab(k as HomeTab)} />
 
-      <div className="p-4 flex flex-col gap-3">
+      <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
         {/* ITEMS */}
         {activeTab === 'items' && (
           <>
@@ -76,63 +73,57 @@ export default function HomeSectionPage() {
               items.map((item) => (
                 <div
                   key={item.id}
-                  className="p-3.5 rounded-2xl"
-                  style={{ background: '#FFFFFF', border: '1px solid var(--border)' }}
+                  style={{
+                    padding: 14, borderRadius: 20,
+                    background: 'var(--surface-card)',
+                    border: '1px solid var(--border-soft)',
+                  }}
                 >
-                  <div className="flex items-start gap-3">
-                    <div
-                      className="p-2.5 rounded-xl flex-shrink-0"
-                      style={{ background: '#F5F5F4' }}
-                    >
-                      <Package size={20} color="#78716C" />
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                    <div style={{ padding: 10, borderRadius: 14, flexShrink: 0, background: 'rgba(255,255,255,0.07)' }}>
+                      <Package size={20} color="var(--text-muted)" strokeWidth={1.7} />
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between">
-                        <p className="font-semibold text-sm" style={{ color: '#1C1917' }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                        <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>
                           {item.name}
                         </p>
                         {item.warrantyExpiry && isExpiringSoon(item.warrantyExpiry) && (
-                          <span
-                            className="text-[10px] px-2 py-0.5 rounded-full font-medium"
-                            style={{ background: '#FEF3C7', color: '#92400E' }}
-                          >
+                          <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, fontWeight: 600, background: 'var(--warning-soft)', color: 'var(--warning)' }}>
                             ضمان قريب
                           </span>
                         )}
                       </div>
-                      <div className="flex flex-wrap gap-2 mt-1.5">
-                        <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: '#F5F5F4', color: '#78716C' }}>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 6 }}>
+                        <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, background: 'rgba(255,255,255,0.07)', color: 'var(--text-muted)' }}>
                           {itemCategoryLabels[item.category] || item.category}
                         </span>
                         {item.location && (
-                          <span className="flex items-center gap-1 text-xs" style={{ color: '#78716C' }}>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'var(--text-muted)' }}>
                             <MapPin size={10} />{item.location}
                           </span>
                         )}
                       </div>
-                      <div className="flex flex-wrap gap-3 mt-2">
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 8 }}>
                         {item.purchaseDate && (
-                          <span className="flex items-center gap-1 text-xs" style={{ color: '#A8A29E' }}>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'var(--text-muted)' }}>
                             <Calendar size={10} />شُري {formatArabicDate(item.purchaseDate)}
                           </span>
                         )}
                         {item.warrantyExpiry && (
-                          <span
-                            className="flex items-center gap-1 text-xs font-medium"
-                            style={{ color: isExpiringSoon(item.warrantyExpiry) ? '#D97706' : '#A8A29E' }}
-                          >
+                          <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 500, color: isExpiringSoon(item.warrantyExpiry) ? 'var(--warning)' : 'var(--text-muted)' }}>
                             <ShieldCheck size={10} />
                             ضمان حتى {formatArabicDate(item.warrantyExpiry)}
                           </span>
                         )}
                         {item.price && (
-                          <span className="text-xs" style={{ color: '#A8A29E' }}>
+                          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
                             {item.price.toLocaleString('ar-SA')} ريال
                           </span>
                         )}
                       </div>
                       {item.notes && (
-                        <p className="text-xs mt-1.5" style={{ color: '#78716C' }}>
+                        <p style={{ fontSize: 11, marginTop: 6, color: 'var(--text-muted)' }}>
                           {item.notes}
                         </p>
                       )}
@@ -153,43 +144,37 @@ export default function HomeSectionPage() {
               docs.map((doc) => (
                 <div
                   key={doc.id}
-                  className="p-3.5 rounded-2xl"
                   style={{
-                    background: '#FFFFFF',
-                    border: `1px solid ${isExpiringSoon(doc.expiryDate) ? '#FED7AA' : 'var(--border)'}`,
+                    padding: 14, borderRadius: 20,
+                    background: 'var(--surface-card)',
+                    border: `1px solid ${isExpiringSoon(doc.expiryDate) ? 'rgba(253,186,116,0.30)' : 'var(--border-soft)'}`,
                   }}
                 >
-                  <div className="flex items-start gap-3">
-                    <span className="text-2xl flex-shrink-0 mt-0.5">
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                    <span style={{ fontSize: 24, flexShrink: 0, marginTop: 2 }}>
                       {docTypeIcons[doc.type]}
                     </span>
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between gap-2">
-                        <p className="font-semibold text-sm" style={{ color: '#1C1917' }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+                        <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>
                           {doc.name}
                         </p>
-                        <span
-                          className="text-xs px-2 py-0.5 rounded-full flex-shrink-0"
-                          style={{ background: '#F5F5F4', color: '#78716C' }}
-                        >
+                        <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, flexShrink: 0, background: 'rgba(255,255,255,0.07)', color: 'var(--text-muted)' }}>
                           {docTypeLabels[doc.type]}
                         </span>
                       </div>
                       {doc.expiryDate && (
-                        <div className="flex items-center gap-1.5 mt-1.5">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6 }}>
                           {isExpiringSoon(doc.expiryDate) && (
-                            <AlertTriangle size={12} color="#D97706" />
+                            <AlertTriangle size={12} color="var(--warning)" />
                           )}
-                          <span
-                            className="text-xs font-medium"
-                            style={{ color: isExpiringSoon(doc.expiryDate) ? '#D97706' : '#78716C' }}
-                          >
+                          <span style={{ fontSize: 12, fontWeight: 500, color: isExpiringSoon(doc.expiryDate) ? 'var(--warning)' : 'var(--text-muted)' }}>
                             ينتهي {formatArabicDate(doc.expiryDate)}
                           </span>
                         </div>
                       )}
                       {doc.notes && (
-                        <p className="text-xs mt-1" style={{ color: '#A8A29E' }}>
+                        <p style={{ fontSize: 11, marginTop: 4, color: 'var(--text-muted)' }}>
                           {doc.notes}
                         </p>
                       )}
@@ -212,47 +197,40 @@ export default function HomeSectionPage() {
                 return (
                   <div
                     key={m.id}
-                    className="p-3.5 rounded-2xl"
-                    style={{ background: '#FFFFFF', border: '1px solid var(--border)' }}
+                    style={{ padding: 14, borderRadius: 20, background: 'var(--surface-card)', border: '1px solid var(--border-soft)' }}
                   >
-                    <div className="flex items-start gap-3">
-                      <div
-                        className="p-2.5 rounded-xl flex-shrink-0"
-                        style={{ background: '#FFF7ED' }}
-                      >
-                        <Wrench size={18} color="#C8922A" />
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                      <div style={{ padding: 10, borderRadius: 14, flexShrink: 0, background: 'rgba(176,141,87,0.15)' }}>
+                        <Wrench size={18} color="var(--bronze)" strokeWidth={1.7} />
                       </div>
-                      <div className="flex-1">
-                        <p className="font-semibold text-sm" style={{ color: '#1C1917' }}>
+                      <div style={{ flex: 1 }}>
+                        <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>
                           {m.type}
                         </p>
                         {linkedItem && (
-                          <p className="text-xs mt-0.5" style={{ color: '#78716C' }}>
+                          <p style={{ fontSize: 12, marginTop: 2, color: 'var(--text-muted)' }}>
                             {linkedItem.name}
                           </p>
                         )}
-                        <div className="flex flex-wrap gap-3 mt-1.5">
-                          <span className="flex items-center gap-1 text-xs" style={{ color: '#78716C' }}>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 6 }}>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'var(--text-muted)' }}>
                             <Calendar size={10} />{formatArabicDate(m.date)}
                           </span>
                           {m.cost && (
-                            <span className="text-xs" style={{ color: '#78716C' }}>
+                            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
                               {m.cost} ريال
                             </span>
                           )}
                           {m.performedBy && (
-                            <span className="text-xs" style={{ color: '#A8A29E' }}>
+                            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
                               بواسطة: {m.performedBy}
                             </span>
                           )}
                         </div>
                         {m.nextReminder && (
-                          <div
-                            className="flex items-center gap-1 mt-2 px-2.5 py-1.5 rounded-xl"
-                            style={{ background: '#FFF7ED' }}
-                          >
-                            <AlertTriangle size={12} color="#C8922A" />
-                            <span className="text-xs font-medium" style={{ color: '#C8922A' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 8, padding: '8px 10px', borderRadius: 12, background: 'rgba(176,141,87,0.12)' }}>
+                            <AlertTriangle size={12} color="var(--bronze)" />
+                            <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--bronze)' }}>
                               الصيانة القادمة: {formatArabicDate(m.nextReminder)}
                             </span>
                           </div>

@@ -6,17 +6,17 @@ import { PageHeader } from '@/components/shared/PageHeader';
 import { Tabs } from '@/components/shared/Tabs';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { useAppStore } from '@/store/appStore';
-import { cn, categoryLabels } from '@/lib/utils';
+import { categoryLabels } from '@/lib/utils';
 import { Clock, Heart, ChefHat, CheckCircle2, Circle } from 'lucide-react';
 import type { ShortagePriority } from '@/types';
 
 type KitchenTab = 'shortages' | 'recipes' | 'today' | 'week';
 
 const shortagePriorityColors: Record<ShortagePriority, { bg: string; text: string }> = {
-  urgent: { bg: '#FEF2F2', text: '#DC2626' },
-  high: { bg: '#FFF7ED', text: '#C8922A' },
-  medium: { bg: '#FFFBEB', text: '#D97706' },
-  low: { bg: '#F5F5F4', text: '#78716C' },
+  urgent: { bg: 'var(--danger-soft)',  text: 'var(--danger)'  },
+  high:   { bg: 'var(--warning-soft)', text: 'var(--warning)' },
+  medium: { bg: 'rgba(255,255,255,0.07)', text: 'var(--text-secondary)' },
+  low:    { bg: 'rgba(255,255,255,0.05)', text: 'var(--text-muted)'     },
 };
 
 const shortagePriorityLabels: Record<ShortagePriority, string> = {
@@ -56,7 +56,6 @@ export default function KitchenPage() {
     { key: 'week', label: 'الأسبوع' },
   ];
 
-  // Build week plan rows
   const weekDays = Array.from({ length: 7 }, (_, i) => {
     const d = new Date();
     d.setDate(d.getDate() + i);
@@ -72,7 +71,7 @@ export default function KitchenPage() {
       <PageHeader title="المطبخ" />
       <Tabs tabs={tabs} active={activeTab} onChange={(k) => setActiveTab(k as KitchenTab)} />
 
-      <div className="p-4 flex flex-col gap-3">
+      <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
         {/* SHORTAGES */}
         {activeTab === 'shortages' && (
           <>
@@ -80,22 +79,18 @@ export default function KitchenPage() {
               <EmptyState icon="🛒" title="لا توجد نواقص" description="سجّل ما ينقصك من المطبخ" />
             ) : (
               <>
-                {/* Group by status */}
                 {['missing', 'provided'].map((status) => {
                   const group = myShortages.filter((s) => s.status === status);
                   if (group.length === 0) return null;
                   return (
                     <div key={status}>
-                      <p
-                        className="text-xs font-semibold uppercase tracking-wide mb-2"
-                        style={{ color: status === 'missing' ? '#DC2626' : '#16A34A' }}
-                      >
+                      <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', marginBottom: 8, color: status === 'missing' ? 'var(--danger)' : 'var(--success)' }}>
                         {status === 'missing' ? `ناقص (${group.length})` : `✓ تم توفيره (${group.length})`}
                       </p>
-                      <div className="flex flex-col gap-2">
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                         {group
                           .sort((a, b) => {
-                            const o = { urgent: 0, high: 1, medium: 2, low: 3 };
+                            const o: Record<string, number> = { urgent: 0, high: 1, medium: 2, low: 3 };
                             return o[a.priority] - o[b.priority];
                           })
                           .map((item) => {
@@ -104,48 +99,39 @@ export default function KitchenPage() {
                             return (
                               <div
                                 key={item.id}
-                                className={cn(
-                                  'flex items-center gap-3 p-3 rounded-2xl',
-                                  !isMissing && 'opacity-60'
-                                )}
                                 style={{
-                                  background: isMissing ? '#FFFFFF' : '#F9FAFB',
-                                  border: '1px solid var(--border)',
+                                  display: 'flex', alignItems: 'center', gap: 12,
+                                  padding: 12, borderRadius: 16,
+                                  background: 'var(--surface-card)',
+                                  border: '1px solid var(--border-soft)',
+                                  opacity: isMissing ? 1 : 0.55,
                                 }}
                               >
                                 <button
                                   onClick={() => toggleShortageStatus(item.id)}
-                                  className="flex-shrink-0"
+                                  style={{ flexShrink: 0, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                                 >
                                   {isMissing ? (
-                                    <Circle size={20} color="#D6D3D1" />
+                                    <Circle size={20} color="rgba(255,255,255,0.25)" />
                                   ) : (
-                                    <CheckCircle2 size={20} color="#16A34A" />
+                                    <CheckCircle2 size={20} color="var(--success)" />
                                   )}
                                 </button>
-                                <div className="flex-1">
-                                  <p
-                                    className={cn('text-sm font-medium', !isMissing && 'line-through')}
-                                    style={{ color: '#1C1917' }}
-                                  >
+                                <div style={{ flex: 1 }}>
+                                  <p style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', textDecoration: isMissing ? 'none' : 'line-through' }}>
                                     {item.name}
                                   </p>
-                                  <div className="flex items-center gap-2 mt-0.5">
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 2 }}>
                                     {item.quantity && (
-                                      <span className="text-xs" style={{ color: '#78716C' }}>
-                                        {item.quantity}
-                                      </span>
+                                      <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{item.quantity}</span>
                                     )}
-                                    <span className="text-xs" style={{ color: '#78716C' }}>
+                                    <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
                                       {categoryLabels[item.category] || item.category}
                                     </span>
                                   </div>
                                 </div>
                                 {isMissing && (
-                                  <span
-                                    className="text-[10px] px-2 py-0.5 rounded-full font-medium flex-shrink-0"
-                                    style={{ background: pColor.bg, color: pColor.text }}
-                                  >
+                                  <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, fontWeight: 600, flexShrink: 0, background: pColor.bg, color: pColor.text }}>
                                     {shortagePriorityLabels[item.priority]}
                                   </span>
                                 )}
@@ -170,43 +156,38 @@ export default function KitchenPage() {
               myRecipes.map((recipe) => (
                 <div
                   key={recipe.id}
-                  className="p-3.5 rounded-2xl"
-                  style={{ background: '#FFFFFF', border: '1px solid var(--border)' }}
+                  style={{ padding: 14, borderRadius: 20, background: 'var(--surface-card)', border: '1px solid var(--border-soft)' }}
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="p-2.5 rounded-xl flex-shrink-0" style={{ background: '#FFF7ED' }}>
-                      <ChefHat size={20} color="#C8922A" />
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                    <div style={{ padding: 10, borderRadius: 14, flexShrink: 0, background: 'rgba(176,141,87,0.15)' }}>
+                      <ChefHat size={20} color="var(--bronze)" strokeWidth={1.7} />
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="font-semibold text-sm" style={{ color: '#1C1917' }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                        <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>
                           {recipe.name}
                         </p>
                         {recipe.favoritedBy.includes(currentUserId) && (
-                          <Heart size={14} color="#DB2777" fill="#DB2777" />
+                          <Heart size={14} color="#F472B6" fill="#F472B6" />
                         )}
                       </div>
-                      <div className="flex flex-wrap gap-2 mt-1.5">
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
                         {recipe.mealTime.map((t) => (
-                          <span
-                            key={t}
-                            className="text-[10px] px-2 py-0.5 rounded-full"
-                            style={{ background: '#F5F5F4', color: '#78716C' }}
-                          >
+                          <span key={t} style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, background: 'rgba(255,255,255,0.07)', color: 'var(--text-muted)' }}>
                             {mealTimeLabels[t]}
                           </span>
                         ))}
                         {recipe.prepTime && (
-                          <span className="flex items-center gap-1 text-xs" style={{ color: '#78716C' }}>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'var(--text-muted)' }}>
                             <Clock size={10} />{recipe.prepTime} دقيقة
                           </span>
                         )}
                       </div>
-                      <div className="mt-2">
-                        <p className="text-xs font-medium mb-1" style={{ color: '#57534E' }}>
+                      <div style={{ marginTop: 10 }}>
+                        <p style={{ fontSize: 11, fontWeight: 600, marginBottom: 4, color: 'var(--text-secondary)' }}>
                           المكونات:
                         </p>
-                        <p className="text-xs leading-relaxed" style={{ color: '#78716C' }}>
+                        <p style={{ fontSize: 12, lineHeight: 1.6, color: 'var(--text-muted)' }}>
                           {recipe.ingredients.join(' · ')}
                         </p>
                       </div>
@@ -220,30 +201,22 @@ export default function KitchenPage() {
 
         {/* TODAY'S MEALS */}
         {activeTab === 'today' && (
-          <div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {(['breakfast', 'lunch', 'dinner'] as const).map((meal) => {
               const icons = { breakfast: '🌅', lunch: '☀️', dinner: '🌙' };
               const mealValue = todayPlan?.[meal];
               return (
-                <div
-                  key={meal}
-                  className="mb-3 p-4 rounded-2xl"
-                  style={{ background: '#FFFFFF', border: '1px solid var(--border)' }}
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-lg">{icons[meal]}</span>
-                    <span className="font-semibold text-sm" style={{ color: '#1C1917' }}>
+                <div key={meal} style={{ padding: 16, borderRadius: 20, background: 'var(--surface-card)', border: '1px solid var(--border-soft)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                    <span style={{ fontSize: 18 }}>{icons[meal]}</span>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>
                       {mealTimeLabels[meal]}
                     </span>
                   </div>
                   {mealValue ? (
-                    <p className="text-sm" style={{ color: '#57534E' }}>
-                      {mealValue}
-                    </p>
+                    <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{mealValue}</p>
                   ) : (
-                    <p className="text-sm" style={{ color: '#A8A29E' }}>
-                      لم يُحدد بعد
-                    </p>
+                    <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>لم يُحدد بعد</p>
                   )}
                 </div>
               );
@@ -253,44 +226,38 @@ export default function KitchenPage() {
 
         {/* WEEK PLAN */}
         {activeTab === 'week' && (
-          <div className="flex flex-col gap-2">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {weekDays.map(({ date, dateStr, plan, dayLabel }) => {
               const isToday = dateStr === new Date().toISOString().split('T')[0];
               return (
                 <div
                   key={dateStr}
-                  className="p-3.5 rounded-2xl"
                   style={{
-                    background: isToday ? '#FFF7ED' : '#FFFFFF',
-                    border: `1px solid ${isToday ? '#FED7AA' : 'var(--border)'}`,
+                    padding: 14, borderRadius: 20,
+                    background: isToday ? 'rgba(176,141,87,0.10)' : 'var(--surface-card)',
+                    border: `1px solid ${isToday ? 'rgba(176,141,87,0.35)' : 'var(--border-soft)'}`,
                   }}
                 >
-                  <div className="flex items-center gap-2 mb-2">
-                    <span
-                      className="font-bold text-sm"
-                      style={{ color: isToday ? '#C8922A' : '#1C1917' }}
-                    >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: isToday ? 'var(--bronze)' : 'var(--text-primary)' }}>
                       {dayLabel}
                     </span>
-                    <span className="text-xs" style={{ color: '#78716C' }}>
+                    <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
                       {date.getDate()}/{date.getMonth() + 1}
                     </span>
                     {isToday && (
-                      <span
-                        className="text-[10px] px-2 py-0.5 rounded-full font-medium"
-                        style={{ background: '#C8922A', color: '#FFFFFF' }}
-                      >
+                      <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, fontWeight: 600, background: 'var(--bronze)', color: '#0D0F12' }}>
                         اليوم
                       </span>
                     )}
                   </div>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
                     {(['breakfast', 'lunch', 'dinner'] as const).map((meal) => (
                       <div key={meal}>
-                        <p className="text-[10px] font-medium mb-1" style={{ color: '#A8A29E' }}>
+                        <p style={{ fontSize: 10, fontWeight: 600, marginBottom: 4, color: 'var(--text-muted)' }}>
                           {mealTimeLabels[meal]}
                         </p>
-                        <p className="text-xs" style={{ color: plan?.[meal] ? '#57534E' : '#D6D3D1' }}>
+                        <p style={{ fontSize: 12, color: plan?.[meal] ? 'var(--text-secondary)' : 'rgba(255,255,255,0.15)' }}>
                           {plan?.[meal] || '—'}
                         </p>
                       </div>

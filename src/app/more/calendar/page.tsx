@@ -22,7 +22,6 @@ export default function CalendarPage() {
 
   const entries: CalEntry[] = [];
 
-  // Tasks with due dates
   tasks
     .filter((t) => t.familyGroupId === currentFamilyGroupId && t.dueDate && !['done', 'cancelled'].includes(t.status))
     .forEach((t) => {
@@ -36,7 +35,6 @@ export default function CalendarPage() {
       });
     });
 
-  // Maintenance reminders
   maintenance
     .filter((m) => m.familyGroupId === currentFamilyGroupId && m.nextReminder)
     .forEach((m) => {
@@ -50,7 +48,6 @@ export default function CalendarPage() {
       });
     });
 
-  // Warranty expiry
   homeItems
     .filter((i) => i.familyGroupId === currentFamilyGroupId && i.warrantyExpiry)
     .forEach((i) => {
@@ -67,7 +64,6 @@ export default function CalendarPage() {
       }
     });
 
-  // Document expiry
   documents
     .filter((d) => d.familyGroupId === currentFamilyGroupId && d.expiryDate)
     .forEach((d) => {
@@ -83,13 +79,12 @@ export default function CalendarPage() {
   entries.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   const typeConfig = {
-    task: { icon: CheckSquare, color: '#2563EB', bg: '#EFF6FF', label: 'مهمة' },
-    maintenance: { icon: Wrench, color: '#C8922A', bg: '#FFF7ED', label: 'صيانة' },
-    warranty: { icon: ShieldAlert, color: '#7C3AED', bg: '#F5F3FF', label: 'ضمان' },
-    document: { icon: FileWarning, color: '#DC2626', bg: '#FEF2F2', label: 'وثيقة' },
+    task:        { icon: CheckSquare,  color: 'var(--info)',    bg: 'var(--info-soft)',            label: 'مهمة'  },
+    maintenance: { icon: Wrench,       color: 'var(--bronze)',  bg: 'rgba(176,141,87,0.15)',        label: 'صيانة' },
+    warranty:    { icon: ShieldAlert,  color: '#A782FF',        bg: 'rgba(167,130,255,0.12)',       label: 'ضمان'  },
+    document:    { icon: FileWarning,  color: 'var(--danger)',  bg: 'var(--danger-soft)',           label: 'وثيقة' },
   };
 
-  // Group by relative period
   const upcoming: CalEntry[] = [];
   const later: CalEntry[] = [];
   const overdue: CalEntry[] = [];
@@ -106,40 +101,38 @@ export default function CalendarPage() {
   const renderGroup = (label: string, group: CalEntry[], labelColor: string) => {
     if (group.length === 0) return null;
     return (
-      <div key={label} className="mb-5">
-        <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: labelColor }}>
+      <div key={label} style={{ marginBottom: 20 }}>
+        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', marginBottom: 10, color: labelColor }}>
           {label} ({group.length})
         </p>
-        <div className="flex flex-col gap-2">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {group.map((e) => {
             const cfg = typeConfig[e.type];
             const Icon = cfg.icon;
             return (
               <div
                 key={`${e.type}-${e.id}`}
-                className="flex items-center gap-3 p-3.5 rounded-2xl"
                 style={{
-                  background: '#FFFFFF',
-                  border: `1px solid ${e.isUrgent ? '#FECACA' : 'var(--border)'}`,
+                  display: 'flex', alignItems: 'center', gap: 12,
+                  padding: 14, borderRadius: 20,
+                  background: 'var(--surface-card)',
+                  border: `1px solid ${e.isUrgent ? 'rgba(249,112,102,0.30)' : 'var(--border-soft)'}`,
                 }}
               >
-                <div className="p-2.5 rounded-xl flex-shrink-0" style={{ background: cfg.bg }}>
-                  <Icon size={16} color={cfg.color} />
+                <div style={{ padding: 10, borderRadius: 14, flexShrink: 0, background: cfg.bg }}>
+                  <Icon size={16} color={cfg.color} strokeWidth={1.8} />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate" style={{ color: '#1C1917' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {e.title}
                   </p>
                   {e.subtitle && (
-                    <p className="text-xs" style={{ color: '#78716C' }}>
+                    <p style={{ fontSize: 11, marginTop: 2, color: 'var(--text-muted)' }}>
                       {e.subtitle}
                     </p>
                   )}
                 </div>
-                <span
-                  className="text-xs font-medium flex-shrink-0"
-                  style={{ color: e.isUrgent ? '#DC2626' : '#78716C' }}
-                >
+                <span style={{ fontSize: 11, fontWeight: 500, flexShrink: 0, color: e.isUrgent ? 'var(--danger)' : 'var(--text-muted)' }}>
                   {formatArabicDate(e.date)}
                 </span>
               </div>
@@ -155,20 +148,20 @@ export default function CalendarPage() {
       <PageHeader
         title="التقويم"
         action={
-          <Link href="/more" className="p-2">
-            <ChevronRight size={20} color="#78716C" />
+          <Link href="/more" style={{ padding: 8, display: 'block' }}>
+            <ChevronRight size={20} color="var(--text-muted)" />
           </Link>
         }
       />
 
-      <div className="p-4">
+      <div style={{ padding: '16px' }}>
         {entries.length === 0 ? (
           <EmptyState icon="📅" title="لا توجد أحداث" description="المهام والصيانة والضمانات ستظهر هنا" />
         ) : (
           <>
-            {renderGroup('متأخر', overdue, '#DC2626')}
-            {renderGroup('هذا الأسبوع', upcoming, '#D97706')}
-            {renderGroup('قادم', later, '#78716C')}
+            {renderGroup('متأخر', overdue, 'var(--danger)')}
+            {renderGroup('هذا الأسبوع', upcoming, 'var(--warning)')}
+            {renderGroup('قادم', later, 'var(--text-muted)')}
           </>
         )}
       </div>
