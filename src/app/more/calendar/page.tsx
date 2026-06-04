@@ -17,6 +17,13 @@ interface CalEntry {
   isUrgent?: boolean;
 }
 
+const typeConfig = {
+  task:        { icon: CheckSquare, color: 'var(--accent-strong)', bg: 'rgba(163,177,138,0.14)', label: 'مهمة'  },
+  maintenance: { icon: Wrench,      color: 'var(--bronze)',        bg: 'rgba(176,141,87,0.15)',  label: 'صيانة' },
+  warranty:    { icon: ShieldAlert, color: '#C5A3FF',              bg: 'rgba(197,163,255,0.12)', label: 'ضمان'  },
+  document:    { icon: FileWarning, color: 'var(--danger)',        bg: 'var(--danger-soft)',      label: 'وثيقة' },
+};
+
 export default function CalendarPage() {
   const { tasks, maintenance, homeItems, documents, currentFamilyGroupId } = useAppStore();
 
@@ -43,7 +50,7 @@ export default function CalendarPage() {
         id: m.id,
         date: m.nextReminder!,
         title: m.type,
-        subtitle: item?.name || 'صيانة',
+        subtitle: item?.name ?? 'صيانة',
         type: 'maintenance',
       });
     });
@@ -78,52 +85,107 @@ export default function CalendarPage() {
 
   entries.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-  const typeConfig = {
-    task:        { icon: CheckSquare,  color: 'var(--info)',    bg: 'var(--info-soft)',            label: 'مهمة'  },
-    maintenance: { icon: Wrench,       color: 'var(--bronze)',  bg: 'rgba(176,141,87,0.15)',        label: 'صيانة' },
-    warranty:    { icon: ShieldAlert,  color: '#A782FF',        bg: 'rgba(167,130,255,0.12)',       label: 'ضمان'  },
-    document:    { icon: FileWarning,  color: 'var(--danger)',  bg: 'var(--danger-soft)',           label: 'وثيقة' },
-  };
+  const todayStr    = new Date().toISOString().split('T')[0];
+  const sevenDays   = new Date(Date.now() + 604800000);
+  const now         = new Date();
 
-  const upcoming: CalEntry[] = [];
-  const later: CalEntry[] = [];
-  const overdue: CalEntry[] = [];
+  const overdue:  CalEntry[] = [];
+  const today:    CalEntry[] = [];
+  const week:     CalEntry[] = [];
+  const later:    CalEntry[] = [];
 
   entries.forEach((e) => {
     const d = new Date(e.date);
-    const now = new Date();
-    const sevenDays = new Date(Date.now() + 604800000);
-    if (d < now) overdue.push(e);
-    else if (d <= sevenDays) upcoming.push(e);
-    else later.push(e);
+    const dStr = e.date.slice(0, 10);
+    if (d < now && dStr < todayStr) {
+      overdue.push(e);
+    } else if (dStr === todayStr) {
+      today.push(e);
+    } else if (d <= sevenDays) {
+      week.push(e);
+    } else {
+      later.push(e);
+    }
   });
 
-  const renderGroup = (label: string, group: CalEntry[], labelColor: string) => {
+  const renderGroup = (
+    label: string,
+    group: CalEntry[],
+    labelColor: string,
+    isOverdueGroup = false,
+  ) => {
     if (group.length === 0) return null;
     return (
-      <div key={label} style={{ marginBottom: 20 }}>
-        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', marginBottom: 10, color: labelColor }}>
-          {label} ({group.length})
-        </p>
+      <div style={{ marginBottom: 24 }}>
+        {/* Section label */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+          {isOverdueGroup && (
+            <span
+              style={{
+                width: 8, height: 8, borderRadius: '50%',
+                background: 'var(--danger)',
+                flexShrink: 0,
+                boxShadow: '0 0 6px rgba(249,112,102,0.5)',
+              }}
+            />
+          )}
+          <p
+            style={{
+              fontSize: 11, fontWeight: 700, letterSpacing: '0.07em',
+              color: labelColor, textTransform: 'uppercase',
+            }}
+          >
+            {label}
+          </p>
+          <span
+            style={{
+              fontSize: 11, padding: '1px 7px', borderRadius: 10,
+              background: 'rgba(255,255,255,0.06)',
+              color: 'var(--text-muted)', fontWeight: 600,
+            }}
+          >
+            {group.length}
+          </span>
+        </div>
+
+        {/* Entry cards */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {group.map((e) => {
             const cfg = typeConfig[e.type];
             const Icon = cfg.icon;
+            const showOverdueBorder = isOverdueGroup || e.isUrgent;
             return (
               <div
                 key={`${e.type}-${e.id}`}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 12,
-                  padding: 14, borderRadius: 20,
-                  background: 'var(--surface-card)',
-                  border: `1px solid ${e.isUrgent ? 'rgba(249,112,102,0.30)' : 'var(--border-soft)'}`,
+                  padding: '12px 14px', borderRadius: 18,
+                  background: isOverdueGroup
+                    ? 'rgba(249,112,102,0.06)'
+                    : 'var(--surface-card)',
+                  border: `1px solid ${showOverdueBorder ? 'rgba(249,112,102,0.25)' : 'var(--border-soft)'}`,
                 }}
               >
-                <div style={{ padding: 10, borderRadius: 14, flexShrink: 0, background: cfg.bg }}>
+                {/* Icon bubble */}
+                <div
+                  style={{
+                    width: 38, height: 38, borderRadius: 12, flexShrink: 0,
+                    background: cfg.bg,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}
+                >
                   <Icon size={16} color={cfg.color} strokeWidth={1.8} />
                 </div>
+
+                {/* Text */}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <p
+                    style={{
+                      fontSize: 13, fontWeight: 600,
+                      color: 'var(--text-primary)',
+                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    }}
+                  >
                     {e.title}
                   </p>
                   {e.subtitle && (
@@ -132,9 +194,28 @@ export default function CalendarPage() {
                     </p>
                   )}
                 </div>
-                <span style={{ fontSize: 11, fontWeight: 500, flexShrink: 0, color: e.isUrgent ? 'var(--danger)' : 'var(--text-muted)' }}>
-                  {formatArabicDate(e.date)}
-                </span>
+
+                {/* Right side: date + type badge */}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, flexShrink: 0 }}>
+                  <span
+                    style={{
+                      fontSize: 10, fontWeight: 600,
+                      padding: '2px 8px', borderRadius: 10,
+                      background: cfg.bg,
+                      color: cfg.color,
+                    }}
+                  >
+                    {cfg.label}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: 11, fontWeight: 500,
+                      color: (isOverdueGroup || e.isUrgent) ? 'var(--danger)' : 'var(--text-muted)',
+                    }}
+                  >
+                    {formatArabicDate(e.date)}
+                  </span>
+                </div>
               </div>
             );
           })}
@@ -147,6 +228,7 @@ export default function CalendarPage() {
     <AppShell>
       <PageHeader
         title="التقويم"
+        subtitle="المواعيد والتنبيهات القادمة"
         action={
           <Link href="/more" style={{ padding: 8, display: 'block' }}>
             <ChevronRight size={20} color="var(--text-muted)" />
@@ -159,8 +241,9 @@ export default function CalendarPage() {
           <EmptyState icon="📅" title="لا توجد أحداث" description="المهام والصيانة والضمانات ستظهر هنا" />
         ) : (
           <>
-            {renderGroup('متأخر', overdue, 'var(--danger)')}
-            {renderGroup('هذا الأسبوع', upcoming, 'var(--warning)')}
+            {renderGroup('متأخر', overdue, 'var(--danger)', true)}
+            {renderGroup('اليوم', today, 'var(--accent-strong)')}
+            {renderGroup('هذا الأسبوع', week, 'var(--warning)')}
             {renderGroup('قادم', later, 'var(--text-muted)')}
           </>
         )}

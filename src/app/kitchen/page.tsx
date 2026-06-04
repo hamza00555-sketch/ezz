@@ -125,11 +125,12 @@ export default function KitchenPage() {
   const [parsed, setParsed]                 = useState<ParsedRecipe | null>(null);
   const [parsedName, setParsedName]         = useState('');
   const [parsedMealTime, setParsedMealTime] = useState<MealTime[]>([]);
+  const [quickAddVal, setQuickAddVal]       = useState('');
 
   const {
     shortages, recipes, mealPlans, members,
     currentFamilyGroupId, currentUserId,
-    toggleShortageStatus, addMealOption, removeMealOption, addRecipe,
+    toggleShortageStatus, addMealOption, removeMealOption, addRecipe, addShortage,
   } = useAppStore();
 
   const currentMember = members.find((m) => m.id === currentUserId);
@@ -197,6 +198,19 @@ export default function KitchenPage() {
 
   // ─── Import handlers ──────────────────────────────────────────────────────
 
+  function handleQuickAdd() {
+    if (!quickAddVal.trim() || !canEdit) return;
+    addShortage({
+      familyGroupId: currentFamilyGroupId,
+      name: quickAddVal.trim(),
+      category: 'other',
+      priority: 'medium',
+      status: 'missing',
+      addedBy: currentUserId,
+    });
+    setQuickAddVal('');
+  }
+
   function closeImport() {
     setImportOpen(false);
     setImportText('');
@@ -222,7 +236,7 @@ export default function KitchenPage() {
 
   return (
     <AppShell>
-      <PageHeader title="المطبخ" />
+      <PageHeader title="المطبخ" subtitle="النواقص والطلبات اليومية" />
       <Tabs tabs={tabs} active={activeTab} onChange={(k) => setActiveTab(k as KitchenTab)} />
 
       <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -461,6 +475,63 @@ export default function KitchenPage() {
         {/* ─── SHORTAGES ────────────────────────────────────────────────────────── */}
         {activeTab === 'shortages' && (
           <>
+            {/* Quick add */}
+            {canEdit && (
+              <div style={{ display: 'flex', gap: 8 }}>
+                <input
+                  value={quickAddVal}
+                  onChange={(e) => setQuickAddVal(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleQuickAdd()}
+                  placeholder="وش ناقص؟"
+                  style={{
+                    flex: 1, padding: '11px 14px', borderRadius: 14,
+                    background: 'var(--surface-card)',
+                    border: '1px solid var(--border-soft)',
+                    color: 'var(--text-primary)', fontSize: 14,
+                    fontFamily: 'inherit', direction: 'rtl', outline: 'none',
+                  }}
+                />
+                <button
+                  onClick={handleQuickAdd}
+                  disabled={!quickAddVal.trim()}
+                  style={{
+                    padding: '11px 18px', borderRadius: 14,
+                    background: quickAddVal.trim() ? 'rgba(163,177,138,0.18)' : 'rgba(255,255,255,0.05)',
+                    border: `1px solid ${quickAddVal.trim() ? 'rgba(163,177,138,0.35)' : 'rgba(255,255,255,0.08)'}`,
+                    color: quickAddVal.trim() ? 'var(--accent-strong)' : 'var(--text-muted)',
+                    fontSize: 13, fontWeight: 700,
+                    cursor: quickAddVal.trim() ? 'pointer' : 'not-allowed',
+                    fontFamily: 'inherit', whiteSpace: 'nowrap',
+                  }}
+                >
+                  إضافة
+                </button>
+              </div>
+            )}
+
+            {/* Summary chips */}
+            {myShortages.length > 0 && (() => {
+              const urgentCount   = myShortages.filter((s) => s.status === 'missing' && (s.priority === 'urgent' || s.priority === 'high')).length;
+              const providedCount = myShortages.filter((s) => s.status === 'provided').length;
+              return (
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: 12, padding: '5px 12px', borderRadius: 20, background: 'rgba(255,255,255,0.06)', color: 'var(--text-secondary)', border: '1px solid var(--border-soft)' }}>
+                    🛒 ناقص {missingCount}
+                  </span>
+                  {urgentCount > 0 && (
+                    <span style={{ fontSize: 12, padding: '5px 12px', borderRadius: 20, background: 'var(--danger-soft)', color: 'var(--danger)', border: '1px solid rgba(249,112,102,0.22)' }}>
+                      ⚡ عاجل {urgentCount}
+                    </span>
+                  )}
+                  {providedCount > 0 && (
+                    <span style={{ fontSize: 12, padding: '5px 12px', borderRadius: 20, background: 'var(--success-soft)', color: 'var(--success)', border: '1px solid rgba(134,239,172,0.22)' }}>
+                      ✓ تم توفيره {providedCount}
+                    </span>
+                  )}
+                </div>
+              );
+            })()}
+
             {myShortages.length === 0 ? (
               <EmptyState icon="🛒" title="لا توجد نواقص" description="سجّل ما ينقصك من المطبخ" />
             ) : (
