@@ -82,7 +82,7 @@ export default function TasksPage() {
       <div
         style={{
           position: 'sticky', top: 0, zIndex: 20,
-          padding: '16px 16px 0',
+          padding: 'calc(16px + env(safe-area-inset-top, 0px)) 16px 0',
           background: 'var(--bg-app)',
           borderBottom: '1px solid var(--border-soft)',
         }}
