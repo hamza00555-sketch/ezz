@@ -71,6 +71,7 @@ const mockFamilyGroups: FamilyGroup[] = [
     emoji: '🏡',
     color: '#C8922A',
     members: ['member-1', 'member-2', 'member-3', 'member-4'],
+    inviteCode: 'EZZ12345',
     createdBy: 'member-1',
     createdAt: '2024-01-01',
     updatedAt: '2024-01-01',

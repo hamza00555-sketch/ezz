@@ -53,6 +53,7 @@ export interface FamilyGroup {
   emoji: string;
   color: string;
   members: string[]; // member IDs
+  inviteCode?: string;
   createdBy: string;
   createdAt: string;
   updatedAt: string;

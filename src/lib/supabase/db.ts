@@ -36,6 +36,7 @@ function toFamilyGroup(r: any, memberIds: string[]): FamilyGroup {
     emoji: r.emoji ?? '🏡',
     color: r.color ?? '#C8922A',
     members: memberIds,
+    inviteCode: r.invite_code,
     createdBy: r.created_by ?? '',
     createdAt: r.created_at,
     updatedAt: r.updated_at,

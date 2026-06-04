@@ -40,6 +40,7 @@ function NavItem({ href, icon: Icon, label, active }: { href: string; icon: Reac
   return (
     <Link
       href={href}
+      prefetch={true}
       style={{
         flex: 1,
         display: 'flex',

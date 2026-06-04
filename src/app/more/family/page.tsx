@@ -1,7 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Copy, Share2, Check } from 'lucide-react';
 import { AppShell } from '@/components/layout/AppShell';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { MemberAvatar } from '@/components/shared/MemberAvatar';
@@ -14,8 +15,34 @@ const roleStyle: Record<string, { bg: string; color: string }> = {
 };
 
 export default function FamilyPage() {
-  const { members, tasks, currentFamilyGroupId, currentUserId } = useAppStore();
+  const { members, tasks, familyGroups, currentFamilyGroupId, currentUserId } = useAppStore();
   const familyMembers = members.filter((m) => m.familyGroupId === currentFamilyGroupId);
+  const familyGroup   = familyGroups.find((g) => g.id === currentFamilyGroupId);
+  const currentMember = members.find((m) => m.id === currentUserId);
+  const canInvite     = currentMember?.role === 'family_admin' || !!currentMember?.permissions.canInviteMembers;
+
+  const [copied, setCopied] = useState(false);
+
+  const inviteCode = familyGroup?.inviteCode;
+  const shareText  = `انضم لبيتنا "${familyGroup?.name ?? 'عز'}" على تطبيق عز بالكود: ${inviteCode}`;
+
+  function handleCopy() {
+    if (!inviteCode) return;
+    navigator.clipboard.writeText(inviteCode).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  function handleShare() {
+    if (!inviteCode) return;
+    if (navigator.share) {
+      navigator.share({ text: shareText }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(shareText).catch(() => {});
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  }
 
   const getActiveTasks = (memberId: string) =>
     tasks.filter(
@@ -38,6 +65,88 @@ export default function FamilyPage() {
       />
 
       <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+
+        {/* ── Invite Code Card ─────────────────────────────────────────────── */}
+        {canInvite && inviteCode && (
+          <div
+            style={{
+              padding: '16px 18px',
+              borderRadius: 22,
+              background: 'linear-gradient(135deg, rgba(176,141,87,0.10) 0%, rgba(176,141,87,0.04) 100%)',
+              border: '1px solid rgba(176,141,87,0.30)',
+              marginBottom: 4,
+            }}
+          >
+            <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--bronze)', marginBottom: 10, letterSpacing: '0.05em' }}>
+              🔗 كود دعوة البيت
+            </p>
+
+            {/* Code display */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+              <span
+                style={{
+                  flex: 1,
+                  fontFamily: 'monospace',
+                  fontSize: 28,
+                  fontWeight: 900,
+                  letterSpacing: '0.25em',
+                  color: 'var(--text-primary)',
+                  direction: 'ltr',
+                  textAlign: 'center',
+                  padding: '10px 14px',
+                  borderRadius: 14,
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.10)',
+                }}
+              >
+                {inviteCode}
+              </span>
+            </div>
+
+            <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 12, lineHeight: 1.5 }}>
+              شارك هذا الكود مع أفراد عائلتك — يُدخلونه عند إنشاء حسابهم للانضمام للبيت
+            </p>
+
+            {/* Action buttons */}
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button
+                onClick={handleCopy}
+                style={{
+                  flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                  padding: '10px 16px', borderRadius: 14,
+                  background: copied ? 'rgba(163,177,138,0.18)' : 'rgba(255,255,255,0.07)',
+                  border: `1px solid ${copied ? 'rgba(163,177,138,0.35)' : 'rgba(255,255,255,0.12)'}`,
+                  cursor: 'pointer', fontFamily: 'inherit',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                {copied
+                  ? <Check size={14} color="var(--accent-strong)" />
+                  : <Copy size={14} color="var(--text-muted)" />
+                }
+                <span style={{ fontSize: 12, fontWeight: 600, color: copied ? 'var(--accent-strong)' : 'var(--text-secondary)' }}>
+                  {copied ? 'تم النسخ' : 'نسخ الكود'}
+                </span>
+              </button>
+
+              <button
+                onClick={handleShare}
+                style={{
+                  flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                  padding: '10px 16px', borderRadius: 14,
+                  background: 'rgba(176,141,87,0.15)',
+                  border: '1px solid rgba(176,141,87,0.30)',
+                  cursor: 'pointer', fontFamily: 'inherit',
+                }}
+              >
+                <Share2 size={14} color="var(--bronze)" />
+                <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--bronze)' }}>مشاركة</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ── Members list ─────────────────────────────────────────────────── */}
         {familyMembers.map((member) => {
           const activeTasks = getActiveTasks(member.id);
           const isCurrentUser = member.id === currentUserId;
@@ -78,7 +187,6 @@ export default function FamilyPage() {
                 </div>
               </div>
 
-              {/* Permissions */}
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 14 }}>
                 {member.permissions.canManageTasks && (
                   <span style={{ fontSize: 10, padding: '4px 10px', borderRadius: 10, background: 'var(--info-soft)', color: 'var(--info)' }}>
@@ -98,6 +206,11 @@ export default function FamilyPage() {
                 {member.permissions.canInviteMembers && (
                   <span style={{ fontSize: 10, padding: '4px 10px', borderRadius: 10, background: 'rgba(167,130,255,0.12)', color: '#A782FF' }}>
                     دعوة أفراد
+                  </span>
+                )}
+                {member.permissions.canManageKitchen && (
+                  <span style={{ fontSize: 10, padding: '4px 10px', borderRadius: 10, background: 'rgba(232,121,249,0.10)', color: '#E879F9' }}>
+                    إدارة المطبخ
                   </span>
                 )}
               </div>
