@@ -39,7 +39,14 @@ export default function SignupPage() {
       if (authError) throw authError;
       router.push('/onboarding');
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'حدث خطأ، حاول مجدداً');
+      if (err instanceof Error) {
+        // AuthApiError has status + code
+        const anyErr = err as Error & { status?: number; code?: string };
+        const detail = anyErr.status ? ` (${anyErr.status})` : '';
+        setError(err.message + detail);
+      } else {
+        setError('حدث خطأ غير معروف');
+      }
     } finally {
       setLoading(false);
     }
