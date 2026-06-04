@@ -217,29 +217,29 @@ export function BottomNav() {
         <button
           onClick={() => setSheetOpen((p) => !p)}
           style={{
-            width: 50,
-            height: 50,
-            borderRadius: 18,
+            width: 58,
+            height: 58,
+            borderRadius: 22,
             flexShrink: 0,
             background: sheetOpen
               ? 'rgba(255,255,255,0.12)'
               : 'linear-gradient(135deg, var(--accent), var(--accent-strong))',
-            border: '1px solid rgba(255,255,255,0.15)',
+            border: '1.5px solid rgba(255,255,255,0.18)',
             boxShadow: sheetOpen
               ? '0 4px 20px rgba(0,0,0,0.3)'
-              : '0 4px 24px rgba(163,177,138,0.4)',
+              : '0 6px 32px rgba(163,177,138,0.55), 0 2px 8px rgba(0,0,0,0.3)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
             transition: 'all 0.2s ease',
-            margin: '0 6px',
+            margin: '0 4px',
           }}
           className="active:scale-90"
         >
           {sheetOpen
-            ? <X size={20} color="var(--text-primary)" strokeWidth={2.5} />
-            : <Plus size={24} color="#0D0F12" strokeWidth={2.8} />
+            ? <X size={22} color="var(--text-primary)" strokeWidth={2.5} />
+            : <Plus size={27} color="#0D0F12" strokeWidth={2.8} />
           }
         </button>
 

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Clock, RotateCcw } from 'lucide-react';
 import { useAppStore } from '@/store/appStore';
 import { MemberAvatar } from '@/components/shared/MemberAvatar';
-import { formatArabicDate, isOverdue, taskStatusLabels, categoryLabels, cn } from '@/lib/utils';
+import { formatArabicDate, isOverdue, taskStatusLabels, priorityLabels, categoryLabels, cn } from '@/lib/utils';
 import type { Task } from '@/types';
 
 const priorityConfig: Record<string, { bar: string; badge: string; badgeText: string }> = {
@@ -107,6 +107,18 @@ export function TaskCard({ task, showAssignee = true }: TaskCardProps) {
             )}
 
             <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
+              {/* Priority badge */}
+              {!isDone && (
+                <span
+                  style={{
+                    fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 10,
+                    background: pCfg.badge, color: pCfg.badgeText,
+                  }}
+                >
+                  {priorityLabels[task.priority]}
+                </span>
+              )}
+
               {/* Status badge */}
               <span
                 style={{
@@ -145,6 +157,36 @@ export function TaskCard({ task, showAssignee = true }: TaskCardProps) {
                 </span>
               )}
             </div>
+
+            {/* CTA row */}
+            {!isDone && (
+              <div style={{ display: 'flex', gap: 8, marginTop: 10, justifyContent: 'flex-end' }}>
+                {task.status !== 'postponed' && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); updateTaskStatus(task.id, 'postponed'); }}
+                    style={{
+                      fontSize: 11, fontWeight: 600, padding: '5px 12px', borderRadius: 12,
+                      background: 'rgba(167,130,255,0.08)',
+                      border: '1px solid rgba(167,130,255,0.20)',
+                      color: '#A782FF', cursor: 'pointer', fontFamily: 'inherit',
+                    }}
+                  >
+                    تأجيل
+                  </button>
+                )}
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleToggle(); }}
+                  style={{
+                    fontSize: 11, fontWeight: 700, padding: '5px 14px', borderRadius: 12,
+                    background: 'rgba(163,177,138,0.14)',
+                    border: '1px solid rgba(163,177,138,0.30)',
+                    color: 'var(--accent-strong)', cursor: 'pointer', fontFamily: 'inherit',
+                  }}
+                >
+                  تم ✓
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Assignee */}

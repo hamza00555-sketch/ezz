@@ -236,7 +236,7 @@ export default function KitchenPage() {
 
   return (
     <AppShell>
-      <PageHeader title="المطبخ" subtitle="النواقص والطلبات اليومية" />
+      <PageHeader title="المطبخ" subtitle="وجبات البيت ونواقص المطبخ" />
       <Tabs tabs={tabs} active={activeTab} onChange={(k) => setActiveTab(k as KitchenTab)} />
 
       <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -244,9 +244,6 @@ export default function KitchenPage() {
         {/* ─── TODAY ────────────────────────────────────────────────────────────── */}
         {activeTab === 'today' && (
           <>
-            <p style={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', paddingBottom: 2 }}>
-              وجبات اليوم — يُختار عشوائياً من خيارات الأسبوع
-            </p>
             {meals.map((meal) => {
               const options = todayPlan?.[meal] ?? [];
               const idx = Math.min(mealIndices[meal], options.length - 1);
@@ -257,39 +254,53 @@ export default function KitchenPage() {
                 <div
                   key={meal}
                   style={{
-                    padding: 18, borderRadius: 22,
-                    background: 'var(--surface-card)',
-                    border: '1px solid var(--border-soft)',
+                    padding: '20px 20px 18px',
+                    borderRadius: 24,
+                    background: selected ? 'var(--surface-card)' : 'rgba(255,255,255,0.02)',
+                    border: `1px solid ${selected ? 'var(--border-soft)' : 'rgba(255,255,255,0.05)'}`,
                   }}
                 >
                   {/* Meal header */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-                    <span style={{ fontSize: 24 }}>{mealIcons[meal]}</span>
-                    <p style={{ flex: 1, fontSize: 13, fontWeight: 700, color: 'var(--text-secondary)' }}>
-                      {mealLabels[meal]}
-                    </p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: selected ? 14 : 0 }}>
+                    <div style={{
+                      width: 46, height: 46, borderRadius: 16, flexShrink: 0,
+                      background: 'rgba(255,255,255,0.05)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <span style={{ fontSize: 24, lineHeight: 1 }}>{mealIcons[meal]}</span>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 2 }}>
+                        {mealLabels[meal]}
+                      </p>
+                      {!selected && (
+                        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.18)' }}>
+                          لم تُضَف وجبات — افتح تاب الأسبوع لإضافة خيارات
+                        </p>
+                      )}
+                    </div>
                     {options.length > 1 && (
                       <button
                         onClick={() => rerollMeal(meal)}
                         title="خيار آخر"
                         style={{
                           display: 'flex', alignItems: 'center', gap: 5,
-                          padding: '5px 12px', borderRadius: 20,
-                          background: 'rgba(255,255,255,0.07)',
+                          padding: '6px 14px', borderRadius: 20,
+                          background: 'rgba(255,255,255,0.06)',
                           border: '1px solid rgba(255,255,255,0.10)',
                           cursor: 'pointer', fontFamily: 'inherit',
                         }}
                       >
-                        <RefreshCw size={13} color="var(--text-muted)" />
-                        <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>غيّر</span>
+                        <RefreshCw size={12} color="var(--text-muted)" />
+                        <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)' }}>غيّر</span>
                       </button>
                     )}
                   </div>
 
                   {/* Selected dish */}
-                  {selected ? (
+                  {selected && (
                     <>
-                      <p style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8 }}>
+                      <p style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.3, marginBottom: others.length > 0 ? 10 : 0 }}>
                         {selected}
                       </p>
                       {others.length > 0 && (
@@ -301,7 +312,7 @@ export default function KitchenPage() {
                                 fontSize: 11, padding: '3px 10px', borderRadius: 20,
                                 background: 'rgba(255,255,255,0.05)',
                                 color: 'var(--text-muted)',
-                                border: '1px solid rgba(255,255,255,0.06)',
+                                border: '1px solid rgba(255,255,255,0.07)',
                               }}
                             >
                               {opt}
@@ -310,10 +321,6 @@ export default function KitchenPage() {
                         </div>
                       )}
                     </>
-                  ) : (
-                    <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.2)' }}>
-                      لم تُضَف خيارات — اذهب لتاب الأسبوع وأضف وجبات اليوم
-                    </p>
                   )}
                 </div>
               );
@@ -534,65 +541,98 @@ export default function KitchenPage() {
 
             {myShortages.length === 0 ? (
               <EmptyState icon="🛒" title="لا توجد نواقص" description="سجّل ما ينقصك من المطبخ" />
-            ) : (
-              ['missing', 'provided'].map((status) => {
-                const group = myShortages.filter((s) => s.status === status);
-                if (!group.length) return null;
-                const pOrder: Record<string, number> = { urgent: 0, high: 1, medium: 2, low: 3 };
+            ) : (() => {
+              const missing = myShortages.filter((s) => s.status === 'missing');
+              const provided = myShortages.filter((s) => s.status === 'provided');
+
+              const priorityGroups: { key: string; label: string; color: string; items: typeof missing }[] = [
+                {
+                  key: 'urgent',
+                  label: 'عاجل',
+                  color: 'var(--danger)',
+                  items: missing.filter((s) => s.priority === 'urgent'),
+                },
+                {
+                  key: 'high',
+                  label: 'مهم',
+                  color: 'var(--warning)',
+                  items: missing.filter((s) => s.priority === 'high'),
+                },
+                {
+                  key: 'medium',
+                  label: 'متوسط',
+                  color: 'var(--text-secondary)',
+                  items: missing.filter((s) => s.priority === 'medium' || s.priority === 'low'),
+                },
+              ];
+
+              const renderItem = (item: typeof missing[0], isMissing: boolean) => {
+                const pColor = shortagePriorityColors[item.priority];
                 return (
-                  <div key={status}>
-                    <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', marginBottom: 8, color: status === 'missing' ? 'var(--danger)' : 'var(--success)' }}>
-                      {status === 'missing' ? `ناقص (${group.length})` : `✓ تم توفيره (${group.length})`}
-                    </p>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      {group
-                        .slice()
-                        .sort((a, b) => pOrder[a.priority] - pOrder[b.priority])
-                        .map((item) => {
-                          const pColor = shortagePriorityColors[item.priority];
-                          const isMissing = item.status === 'missing';
-                          return (
-                            <div
-                              key={item.id}
-                              style={{
-                                display: 'flex', alignItems: 'center', gap: 12,
-                                padding: 12, borderRadius: 16,
-                                background: 'var(--surface-card)',
-                                border: '1px solid var(--border-soft)',
-                                opacity: isMissing ? 1 : 0.55,
-                              }}
-                            >
-                              <button
-                                onClick={() => toggleShortageStatus(item.id)}
-                                style={{ flexShrink: 0, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                              >
-                                {isMissing
-                                  ? <Circle size={20} color="rgba(255,255,255,0.25)" />
-                                  : <CheckCircle2 size={20} color="var(--success)" />
-                                }
-                              </button>
-                              <div style={{ flex: 1 }}>
-                                <p style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', textDecoration: isMissing ? 'none' : 'line-through' }}>
-                                  {item.name}
-                                </p>
-                                <div style={{ display: 'flex', gap: 8, marginTop: 2 }}>
-                                  {item.quantity && <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{item.quantity}</span>}
-                                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{categoryLabels[item.category] || item.category}</span>
-                                </div>
-                              </div>
-                              {isMissing && (
-                                <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, fontWeight: 600, flexShrink: 0, background: pColor.bg, color: pColor.text }}>
-                                  {shortagePriorityLabels[item.priority]}
-                                </span>
-                              )}
-                            </div>
-                          );
-                        })}
+                  <div
+                    key={item.id}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 12,
+                      padding: '12px 14px', borderRadius: 16,
+                      background: 'var(--surface-card)',
+                      border: '1px solid var(--border-soft)',
+                      opacity: isMissing ? 1 : 0.55,
+                    }}
+                  >
+                    <button
+                      onClick={() => toggleShortageStatus(item.id)}
+                      style={{ flexShrink: 0, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                    >
+                      {isMissing
+                        ? <Circle size={20} color="rgba(255,255,255,0.22)" />
+                        : <CheckCircle2 size={20} color="var(--success)" />
+                      }
+                    </button>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', textDecoration: isMissing ? 'none' : 'line-through', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {item.name}
+                      </p>
+                      <div style={{ display: 'flex', gap: 8, marginTop: 2 }}>
+                        {item.quantity && <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{item.quantity}</span>}
+                        <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{categoryLabels[item.category] || item.category}</span>
+                      </div>
                     </div>
+                    {isMissing && (
+                      <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, fontWeight: 700, flexShrink: 0, background: pColor.bg, color: pColor.text }}>
+                        {shortagePriorityLabels[item.priority]}
+                      </span>
+                    )}
                   </div>
                 );
-              })
-            )}
+              };
+
+              return (
+                <>
+                  {priorityGroups.map(({ key, label, color, items }) =>
+                    items.length === 0 ? null : (
+                      <div key={key} style={{ marginBottom: 4 }}>
+                        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', marginBottom: 8, color }}>
+                          {label} ({items.length})
+                        </p>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                          {items.map((item) => renderItem(item, true))}
+                        </div>
+                      </div>
+                    )
+                  )}
+                  {provided.length > 0 && (
+                    <div style={{ marginTop: 4 }}>
+                      <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', marginBottom: 8, color: 'var(--success)' }}>
+                        ✓ تم توفيره ({provided.length})
+                      </p>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        {provided.map((item) => renderItem(item, false))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              );
+            })()}
           </>
         )}
 

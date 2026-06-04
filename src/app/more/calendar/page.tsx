@@ -116,22 +116,21 @@ export default function CalendarPage() {
   ) => {
     if (group.length === 0) return null;
     return (
-      <div style={{ marginBottom: 24 }}>
+      <div style={{ marginBottom: 28 }}>
         {/* Section label */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
           {isOverdueGroup && (
             <span
               style={{
-                width: 8, height: 8, borderRadius: '50%',
-                background: 'var(--danger)',
+                width: 7, height: 7, borderRadius: '50%',
+                background: 'rgba(249,112,102,0.75)',
                 flexShrink: 0,
-                boxShadow: '0 0 6px rgba(249,112,102,0.5)',
               }}
             />
           )}
           <p
             style={{
-              fontSize: 11, fontWeight: 700, letterSpacing: '0.07em',
+              fontSize: 11, fontWeight: 700, letterSpacing: '0.08em',
               color: labelColor, textTransform: 'uppercase',
             }}
           >
@@ -153,28 +152,28 @@ export default function CalendarPage() {
           {group.map((e) => {
             const cfg = typeConfig[e.type];
             const Icon = cfg.icon;
-            const showOverdueBorder = isOverdueGroup || e.isUrgent;
+            const showUrgentBorder = isOverdueGroup || e.isUrgent;
             return (
               <div
                 key={`${e.type}-${e.id}`}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 12,
-                  padding: '12px 14px', borderRadius: 18,
+                  padding: '13px 14px', borderRadius: 18,
                   background: isOverdueGroup
-                    ? 'rgba(249,112,102,0.06)'
+                    ? 'rgba(249,112,102,0.04)'
                     : 'var(--surface-card)',
-                  border: `1px solid ${showOverdueBorder ? 'rgba(249,112,102,0.25)' : 'var(--border-soft)'}`,
+                  border: `1px solid ${showUrgentBorder ? 'rgba(249,112,102,0.18)' : 'var(--border-soft)'}`,
                 }}
               >
                 {/* Icon bubble */}
                 <div
                   style={{
-                    width: 38, height: 38, borderRadius: 12, flexShrink: 0,
+                    width: 40, height: 40, borderRadius: 14, flexShrink: 0,
                     background: cfg.bg,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}
                 >
-                  <Icon size={16} color={cfg.color} strokeWidth={1.8} />
+                  <Icon size={17} color={cfg.color} strokeWidth={1.7} />
                 </div>
 
                 {/* Text */}
@@ -195,7 +194,7 @@ export default function CalendarPage() {
                   )}
                 </div>
 
-                {/* Right side: date + type badge */}
+                {/* Right side: badges + date */}
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, flexShrink: 0 }}>
                   <span
                     style={{
@@ -207,10 +206,22 @@ export default function CalendarPage() {
                   >
                     {cfg.label}
                   </span>
+                  {(isOverdueGroup || e.isUrgent) && (
+                    <span
+                      style={{
+                        fontSize: 9, fontWeight: 700,
+                        padding: '1px 7px', borderRadius: 8,
+                        background: 'rgba(249,112,102,0.10)',
+                        color: 'rgba(249,112,102,0.82)',
+                      }}
+                    >
+                      {isOverdueGroup ? 'متأخر' : 'عاجل'}
+                    </span>
+                  )}
                   <span
                     style={{
                       fontSize: 11, fontWeight: 500,
-                      color: (isOverdueGroup || e.isUrgent) ? 'var(--danger)' : 'var(--text-muted)',
+                      color: (isOverdueGroup || e.isUrgent) ? 'rgba(249,112,102,0.78)' : 'var(--text-muted)',
                     }}
                   >
                     {formatArabicDate(e.date)}
