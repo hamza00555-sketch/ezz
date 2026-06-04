@@ -1,18 +1,17 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Check, X } from 'lucide-react';
 import { useAppStore } from '@/store/appStore';
-import { SectionHeader } from '@/components/shared/SectionHeader';
 import { MemberAvatar } from '@/components/shared/MemberAvatar';
 
-const requestTypeLabels: Record<string, string> = {
-  purchase: '🛒 شراء',
-  help: '🤝 مساعدة',
-  errand: '🚗 مشوار',
-  maintenance: '🔧 صيانة',
-  follow_up: '📋 متابعة',
-  other: '💬 أخرى',
+const typeLabels: Record<string, string> = {
+  purchase:   '🛒 شراء',
+  help:       '🤝 مساعدة',
+  errand:     '🚗 مشوار',
+  maintenance:'🔧 صيانة',
+  follow_up:  '📋 متابعة',
+  other:      '💬 أخرى',
 };
 
 export function PendingRequests() {
@@ -29,46 +28,76 @@ export function PendingRequests() {
 
   return (
     <div className="px-4 mb-5">
-      <SectionHeader
-        title="طلبات بانتظارك"
-        action={
-          <Link href="/tasks?tab=requests" className="text-xs font-medium" style={{ color: '#C8922A' }}>
-            الكل <ArrowLeft size={12} className="inline" />
-          </Link>
-        }
-      />
+      {/* Section header */}
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <h2 className="text-[15px] font-bold" style={{ color: 'var(--foreground)' }}>طلبات تنتظرك</h2>
+          <span className="badge badge-red">{pending.length}</span>
+        </div>
+        <Link href="/tasks" className="flex items-center gap-0.5 text-xs font-medium" style={{ color: 'var(--c-green)' }}>
+          الكل <ArrowLeft size={12} className="mt-px" />
+        </Link>
+      </div>
+
       <div className="flex flex-col gap-2">
         {pending.map((req) => {
           const from = members.find((m) => m.id === req.from);
           return (
             <div
               key={req.id}
-              className="flex items-center gap-3 p-3 rounded-2xl"
-              style={{ background: '#FFFFFF', border: '1px solid var(--border)' }}
+              className="p-4"
+              style={{
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--card-radius)',
+                boxShadow: 'var(--shadow-xs)',
+              }}
             >
-              {from && <MemberAvatar name={from.name} size="sm" />}
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate" style={{ color: '#1C1917' }}>
-                  {req.title}
-                </p>
-                <span className="text-xs" style={{ color: '#78716C' }}>
-                  {requestTypeLabels[req.type]} · من {from?.name}
-                </span>
+              {/* Request info */}
+              <div className="flex items-start gap-3 mb-3">
+                {from && <MemberAvatar name={from.name} size="sm" />}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold truncate" style={{ color: 'var(--foreground)' }}>
+                    {req.title}
+                  </p>
+                  {req.description && (
+                    <p className="text-xs mt-0.5 line-clamp-1" style={{ color: 'var(--foreground-muted)' }}>
+                      {req.description}
+                    </p>
+                  )}
+                  <div className="flex items-center gap-2 mt-1.5">
+                    <span className="badge badge-muted">{typeLabels[req.type]}</span>
+                    {from && (
+                      <span className="text-[11px]" style={{ color: 'var(--foreground-muted)' }}>
+                        من {from.name}
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
-              <div className="flex gap-1.5">
+
+              {/* Actions */}
+              <div className="flex gap-2">
                 <button
                   onClick={() => updateRequestStatus(req.id, 'accepted')}
-                  className="px-3 py-1.5 rounded-xl text-xs font-medium text-white"
-                  style={{ background: '#16A34A' }}
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold"
+                  style={{ background: 'var(--c-green-soft)', color: 'var(--c-green)' }}
                 >
-                  قبول
+                  <Check size={13} strokeWidth={2.5} /> قبول
+                </button>
+                <button
+                  onClick={() => updateRequestStatus(req.id, 'converted')}
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold"
+                  style={{ background: '#EFF6FF', color: '#1D4ED8' }}
+                >
+                  تحويل لمهمة
                 </button>
                 <button
                   onClick={() => updateRequestStatus(req.id, 'rejected')}
-                  className="px-3 py-1.5 rounded-xl text-xs font-medium"
-                  style={{ background: '#FEE2E2', color: '#DC2626' }}
+                  className="w-9 flex items-center justify-center py-2 rounded-xl text-xs"
+                  style={{ background: 'var(--c-red-soft)', color: 'var(--c-red)' }}
                 >
-                  رفض
+                  <X size={13} strokeWidth={2.5} />
                 </button>
               </div>
             </div>

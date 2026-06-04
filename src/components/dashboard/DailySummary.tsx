@@ -1,83 +1,38 @@
 'use client';
 
+import { CheckSquare, ShoppingCart, Wallet, Megaphone } from 'lucide-react';
 import { useAppStore } from '@/store/appStore';
-import { format } from 'date-fns';
-import { ar } from 'date-fns/locale';
+
+const actions = [
+  { key: 'task',         icon: CheckSquare,  label: 'مهمة',    color: 'var(--c-green)', bg: 'var(--c-green-soft)' },
+  { key: 'shortage',     icon: ShoppingCart, label: 'نقص',     color: '#B45309',        bg: 'var(--c-amber-soft)' },
+  { key: 'expense',      icon: Wallet,       label: 'مصروف',   color: 'var(--c-muted)', bg: '#F2F4F7'             },
+  { key: 'announcement', icon: Megaphone,    label: 'إعلان',   color: 'var(--c-dark)',  bg: '#EAECF0'             },
+];
 
 export function DailySummary() {
-  const { tasks, currentUserId, members, currentFamilyGroupId } = useAppStore();
-  const me = members.find((m) => m.id === currentUserId);
-  const today = new Date();
-
-  const myTasks = tasks.filter(
-    (t) =>
-      t.familyGroupId === currentFamilyGroupId &&
-      t.assignedTo === currentUserId &&
-      !['done', 'cancelled'].includes(t.status)
-  );
-
-  const doneToday = tasks.filter(
-    (t) =>
-      t.familyGroupId === currentFamilyGroupId &&
-      t.status === 'done' &&
-      t.updatedAt &&
-      new Date(t.updatedAt).toDateString() === today.toDateString()
-  ).length;
-
-  const greeting = () => {
-    const h = today.getHours();
-    if (h < 12) return 'صباح الخير';
-    if (h < 17) return 'مساء الخير';
-    return 'مساء النور';
-  };
+  const { setActiveQuickForm } = useAppStore();
 
   return (
-    <div className="px-4 py-4">
-      {/* Greeting */}
-      <div className="mb-4">
-        <p className="text-sm" style={{ color: '#78716C' }}>
-          {format(today, 'EEEE، dd MMMM yyyy', { locale: ar })}
-        </p>
-        <h2 className="text-2xl font-bold mt-0.5" style={{ color: '#1C1917' }}>
-          {greeting()}، {me?.name.split(' ')[0]} 👋
-        </h2>
-      </div>
-
-      {/* Summary row */}
-      <div className="grid grid-cols-3 gap-3">
-        <div
-          className="flex flex-col items-center py-4 rounded-2xl"
-          style={{ background: '#FFFFFF', border: '1px solid var(--border)' }}
-        >
-          <span className="text-2xl font-bold" style={{ color: '#C8922A' }}>
-            {myTasks.length}
-          </span>
-          <span className="text-xs mt-1 text-center" style={{ color: '#78716C' }}>
-            مهام معلقة
-          </span>
-        </div>
-        <div
-          className="flex flex-col items-center py-4 rounded-2xl"
-          style={{ background: '#FFFFFF', border: '1px solid var(--border)' }}
-        >
-          <span className="text-2xl font-bold" style={{ color: '#16A34A' }}>
-            {doneToday}
-          </span>
-          <span className="text-xs mt-1 text-center" style={{ color: '#78716C' }}>
-            أُنجز اليوم
-          </span>
-        </div>
-        <div
-          className="flex flex-col items-center py-4 rounded-2xl"
-          style={{ background: '#FFFFFF', border: '1px solid var(--border)' }}
-        >
-          <span className="text-2xl font-bold" style={{ color: '#2563EB' }}>
-            {myTasks.filter((t) => t.priority === 'urgent' || t.priority === 'high').length}
-          </span>
-          <span className="text-xs mt-1 text-center" style={{ color: '#78716C' }}>
-            عاجلة
-          </span>
-        </div>
+    <div className="px-4 mb-5">
+      <p className="text-[13px] font-semibold mb-3" style={{ color: 'var(--foreground-muted)' }}>إضافة سريع</p>
+      <div className="grid grid-cols-4 gap-2.5">
+        {actions.map((action) => {
+          const Icon = action.icon;
+          return (
+            <button
+              key={action.key}
+              onClick={() => setActiveQuickForm(action.key)}
+              className="flex flex-col items-center gap-2 py-3.5 rounded-[18px] active:scale-95 transition-transform"
+              style={{ background: action.bg }}
+            >
+              <Icon size={20} color={action.color} strokeWidth={1.8} />
+              <span className="text-[11px] font-semibold leading-none" style={{ color: action.color }}>
+                {action.label}
+              </span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

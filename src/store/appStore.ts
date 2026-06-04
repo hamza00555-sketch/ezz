@@ -491,11 +491,13 @@ interface AppState {
   // UI state
   activeTab: string;
   isQuickAddOpen: boolean;
+  activeQuickForm: string | null;
 
   // Actions
   setCurrentFamilyGroup: (id: string) => void;
   setActiveTab: (tab: string) => void;
   setQuickAddOpen: (open: boolean) => void;
+  setActiveQuickForm: (form: string | null) => void;
 
   // Task actions
   addTask: (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => void;
@@ -544,10 +546,12 @@ export const useAppStore = create<AppState>((set) => ({
 
   activeTab: 'dashboard',
   isQuickAddOpen: false,
+  activeQuickForm: null,
 
   setCurrentFamilyGroup: (id) => set({ currentFamilyGroupId: id }),
   setActiveTab: (tab) => set({ activeTab: tab }),
   setQuickAddOpen: (open) => set({ isQuickAddOpen: open }),
+  setActiveQuickForm: (form) => set({ activeQuickForm: form, isQuickAddOpen: false }),
 
   addTask: (taskData) =>
     set((state) => ({

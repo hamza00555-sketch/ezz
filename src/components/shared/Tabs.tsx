@@ -17,35 +17,46 @@ interface TabsProps {
 export function Tabs({ tabs, active, onChange }: TabsProps) {
   return (
     <div
-      className="flex gap-0 sticky top-0 z-10"
-      style={{ background: 'var(--background)', borderBottom: '1px solid var(--border)' }}
+      className="flex sticky top-0 z-10 px-4 gap-1 overflow-x-auto"
+      style={{
+        background: 'var(--background)',
+        borderBottom: '1px solid var(--border)',
+        paddingTop: 10,
+        paddingBottom: 10,
+        scrollbarWidth: 'none',
+      }}
     >
-      {tabs.map((tab) => (
-        <button
-          key={tab.key}
-          onClick={() => onChange(tab.key)}
-          className={cn(
-            'flex items-center gap-1.5 px-4 py-3 text-sm font-medium transition-all duration-200 border-b-2',
-            active === tab.key
-              ? 'text-[#C8922A] border-[#C8922A]'
-              : 'text-[#78716C] border-transparent'
-          )}
-        >
-          {tab.label}
-          {tab.count !== undefined && tab.count > 0 && (
-            <span
-              className={cn(
-                'text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center',
-                active === tab.key
-                  ? 'bg-[#F5E6CC] text-[#C8922A]'
-                  : 'bg-[#F5F5F4] text-[#78716C]'
-              )}
-            >
-              {tab.count}
-            </span>
-          )}
-        </button>
-      ))}
+      {tabs.map((tab) => {
+        const isActive = active === tab.key;
+        return (
+          <button
+            key={tab.key}
+            onClick={() => onChange(tab.key)}
+            className={cn(
+              'flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap flex-shrink-0',
+            )}
+            style={
+              isActive
+                ? { background: 'var(--c-green)', color: '#fff' }
+                : { background: 'transparent', color: 'var(--foreground-muted)' }
+            }
+          >
+            {tab.label}
+            {tab.count !== undefined && tab.count > 0 && (
+              <span
+                className="text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center"
+                style={
+                  isActive
+                    ? { background: 'rgba(255,255,255,0.25)', color: '#fff' }
+                    : { background: 'var(--border)', color: 'var(--foreground-muted)' }
+                }
+              >
+                {tab.count}
+              </span>
+            )}
+          </button>
+        );
+      })}
     </div>
   );
 }

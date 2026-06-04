@@ -1,7 +1,9 @@
 'use client';
 
-import { ChevronDown, Bell } from 'lucide-react';
+import { Bell, ChevronDown } from 'lucide-react';
 import { useAppStore } from '@/store/appStore';
+import { format } from 'date-fns';
+import { ar } from 'date-fns/locale';
 
 export function FamilySwitcher() {
   const { familyGroups, currentFamilyGroupId, announcements, currentUserId, members } = useAppStore();
@@ -11,42 +13,49 @@ export function FamilySwitcher() {
     (a) => a.status === 'active' && !a.confirmedBy.includes(currentUserId)
   ).length;
 
+  const today = new Date();
+  const h = today.getHours();
+  const greeting = h < 12 ? 'صباح الخير' : h < 17 ? 'مساء الخير' : 'مساء النور';
+
   if (!group) return null;
 
   return (
-    <div
-      className="px-4 pt-safe-top pb-3 flex items-center justify-between"
-      style={{
-        background: 'linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0) 100%)',
-        paddingTop: 'max(16px, env(safe-area-inset-top, 16px))',
-      }}
-    >
-      <button
-        className="flex items-center gap-2.5 py-2 px-3 rounded-2xl active:scale-95 transition-transform"
-        style={{ background: '#FFFFFF', border: '1px solid var(--border)', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
-      >
-        <span className="text-xl leading-none">{group.emoji}</span>
-        <div className="text-right">
-          <p className="font-bold text-sm leading-tight" style={{ color: '#1C1917' }}>{group.name}</p>
-          <p className="text-[10px] leading-none mt-0.5" style={{ color: '#78716C' }}>{me?.name}</p>
-        </div>
-        <ChevronDown size={14} color="#78716C" />
-      </button>
+    <div className="px-4 pb-5" style={{ paddingTop: 'max(20px, env(safe-area-inset-top, 20px))' }}>
+      {/* Top bar */}
+      <div className="flex items-center justify-between mb-5">
+        <button
+          className="flex items-center gap-2 py-2 px-3 rounded-2xl active:scale-[0.97] transition-transform"
+          style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-xs)' }}
+        >
+          <span className="text-base leading-none">{group.emoji}</span>
+          <span className="text-sm font-semibold" style={{ color: 'var(--foreground)' }}>{group.name}</span>
+          <ChevronDown size={13} strokeWidth={2.2} color="var(--foreground-muted)" />
+        </button>
 
-      <button
-        className="relative p-3 rounded-2xl active:scale-95 transition-transform"
-        style={{ background: '#FFFFFF', border: '1px solid var(--border)', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
-      >
-        <Bell size={20} color="#1C1917" />
-        {unread > 0 && (
-          <span
-            className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
-            style={{ background: '#DC2626' }}
-          >
-            {unread}
-          </span>
-        )}
-      </button>
+        <button
+          className="relative w-10 h-10 rounded-2xl flex items-center justify-center active:scale-[0.97] transition-transform"
+          style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-xs)' }}
+        >
+          <Bell size={18} strokeWidth={1.8} color="var(--foreground)" />
+          {unread > 0 && (
+            <span
+              className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold text-white"
+              style={{ background: 'var(--c-red)' }}
+            >
+              {unread}
+            </span>
+          )}
+        </button>
+      </div>
+
+      {/* Greeting */}
+      <p className="text-[13px] mb-1" style={{ color: 'var(--foreground-muted)' }}>
+        {format(today, 'EEEE، dd MMMM', { locale: ar })}
+      </p>
+      <h1 className="text-[25px] font-bold leading-tight" style={{ color: 'var(--foreground)' }}>
+        {greeting}،{' '}
+        <span style={{ color: 'var(--c-green)' }}>{me?.name.split(' ')[0]}</span>
+      </h1>
     </div>
   );
 }
