@@ -421,47 +421,16 @@ export async function dbConfirmAnnouncement(annId: string, userId: string) {
 
 // ─── Family group creation/joining ───────────────────────────────────────────
 
-export async function dbCreateFamilyGroup(userId: string, name: string, emoji: string) {
+export async function dbCreateFamilyGroup(_userId: string, name: string, emoji: string) {
   const sb = createClient();
-
-  const { data: group, error: groupError } = await sb
-    .from('family_groups')
-    .insert({ name, emoji, created_by: userId })
-    .select()
-    .single();
-
-  if (groupError || !group) throw new Error(groupError?.message ?? 'فشل إنشاء البيت');
-
-  await sb
-    .from('profiles')
-    .update({
-      family_group_id: group.id,
-      role: 'family_admin',
-      can_manage_tasks: true,
-      can_manage_home: true,
-      can_manage_finance: true,
-      can_invite_members: true,
-    })
-    .eq('id', userId);
-
-  return group.id as string;
+  const { data, error } = await sb.rpc('create_family_group', { p_name: name, p_emoji: emoji });
+  if (error) throw new Error(error.message ?? 'فشل إنشاء البيت');
+  return data as string;
 }
 
-export async function dbJoinFamilyGroup(userId: string, inviteCode: string) {
+export async function dbJoinFamilyGroup(_userId: string, inviteCode: string) {
   const sb = createClient();
-
-  const { data: group, error } = await sb
-    .from('family_groups')
-    .select('id')
-    .eq('invite_code', inviteCode.toUpperCase())
-    .single();
-
-  if (error || !group) throw new Error('الكود غير صحيح أو منتهي');
-
-  await sb
-    .from('profiles')
-    .update({ family_group_id: group.id, role: 'adult' })
-    .eq('id', userId);
-
-  return group.id as string;
+  const { data, error } = await sb.rpc('join_family_group', { p_invite_code: inviteCode });
+  if (error) throw new Error(error.message === 'Invalid invite code' ? 'الكود غير صحيح أو منتهي' : error.message);
+  return data as string;
 }
