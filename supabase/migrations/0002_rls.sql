@@ -30,7 +30,8 @@ RETURNS BOOLEAN AS $$
 $$ LANGUAGE sql SECURITY DEFINER STABLE;
 
 -- FAMILY GROUPS
-CREATE POLICY "members_select_own_group"  ON family_groups FOR SELECT USING (id = my_family_group_id());
+-- creator_select: allows reading back the row right after INSERT (before profile.family_group_id is updated)
+CREATE POLICY "members_select_own_group"  ON family_groups FOR SELECT USING (id = my_family_group_id() OR created_by = auth.uid());
 CREATE POLICY "admin_update_group"        ON family_groups FOR UPDATE USING (id = my_family_group_id() AND is_family_admin());
 CREATE POLICY "anyone_create_group"       ON family_groups FOR INSERT WITH CHECK (true);
 
