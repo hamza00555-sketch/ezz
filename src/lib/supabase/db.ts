@@ -21,6 +21,7 @@ function toMember(r: any): FamilyMember {
       canManageHome: r.can_manage_home ?? false,
       canManageFinance: r.can_manage_finance ?? false,
       canInviteMembers: r.can_invite_members ?? false,
+      canManageKitchen: r.can_manage_kitchen ?? false,
     },
     createdAt: r.created_at,
     updatedAt: r.updated_at,
@@ -426,6 +427,34 @@ export async function dbCreateFamilyGroup(_userId: string, name: string, emoji: 
   const { data, error } = await sb.rpc('create_family_group', { p_name: name, p_emoji: emoji });
   if (error) throw new Error(error.message ?? 'فشل إنشاء البيت');
   return data as string;
+}
+
+export async function dbSetMealPlan(plan: MealPlan) {
+  const sb = createClient();
+  return sb.from('meal_plans').upsert({
+    family_group_id: plan.familyGroupId,
+    date: plan.date,
+    breakfast: plan.breakfast ?? null,
+    lunch: plan.lunch ?? null,
+    dinner: plan.dinner ?? null,
+    created_by: plan.createdBy,
+    updated_at: new Date().toISOString(),
+  }, { onConflict: 'family_group_id,date' });
+}
+
+export async function dbAddRecipe(recipe: Omit<Recipe, 'id' | 'createdAt' | 'updatedAt'>) {
+  const sb = createClient();
+  return sb.from('recipes').insert({
+    family_group_id: recipe.familyGroupId,
+    name: recipe.name,
+    ingredients: recipe.ingredients,
+    steps: recipe.steps,
+    prep_time: recipe.prepTime,
+    meal_time: recipe.mealTime,
+    favorited_by: recipe.favoritedBy,
+    notes: recipe.notes,
+    created_by: recipe.createdBy,
+  }).select().single();
 }
 
 export async function dbJoinFamilyGroup(_userId: string, inviteCode: string) {

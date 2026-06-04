@@ -28,7 +28,7 @@ const mockMembers: FamilyMember[] = [
     name: 'أبو أحمد',
     role: 'family_admin',
     generation: 2,
-    permissions: { canManageTasks: true, canManageHome: true, canManageFinance: true, canInviteMembers: true },
+    permissions: { canManageTasks: true, canManageHome: true, canManageFinance: true, canInviteMembers: true, canManageKitchen: true },
     createdAt: '2024-01-01',
     updatedAt: '2024-01-01',
   },
@@ -38,7 +38,7 @@ const mockMembers: FamilyMember[] = [
     name: 'أم أحمد',
     role: 'guardian',
     generation: 2,
-    permissions: { canManageTasks: true, canManageHome: true, canManageFinance: true, canInviteMembers: false },
+    permissions: { canManageTasks: true, canManageHome: true, canManageFinance: true, canInviteMembers: false, canManageKitchen: true },
     createdAt: '2024-01-01',
     updatedAt: '2024-01-01',
   },
@@ -48,7 +48,7 @@ const mockMembers: FamilyMember[] = [
     name: 'أحمد',
     role: 'teen',
     generation: 3,
-    permissions: { canManageTasks: false, canManageHome: false, canManageFinance: false, canInviteMembers: false },
+    permissions: { canManageTasks: false, canManageHome: false, canManageFinance: false, canInviteMembers: false, canManageKitchen: false },
     createdAt: '2024-01-01',
     updatedAt: '2024-01-01',
   },
@@ -58,7 +58,7 @@ const mockMembers: FamilyMember[] = [
     name: 'سارة',
     role: 'child',
     generation: 3,
-    permissions: { canManageTasks: false, canManageHome: false, canManageFinance: false, canInviteMembers: false },
+    permissions: { canManageTasks: false, canManageHome: false, canManageFinance: false, canInviteMembers: false, canManageKitchen: false },
     createdAt: '2024-01-01',
     updatedAt: '2024-01-01',
   },
@@ -522,6 +522,12 @@ interface AppState {
   // Expense actions
   addExpense: (expense: Omit<Expense, 'id' | 'createdAt' | 'updatedAt'>) => void;
 
+  // Meal plan actions
+  setMealPlan: (date: string, meal: 'breakfast' | 'lunch' | 'dinner', value: string) => void;
+
+  // Recipe actions
+  addRecipe: (recipe: Omit<Recipe, 'id' | 'createdAt' | 'updatedAt'>) => void;
+
   // Announcement actions
   confirmAnnouncement: (annId: string, memberId: string) => void;
 }
@@ -685,6 +691,46 @@ export const useAppStore = create<AppState>((set, get) => ({
     }));
     if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
       import('@/lib/supabase/db').then(({ dbAddExpense }) => dbAddExpense(expData));
+    }
+  },
+
+  setMealPlan: (date, meal, value) => {
+    const { mealPlans, currentFamilyGroupId, currentUserId } = get();
+    const existing = mealPlans.find((p) => p.familyGroupId === currentFamilyGroupId && p.date === date);
+    const now = new Date().toISOString();
+    if (existing) {
+      set((state) => ({
+        mealPlans: state.mealPlans.map((p) =>
+          p.id === existing.id ? { ...p, [meal]: value || undefined, updatedAt: now } : p
+        ),
+      }));
+    } else {
+      const newPlan: MealPlan = {
+        id: `mp-${generateId()}`,
+        familyGroupId: currentFamilyGroupId,
+        date,
+        [meal]: value || undefined,
+        createdBy: currentUserId,
+        updatedAt: now,
+      };
+      set((state) => ({ mealPlans: [...state.mealPlans, newPlan] }));
+    }
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      import('@/lib/supabase/db').then(({ dbSetMealPlan }) => {
+        const plan = get().mealPlans.find((p) => p.familyGroupId === currentFamilyGroupId && p.date === date);
+        if (plan) dbSetMealPlan(plan);
+      });
+    }
+  },
+
+  addRecipe: (recipeData) => {
+    const localId = `rec-${generateId()}`;
+    const now = new Date().toISOString();
+    set((state) => ({
+      recipes: [...state.recipes, { ...recipeData, id: localId, createdAt: now, updatedAt: now }],
+    }));
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      import('@/lib/supabase/db').then(({ dbAddRecipe }) => dbAddRecipe(recipeData));
     }
   },
 

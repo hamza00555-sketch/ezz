@@ -41,6 +41,7 @@ export interface FamilyMember {
     canManageHome: boolean;
     canManageFinance: boolean;
     canInviteMembers: boolean;
+    canManageKitchen: boolean;
   };
   createdAt: string;
   updatedAt: string;
