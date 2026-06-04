@@ -2,101 +2,47 @@
 
 import { useState } from 'react';
 import { Plus, X, CheckSquare, MessageSquare, Lightbulb, Home, FileText, ShoppingCart, BookOpen, Megaphone } from 'lucide-react';
-import { useAppStore } from '@/store/appStore';
-import { cn } from '@/lib/utils';
+import { TaskForm } from '@/components/forms/TaskForm';
+import { RequestForm } from '@/components/forms/RequestForm';
+import { WishForm } from '@/components/forms/WishForm';
+import { ShortageForm } from '@/components/forms/ShortageForm';
+import { HomeItemForm } from '@/components/forms/HomeItemForm';
+import { DocumentForm } from '@/components/forms/DocumentForm';
+import { RecipeForm } from '@/components/forms/RecipeForm';
+import { AnnouncementForm } from '@/components/forms/AnnouncementForm';
 
 const quickAddItems = [
-  { key: 'task', icon: CheckSquare, label: 'مهمة جديدة', color: '#2563EB', bg: '#EFF6FF' },
-  { key: 'request', icon: MessageSquare, label: 'طلب من شخص', color: '#7C3AED', bg: '#F5F3FF' },
-  { key: 'wish', icon: Lightbulb, label: 'فكرة / Wish', color: '#D97706', bg: '#FFFBEB' },
-  { key: 'home_item', icon: Home, label: 'عنصر بيت', color: '#059669', bg: '#ECFDF5' },
+  { key: 'task', icon: CheckSquare, label: 'مهمة', color: '#2563EB', bg: '#EFF6FF' },
+  { key: 'request', icon: MessageSquare, label: 'طلب', color: '#7C3AED', bg: '#F5F3FF' },
+  { key: 'wish', icon: Lightbulb, label: 'فكرة', color: '#D97706', bg: '#FFFBEB' },
+  { key: 'home_item', icon: Home, label: 'ممتلكات', color: '#059669', bg: '#ECFDF5' },
   { key: 'document', icon: FileText, label: 'وثيقة', color: '#DC2626', bg: '#FEF2F2' },
-  { key: 'shortage', icon: ShoppingCart, label: 'نقص مطبخ', color: '#C8922A', bg: '#FFF7ED' },
+  { key: 'shortage', icon: ShoppingCart, label: 'نقص', color: '#C8922A', bg: '#FFF7ED' },
   { key: 'recipe', icon: BookOpen, label: 'وصفة', color: '#DB2777', bg: '#FDF2F8' },
-  { key: 'announcement', icon: Megaphone, label: 'إعلان عائلي', color: '#0891B2', bg: '#ECFEFF' },
+  { key: 'announcement', icon: Megaphone, label: 'إعلان', color: '#0891B2', bg: '#ECFEFF' },
 ];
 
-interface QuickAddSheetProps {
-  open: boolean;
-  onClose: () => void;
-  onSelect: (key: string) => void;
-}
-
-export function QuickAddSheet({ open, onClose, onSelect }: QuickAddSheetProps) {
-  if (!open) return null;
-
-  return (
-    <>
-      <div
-        className="fixed inset-0 z-40"
-        style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(3px)' }}
-        onClick={onClose}
-      />
-      <div
-        className="fixed bottom-0 inset-x-0 z-50 slide-up"
-        style={{
-          background: '#FFFFFF',
-          borderTopLeftRadius: 24,
-          borderTopRightRadius: 24,
-          paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px))',
-          boxShadow: '0 -8px 40px rgba(0,0,0,0.12)',
-        }}
-      >
-        {/* Handle */}
-        <div className="flex justify-center pt-3 pb-2">
-          <div className="w-10 h-1 rounded-full" style={{ background: '#E8E0D5' }} />
-        </div>
-
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 pb-4">
-          <span className="text-lg font-bold" style={{ color: '#1C1917' }}>إضافة جديد</span>
-          <button
-            onClick={onClose}
-            className="p-2 rounded-full transition-colors"
-            style={{ background: '#F5F5F4' }}
-          >
-            <X size={18} color="#78716C" />
-          </button>
-        </div>
-
-        {/* Grid */}
-        <div className="grid grid-cols-4 gap-3 px-4">
-          {quickAddItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <button
-                key={item.key}
-                onClick={() => { onSelect(item.key); onClose(); }}
-                className="flex flex-col items-center gap-2 p-3 rounded-2xl transition-transform active:scale-95"
-                style={{ background: item.bg }}
-              >
-                <div className="p-2.5 rounded-xl" style={{ background: item.bg }}>
-                  <Icon size={22} color={item.color} />
-                </div>
-                <span className="text-[11px] font-medium text-center leading-tight" style={{ color: '#1C1917' }}>
-                  {item.label}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    </>
-  );
-}
+type FormKey = 'task' | 'request' | 'wish' | 'home_item' | 'document' | 'shortage' | 'recipe' | 'announcement' | null;
 
 export function QuickAddButton() {
-  const [open, setOpen] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [activeForm, setActiveForm] = useState<FormKey>(null);
 
   function handleSelect(key: string) {
-    // TODO: open respective form modals
-    console.log('Quick add:', key);
+    setSheetOpen(false);
+    setActiveForm(key as FormKey);
+  }
+
+  function closeAll() {
+    setSheetOpen(false);
+    setActiveForm(null);
   }
 
   return (
     <>
+      {/* FAB button */}
       <button
-        onClick={() => setOpen(true)}
+        onClick={() => setSheetOpen((p) => !p)}
         className="fixed z-30 transition-all duration-200 active:scale-90"
         style={{
           bottom: 'calc(var(--bottom-nav-height) + 12px + env(safe-area-inset-bottom, 0px))',
@@ -105,17 +51,77 @@ export function QuickAddButton() {
           width: 56,
           height: 56,
           borderRadius: 20,
-          background: 'linear-gradient(135deg, #C8922A, #A37520)',
+          background: sheetOpen
+            ? '#78716C'
+            : 'linear-gradient(135deg, #C8922A, #A37520)',
           boxShadow: '0 4px 20px rgba(200,146,42,0.4)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        <Plus size={28} color="#FFFFFF" strokeWidth={2.5} />
+        {sheetOpen
+          ? <X size={24} color="#FFFFFF" strokeWidth={2.5} />
+          : <Plus size={28} color="#FFFFFF" strokeWidth={2.5} />
+        }
       </button>
 
-      <QuickAddSheet open={open} onClose={() => setOpen(false)} onSelect={handleSelect} />
+      {/* Quick-add sheet */}
+      {sheetOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-20"
+            onClick={() => setSheetOpen(false)}
+          />
+          <div
+            className="fixed z-30 slide-up"
+            style={{
+              bottom: 'calc(var(--bottom-nav-height) + 76px + env(safe-area-inset-bottom, 0px))',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: 'calc(100vw - 32px)',
+              maxWidth: 400,
+              background: '#FFFFFF',
+              borderRadius: 24,
+              padding: '16px 12px',
+              boxShadow: '0 8px 40px rgba(0,0,0,0.15)',
+              border: '1px solid var(--border)',
+            }}
+          >
+            <p className="text-xs font-semibold text-center mb-3" style={{ color: '#78716C' }}>
+              ماذا تريد تضيف؟
+            </p>
+            <div className="grid grid-cols-4 gap-2">
+              {quickAddItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.key}
+                    onClick={() => handleSelect(item.key)}
+                    className="flex flex-col items-center gap-1.5 p-2.5 rounded-2xl transition-transform active:scale-95"
+                    style={{ background: item.bg }}
+                  >
+                    <Icon size={20} color={item.color} />
+                    <span className="text-[10px] font-semibold text-center" style={{ color: '#1C1917' }}>
+                      {item.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Forms */}
+      <TaskForm open={activeForm === 'task'} onClose={closeAll} />
+      <RequestForm open={activeForm === 'request'} onClose={closeAll} />
+      <WishForm open={activeForm === 'wish'} onClose={closeAll} />
+      <HomeItemForm open={activeForm === 'home_item'} onClose={closeAll} />
+      <DocumentForm open={activeForm === 'document'} onClose={closeAll} />
+      <ShortageForm open={activeForm === 'shortage'} onClose={closeAll} />
+      <RecipeForm open={activeForm === 'recipe'} onClose={closeAll} />
+      <AnnouncementForm open={activeForm === 'announcement'} onClose={closeAll} />
     </>
   );
 }
