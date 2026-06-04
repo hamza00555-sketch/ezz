@@ -1,7 +1,6 @@
 'use client';
 
 import { BottomNav } from './BottomNav';
-import { QuickAddButton } from './QuickAddButton';
 import { useSupabaseInit } from '@/hooks/useSupabaseInit';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -20,7 +19,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {children}
       </main>
       <BottomNav />
-      <QuickAddButton />
     </div>
   );
 }

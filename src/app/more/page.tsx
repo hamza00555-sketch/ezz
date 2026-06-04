@@ -5,11 +5,12 @@ import { AppShell } from '@/components/layout/AppShell';
 import { PageHeader } from '@/components/shared/PageHeader';
 import {
   Users, Calendar, Wallet, Lightbulb, Megaphone, Settings,
-  ChevronLeft
+  ChevronLeft, Building2
 } from 'lucide-react';
 import { useAppStore } from '@/store/appStore';
 
 const menuItems = [
+  { href: '/home-section',       icon: Building2, label: 'البيت',                 description: 'الممتلكات والصيانة والوثائق',     color: 'var(--accent-strong)', bg: 'rgba(163,177,138,0.12)' },
   { href: '/more/family',        icon: Users,     label: 'العائلة والأفراد',      description: 'إدارة أفراد العائلة والصلاحيات',  color: '#A782FF', bg: 'rgba(167,130,255,0.12)' },
   { href: '/more/calendar',      icon: Calendar,  label: 'التقويم',               description: 'مواعيد وصيانة وضمانات',           color: 'var(--info)',    bg: 'var(--info-soft)'    },
   { href: '/more/expenses',      icon: Wallet,    label: 'المصاريف',              description: 'محافظ وميزانيات يدوية',           color: 'var(--success)', bg: 'var(--success-soft)' },

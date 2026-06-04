@@ -7,10 +7,10 @@ import { Tabs } from '@/components/shared/Tabs';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { useAppStore } from '@/store/appStore';
 import { categoryLabels } from '@/lib/utils';
-import { Clock, Heart, ChefHat, CheckCircle2, Circle } from 'lucide-react';
+import { Clock, Heart, ChefHat, CheckCircle2, Circle, Sparkles, Loader2 } from 'lucide-react';
 import type { ShortagePriority } from '@/types';
 
-type KitchenTab = 'shortages' | 'recipes' | 'today' | 'week';
+type KitchenTab = 'today' | 'week' | 'shortages' | 'recipes';
 
 const shortagePriorityColors: Record<ShortagePriority, { bg: string; text: string }> = {
   urgent: { bg: 'var(--danger-soft)',  text: 'var(--danger)'  },
@@ -18,42 +18,46 @@ const shortagePriorityColors: Record<ShortagePriority, { bg: string; text: strin
   medium: { bg: 'rgba(255,255,255,0.07)', text: 'var(--text-secondary)' },
   low:    { bg: 'rgba(255,255,255,0.05)', text: 'var(--text-muted)'     },
 };
-
 const shortagePriorityLabels: Record<ShortagePriority, string> = {
-  urgent: 'عاجل',
-  high: 'مهم',
-  medium: 'متوسط',
-  low: 'عادي',
+  urgent: 'عاجل', high: 'مهم', medium: 'متوسط', low: 'عادي',
 };
-
 const mealTimeLabels: Record<string, string> = {
-  breakfast: 'فطور',
-  lunch: 'غداء',
-  dinner: 'عشاء',
-  occasion: 'مناسبة',
+  breakfast: 'فطور', lunch: 'غداء', dinner: 'عشاء', occasion: 'مناسبة',
 };
-
 const dayLabels = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
 
+// Popular Arabic dishes per meal for AI-style suggestions
+const mealSuggestions = {
+  breakfast: ['فول مدمس', 'بيض مع جبنة', 'فطائر الجبن', 'شكشوكة', 'لبنة مع زيت', 'بيض بالطماطم', 'عيش وعسل'],
+  lunch:     ['كبسة دجاج', 'مندي لحم', 'مجبوس', 'ملوخية', 'برياني', 'شوربة عدس مع خبز', 'سلطة فتوش مع شاورما'],
+  dinner:    ['شوربة خضار', 'سلطة مع تونة', 'بيض مقلي', 'فتة', 'كشري', 'حمص مع خبز', 'سلطة يونانية'],
+};
+
+function getRandomSuggestion(type: keyof typeof mealSuggestions, exclude: string[] = []) {
+  const pool = mealSuggestions[type].filter((s) => !exclude.includes(s));
+  return pool[Math.floor(Math.random() * pool.length)] ?? mealSuggestions[type][0];
+}
+
 export default function KitchenPage() {
-  const [activeTab, setActiveTab] = useState<KitchenTab>('shortages');
+  const [activeTab, setActiveTab] = useState<KitchenTab>('today');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [weekSuggestions, setWeekSuggestions] = useState<Record<string, { breakfast: string; lunch: string; dinner: string }>>({});
   const { shortages, recipes, mealPlans, currentFamilyGroupId, currentUserId, toggleShortageStatus } =
     useAppStore();
 
   const myShortages = shortages.filter((s) => s.familyGroupId === currentFamilyGroupId);
   const missingCount = myShortages.filter((s) => s.status === 'missing').length;
   const myRecipes = recipes.filter((r) => r.familyGroupId === currentFamilyGroupId);
+  const todayStr = new Date().toISOString().split('T')[0];
   const todayPlan = mealPlans.find(
-    (p) =>
-      p.familyGroupId === currentFamilyGroupId &&
-      p.date === new Date().toISOString().split('T')[0]
+    (p) => p.familyGroupId === currentFamilyGroupId && p.date === todayStr
   );
 
   const tabs = [
+    { key: 'today',     label: 'وجبات اليوم' },
+    { key: 'week',      label: 'الأسبوع'     },
     { key: 'shortages', label: 'النواقص', count: missingCount },
-    { key: 'recipes', label: 'الوصفات', count: myRecipes.length },
-    { key: 'today', label: 'وجبات اليوم' },
-    { key: 'week', label: 'الأسبوع' },
+    { key: 'recipes',   label: 'الوصفات', count: myRecipes.length },
   ];
 
   const weekDays = Array.from({ length: 7 }, (_, i) => {
@@ -66,138 +70,34 @@ export default function KitchenPage() {
     return { date: d, dateStr, plan, dayLabel: dayLabels[d.getDay()] };
   });
 
+  function suggestMeals() {
+    setAiLoading(true);
+    // Simulate AI thinking
+    setTimeout(() => {
+      const usedBreakfasts: string[] = [];
+      const usedLunches: string[] = [];
+      const usedDinners: string[] = [];
+      const suggestions: typeof weekSuggestions = {};
+      weekDays.forEach(({ dateStr }) => {
+        const b = getRandomSuggestion('breakfast', usedBreakfasts);
+        const l = getRandomSuggestion('lunch', usedLunches);
+        const dn = getRandomSuggestion('dinner', usedDinners);
+        usedBreakfasts.push(b);
+        usedLunches.push(l);
+        usedDinners.push(dn);
+        suggestions[dateStr] = { breakfast: b, lunch: l, dinner: dn };
+      });
+      setWeekSuggestions(suggestions);
+      setAiLoading(false);
+    }, 1200);
+  }
+
   return (
     <AppShell>
       <PageHeader title="المطبخ" />
       <Tabs tabs={tabs} active={activeTab} onChange={(k) => setActiveTab(k as KitchenTab)} />
 
       <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-        {/* SHORTAGES */}
-        {activeTab === 'shortages' && (
-          <>
-            {myShortages.length === 0 ? (
-              <EmptyState icon="🛒" title="لا توجد نواقص" description="سجّل ما ينقصك من المطبخ" />
-            ) : (
-              <>
-                {['missing', 'provided'].map((status) => {
-                  const group = myShortages.filter((s) => s.status === status);
-                  if (group.length === 0) return null;
-                  return (
-                    <div key={status}>
-                      <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', marginBottom: 8, color: status === 'missing' ? 'var(--danger)' : 'var(--success)' }}>
-                        {status === 'missing' ? `ناقص (${group.length})` : `✓ تم توفيره (${group.length})`}
-                      </p>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                        {group
-                          .sort((a, b) => {
-                            const o: Record<string, number> = { urgent: 0, high: 1, medium: 2, low: 3 };
-                            return o[a.priority] - o[b.priority];
-                          })
-                          .map((item) => {
-                            const pColor = shortagePriorityColors[item.priority];
-                            const isMissing = item.status === 'missing';
-                            return (
-                              <div
-                                key={item.id}
-                                style={{
-                                  display: 'flex', alignItems: 'center', gap: 12,
-                                  padding: 12, borderRadius: 16,
-                                  background: 'var(--surface-card)',
-                                  border: '1px solid var(--border-soft)',
-                                  opacity: isMissing ? 1 : 0.55,
-                                }}
-                              >
-                                <button
-                                  onClick={() => toggleShortageStatus(item.id)}
-                                  style={{ flexShrink: 0, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                                >
-                                  {isMissing ? (
-                                    <Circle size={20} color="rgba(255,255,255,0.25)" />
-                                  ) : (
-                                    <CheckCircle2 size={20} color="var(--success)" />
-                                  )}
-                                </button>
-                                <div style={{ flex: 1 }}>
-                                  <p style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', textDecoration: isMissing ? 'none' : 'line-through' }}>
-                                    {item.name}
-                                  </p>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 2 }}>
-                                    {item.quantity && (
-                                      <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{item.quantity}</span>
-                                    )}
-                                    <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                                      {categoryLabels[item.category] || item.category}
-                                    </span>
-                                  </div>
-                                </div>
-                                {isMissing && (
-                                  <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, fontWeight: 600, flexShrink: 0, background: pColor.bg, color: pColor.text }}>
-                                    {shortagePriorityLabels[item.priority]}
-                                  </span>
-                                )}
-                              </div>
-                            );
-                          })}
-                      </div>
-                    </div>
-                  );
-                })}
-              </>
-            )}
-          </>
-        )}
-
-        {/* RECIPES */}
-        {activeTab === 'recipes' && (
-          <>
-            {myRecipes.length === 0 ? (
-              <EmptyState icon="👨‍🍳" title="لا توجد وصفات" description="احفظ وصفاتك المفضلة" />
-            ) : (
-              myRecipes.map((recipe) => (
-                <div
-                  key={recipe.id}
-                  style={{ padding: 14, borderRadius: 20, background: 'var(--surface-card)', border: '1px solid var(--border-soft)' }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                    <div style={{ padding: 10, borderRadius: 14, flexShrink: 0, background: 'rgba(176,141,87,0.15)' }}>
-                      <ChefHat size={20} color="var(--bronze)" strokeWidth={1.7} />
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                        <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>
-                          {recipe.name}
-                        </p>
-                        {recipe.favoritedBy.includes(currentUserId) && (
-                          <Heart size={14} color="#F472B6" fill="#F472B6" />
-                        )}
-                      </div>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
-                        {recipe.mealTime.map((t) => (
-                          <span key={t} style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, background: 'rgba(255,255,255,0.07)', color: 'var(--text-muted)' }}>
-                            {mealTimeLabels[t]}
-                          </span>
-                        ))}
-                        {recipe.prepTime && (
-                          <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'var(--text-muted)' }}>
-                            <Clock size={10} />{recipe.prepTime} دقيقة
-                          </span>
-                        )}
-                      </div>
-                      <div style={{ marginTop: 10 }}>
-                        <p style={{ fontSize: 11, fontWeight: 600, marginBottom: 4, color: 'var(--text-secondary)' }}>
-                          المكونات:
-                        </p>
-                        <p style={{ fontSize: 12, lineHeight: 1.6, color: 'var(--text-muted)' }}>
-                          {recipe.ingredients.join(' · ')}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
-          </>
-        )}
 
         {/* TODAY'S MEALS */}
         {activeTab === 'today' && (
@@ -206,29 +106,69 @@ export default function KitchenPage() {
               const icons = { breakfast: '🌅', lunch: '☀️', dinner: '🌙' };
               const mealValue = todayPlan?.[meal];
               return (
-                <div key={meal} style={{ padding: 16, borderRadius: 20, background: 'var(--surface-card)', border: '1px solid var(--border-soft)' }}>
+                <div
+                  key={meal}
+                  style={{
+                    padding: 16, borderRadius: 20,
+                    background: 'var(--surface-card)',
+                    border: '1px solid var(--border-soft)',
+                  }}
+                >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                    <span style={{ fontSize: 18 }}>{icons[meal]}</span>
-                    <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>
+                    <span style={{ fontSize: 20 }}>{icons[meal]}</span>
+                    <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>
                       {mealTimeLabels[meal]}
                     </span>
                   </div>
                   {mealValue ? (
-                    <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{mealValue}</p>
+                    <p style={{ fontSize: 14, color: 'var(--text-secondary)', paddingRight: 28 }}>{mealValue}</p>
                   ) : (
-                    <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>لم يُحدد بعد</p>
+                    <p style={{ fontSize: 13, color: 'var(--text-muted)', paddingRight: 28 }}>لم يُحدد بعد</p>
                   )}
                 </div>
               );
             })}
+            {!todayPlan && (
+              <EmptyState icon="🍽️" title="لم تُحدد وجبات اليوم" description="افتح تاب الأسبوع وأضف وجبات أو اطلب اقتراحاً من الذكاء الاصطناعي" />
+            )}
           </div>
         )}
 
         {/* WEEK PLAN */}
         {activeTab === 'week' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <>
+            {/* AI Suggest button */}
+            <button
+              onClick={suggestMeals}
+              disabled={aiLoading}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                width: '100%', padding: '12px 16px', borderRadius: 16,
+                background: aiLoading ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg, rgba(176,141,87,0.20), rgba(176,141,87,0.10))',
+                border: '1px solid rgba(176,141,87,0.35)',
+                cursor: aiLoading ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s ease',
+                marginBottom: 4,
+              }}
+              className="active:scale-[0.98]"
+            >
+              {aiLoading
+                ? <Loader2 size={16} color="var(--bronze)" style={{ animation: 'spin 1s linear infinite' }} />
+                : <Sparkles size={16} color="var(--bronze)" />
+              }
+              <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--bronze)' }}>
+                {aiLoading ? 'جاري التفكير...' : 'اقتراح وجبات الأسبوع بالذكاء الاصطناعي'}
+              </span>
+            </button>
+
             {weekDays.map(({ date, dateStr, plan, dayLabel }) => {
-              const isToday = dateStr === new Date().toISOString().split('T')[0];
+              const isToday = dateStr === todayStr;
+              const suggested = weekSuggestions[dateStr];
+              const display = {
+                breakfast: plan?.breakfast || suggested?.breakfast,
+                lunch:     plan?.lunch     || suggested?.lunch,
+                dinner:    plan?.dinner    || suggested?.dinner,
+              };
               return (
                 <div
                   key={dateStr}
@@ -250,6 +190,11 @@ export default function KitchenPage() {
                         اليوم
                       </span>
                     )}
+                    {suggested && !plan && (
+                      <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, fontWeight: 600, background: 'rgba(176,141,87,0.15)', color: 'var(--bronze)', marginRight: 'auto' }}>
+                        ✨ مقترح
+                      </span>
+                    )}
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
                     {(['breakfast', 'lunch', 'dinner'] as const).map((meal) => (
@@ -257,8 +202,13 @@ export default function KitchenPage() {
                         <p style={{ fontSize: 10, fontWeight: 600, marginBottom: 4, color: 'var(--text-muted)' }}>
                           {mealTimeLabels[meal]}
                         </p>
-                        <p style={{ fontSize: 12, color: plan?.[meal] ? 'var(--text-secondary)' : 'rgba(255,255,255,0.15)' }}>
-                          {plan?.[meal] || '—'}
+                        <p style={{
+                          fontSize: 12,
+                          color: display[meal]
+                            ? (suggested && !plan ? 'rgba(176,141,87,0.85)' : 'var(--text-secondary)')
+                            : 'rgba(255,255,255,0.15)',
+                        }}>
+                          {display[meal] || '—'}
                         </p>
                       </div>
                     ))}
@@ -266,9 +216,129 @@ export default function KitchenPage() {
                 </div>
               );
             })}
-          </div>
+          </>
+        )}
+
+        {/* SHORTAGES */}
+        {activeTab === 'shortages' && (
+          <>
+            {myShortages.length === 0 ? (
+              <EmptyState icon="🛒" title="لا توجد نواقص" description="سجّل ما ينقصك من المطبخ" />
+            ) : (
+              ['missing', 'provided'].map((status) => {
+                const group = myShortages.filter((s) => s.status === status);
+                if (group.length === 0) return null;
+                return (
+                  <div key={status}>
+                    <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', marginBottom: 8, color: status === 'missing' ? 'var(--danger)' : 'var(--success)' }}>
+                      {status === 'missing' ? `ناقص (${group.length})` : `✓ تم توفيره (${group.length})`}
+                    </p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      {group
+                        .sort((a, b) => {
+                          const o: Record<string, number> = { urgent: 0, high: 1, medium: 2, low: 3 };
+                          return o[a.priority] - o[b.priority];
+                        })
+                        .map((item) => {
+                          const pColor = shortagePriorityColors[item.priority];
+                          const isMissing = item.status === 'missing';
+                          return (
+                            <div
+                              key={item.id}
+                              style={{
+                                display: 'flex', alignItems: 'center', gap: 12,
+                                padding: 12, borderRadius: 16,
+                                background: 'var(--surface-card)',
+                                border: '1px solid var(--border-soft)',
+                                opacity: isMissing ? 1 : 0.55,
+                              }}
+                            >
+                              <button
+                                onClick={() => toggleShortageStatus(item.id)}
+                                style={{ flexShrink: 0, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                              >
+                                {isMissing
+                                  ? <Circle size={20} color="rgba(255,255,255,0.25)" />
+                                  : <CheckCircle2 size={20} color="var(--success)" />
+                                }
+                              </button>
+                              <div style={{ flex: 1 }}>
+                                <p style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', textDecoration: isMissing ? 'none' : 'line-through' }}>
+                                  {item.name}
+                                </p>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 2 }}>
+                                  {item.quantity && <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{item.quantity}</span>}
+                                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{categoryLabels[item.category] || item.category}</span>
+                                </div>
+                              </div>
+                              {isMissing && (
+                                <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, fontWeight: 600, flexShrink: 0, background: pColor.bg, color: pColor.text }}>
+                                  {shortagePriorityLabels[item.priority]}
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })}
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </>
+        )}
+
+        {/* RECIPES */}
+        {activeTab === 'recipes' && (
+          <>
+            {myRecipes.length === 0 ? (
+              <EmptyState icon="👨‍🍳" title="لا توجد وصفات" description="احفظ وصفاتك المفضلة" />
+            ) : (
+              myRecipes.map((recipe) => (
+                <div
+                  key={recipe.id}
+                  style={{ padding: 14, borderRadius: 20, background: 'var(--surface-card)', border: '1px solid var(--border-soft)' }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                    <div style={{ padding: 10, borderRadius: 14, flexShrink: 0, background: 'rgba(176,141,87,0.15)' }}>
+                      <ChefHat size={20} color="var(--bronze)" strokeWidth={1.7} />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                        <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{recipe.name}</p>
+                        {recipe.favoritedBy.includes(currentUserId) && (
+                          <Heart size={14} color="#F472B6" fill="#F472B6" />
+                        )}
+                      </div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
+                        {recipe.mealTime.map((t) => (
+                          <span key={t} style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, background: 'rgba(255,255,255,0.07)', color: 'var(--text-muted)' }}>
+                            {mealTimeLabels[t]}
+                          </span>
+                        ))}
+                        {recipe.prepTime && (
+                          <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'var(--text-muted)' }}>
+                            <Clock size={10} />{recipe.prepTime} دقيقة
+                          </span>
+                        )}
+                      </div>
+                      {recipe.ingredients.length > 0 && (
+                        <div style={{ marginTop: 10 }}>
+                          <p style={{ fontSize: 11, fontWeight: 600, marginBottom: 4, color: 'var(--text-secondary)' }}>المكونات:</p>
+                          <p style={{ fontSize: 12, lineHeight: 1.6, color: 'var(--text-muted)' }}>
+                            {recipe.ingredients.join(' · ')}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </>
         )}
       </div>
+
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </AppShell>
   );
 }
