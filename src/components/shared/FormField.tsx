@@ -13,13 +13,13 @@ interface FormFieldProps {
 export function FormField({ label, error, required, children, className }: FormFieldProps) {
   return (
     <div className={cn('flex flex-col gap-1.5', className)}>
-      <label className="text-sm font-medium" style={{ color: '#44403C' }}>
+      <label className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
         {label}
-        {required && <span className="text-red-500 mr-0.5">*</span>}
+        {required && <span style={{ color: 'var(--danger)' }} className="mr-0.5">*</span>}
       </label>
       {children}
       {error && (
-        <p className="text-xs" style={{ color: '#DC2626' }}>{error}</p>
+        <p className="text-xs" style={{ color: 'var(--danger)' }}>{error}</p>
       )}
     </div>
   );
@@ -29,18 +29,20 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: boolean;
 }
 
-export function Input({ error, className, ...props }: InputProps) {
+export function Input({ error, className, style, ...props }: InputProps) {
   return (
     <input
       className={cn(
         'w-full px-3.5 py-3 rounded-xl text-sm outline-none transition-all',
-        'border placeholder:text-[#A8A29E]',
-        error
-          ? 'border-red-400 focus:border-red-500 bg-red-50'
-          : 'border-[var(--border)] focus:border-[#C8922A] bg-white',
+        'border',
         className
       )}
-      style={{ color: '#1C1917' }}
+      style={{
+        background: error ? 'rgba(249,112,102,0.08)' : 'rgba(255,255,255,0.05)',
+        border: `1px solid ${error ? 'var(--danger)' : 'var(--border-soft)'}`,
+        color: 'var(--text-primary)',
+        ...style,
+      }}
       {...props}
     />
   );
@@ -50,18 +52,20 @@ interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement
   error?: boolean;
 }
 
-export function Textarea({ error, className, ...props }: TextareaProps) {
+export function Textarea({ error, className, style, ...props }: TextareaProps) {
   return (
     <textarea
       className={cn(
         'w-full px-3.5 py-3 rounded-xl text-sm outline-none transition-all resize-none',
-        'border placeholder:text-[#A8A29E]',
-        error
-          ? 'border-red-400 focus:border-red-500 bg-red-50'
-          : 'border-[var(--border)] focus:border-[#C8922A] bg-white',
+        'border',
         className
       )}
-      style={{ color: '#1C1917' }}
+      style={{
+        background: error ? 'rgba(249,112,102,0.08)' : 'rgba(255,255,255,0.05)',
+        border: `1px solid ${error ? 'var(--danger)' : 'var(--border-soft)'}`,
+        color: 'var(--text-primary)',
+        ...style,
+      }}
       rows={3}
       {...props}
     />
@@ -73,18 +77,20 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   placeholder?: string;
 }
 
-export function Select({ error, placeholder, className, children, ...props }: SelectProps) {
+export function Select({ error, placeholder, className, style, children, ...props }: SelectProps) {
   return (
     <select
       className={cn(
         'w-full px-3.5 py-3 rounded-xl text-sm outline-none transition-all appearance-none',
         'border',
-        error
-          ? 'border-red-400 focus:border-red-500 bg-red-50'
-          : 'border-[var(--border)] focus:border-[#C8922A] bg-white',
         className
       )}
-      style={{ color: '#1C1917' }}
+      style={{
+        background: error ? 'rgba(249,112,102,0.08)' : 'rgba(255,255,255,0.05)',
+        border: `1px solid ${error ? 'var(--danger)' : 'var(--border-soft)'}`,
+        color: 'var(--text-primary)',
+        ...style,
+      }}
       {...props}
     >
       {placeholder && <option value="">{placeholder}</option>}
@@ -104,8 +110,12 @@ export function SubmitButton({ label, loading, disabled }: SubmitButtonProps) {
     <button
       type="submit"
       disabled={disabled || loading}
-      className="w-full py-3.5 rounded-2xl text-base font-bold text-white transition-all active:scale-[0.98] disabled:opacity-60"
-      style={{ background: 'linear-gradient(135deg, #C8922A, #A37520)' }}
+      className="w-full py-3.5 rounded-2xl text-base font-bold transition-all active:scale-[0.98] disabled:opacity-50"
+      style={{
+        background: 'linear-gradient(135deg, rgba(176,141,87,0.90), rgba(176,141,87,0.70))',
+        color: '#0D0F12',
+        border: '1px solid rgba(176,141,87,0.40)',
+      }}
     >
       {loading ? 'جاري الحفظ...' : label}
     </button>

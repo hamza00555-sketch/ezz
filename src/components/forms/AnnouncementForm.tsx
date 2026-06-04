@@ -83,7 +83,7 @@ export function AnnouncementForm({ open, onClose }: AnnouncementFormProps) {
         <div className="flex flex-col gap-2">
           <label
             className="flex items-center gap-3 p-3.5 rounded-xl cursor-pointer"
-            style={{ background: '#FAF7F2', border: '1px solid var(--border)' }}
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border-soft)' }}
           >
             <input
               type="checkbox"
@@ -92,14 +92,14 @@ export function AnnouncementForm({ open, onClose }: AnnouncementFormProps) {
               className="w-5 h-5"
             />
             <div>
-              <p className="text-sm font-medium" style={{ color: '#1C1917' }}>📌 تثبيت الإعلان</p>
-              <p className="text-xs" style={{ color: '#78716C' }}>يظهر في الصفحة الرئيسية</p>
+              <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>📌 تثبيت الإعلان</p>
+              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>يظهر في الصفحة الرئيسية</p>
             </div>
           </label>
 
           <label
             className="flex items-center gap-3 p-3.5 rounded-xl cursor-pointer"
-            style={{ background: '#FAF7F2', border: '1px solid var(--border)' }}
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border-soft)' }}
           >
             <input
               type="checkbox"
@@ -108,8 +108,8 @@ export function AnnouncementForm({ open, onClose }: AnnouncementFormProps) {
               className="w-5 h-5"
             />
             <div>
-              <p className="text-sm font-medium" style={{ color: '#1C1917' }}>✅ يتطلب تأكيد القراءة</p>
-              <p className="text-xs" style={{ color: '#78716C' }}>يُظهر زر تأكيد للأفراد</p>
+              <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>✅ يتطلب تأكيد القراءة</p>
+              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>يُظهر زر تأكيد للأفراد</p>
             </div>
           </label>
         </div>

@@ -27,36 +27,38 @@ export function BottomSheet({ open, onClose, title, children, height = 'auto' }:
     <>
       <div
         className="fixed inset-0 z-40"
-        style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(3px)' }}
+        style={{ background: 'rgba(0,0,0,0.70)', backdropFilter: 'blur(4px)' }}
         onClick={onClose}
       />
       <div
         className="fixed bottom-0 inset-x-0 z-50 slide-up flex flex-col"
         style={{
-          background: '#FFFFFF',
+          background: 'var(--bg-elevated)',
           borderTopLeftRadius: 24,
           borderTopRightRadius: 24,
           maxHeight: height === 'full' ? '92dvh' : '90dvh',
-          boxShadow: '0 -8px 40px rgba(0,0,0,0.15)',
+          boxShadow: '0 -8px 40px rgba(0,0,0,0.50)',
+          border: '1px solid var(--border-soft)',
+          borderBottom: 'none',
         }}
       >
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
-          <div className="w-10 h-1 rounded-full" style={{ background: '#E8E0D5' }} />
+          <div className="w-10 h-1 rounded-full" style={{ background: 'var(--border-strong)' }} />
         </div>
 
         {/* Header */}
         <div
           className="flex items-center justify-between px-5 py-3 flex-shrink-0"
-          style={{ borderBottom: '1px solid var(--border)' }}
+          style={{ borderBottom: '1px solid var(--border-soft)' }}
         >
-          <h2 className="text-lg font-bold" style={{ color: '#1C1917' }}>{title}</h2>
+          <h2 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>{title}</h2>
           <button
             onClick={onClose}
             className="p-2 rounded-full"
-            style={{ background: '#F5F5F4' }}
+            style={{ background: 'rgba(255,255,255,0.07)' }}
           >
-            <X size={18} color="#78716C" />
+            <X size={18} color="var(--text-secondary)" />
           </button>
         </div>
 

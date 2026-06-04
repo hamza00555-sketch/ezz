@@ -89,9 +89,9 @@ export function DocumentForm({ open, onClose }: DocumentFormProps) {
                 onClick={() => setType(t.value)}
                 className="py-2.5 px-2 rounded-xl text-xs font-medium transition-all text-center"
                 style={{
-                  background: type === t.value ? '#FFF7ED' : '#F5F5F4',
-                  color: type === t.value ? '#C8922A' : '#57534E',
-                  border: type === t.value ? '1.5px solid #C8922A' : '1.5px solid transparent',
+                  background: type === t.value ? 'rgba(176,141,87,0.18)' : 'rgba(255,255,255,0.06)',
+                  color: type === t.value ? 'var(--bronze)' : 'var(--text-secondary)',
+                  border: type === t.value ? '1.5px solid rgba(176,141,87,0.50)' : '1.5px solid var(--border-soft)',
                 }}
               >
                 {t.label}

@@ -121,8 +121,9 @@ export function RecipeForm({ open, onClose }: RecipeFormProps) {
                   onClick={() => toggleMealTime(t.value)}
                   className="px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all"
                   style={{
-                    background: selectedMealTimes.includes(t.value) ? '#C8922A' : '#F5F5F4',
-                    color: selectedMealTimes.includes(t.value) ? '#FFFFFF' : '#57534E',
+                    background: selectedMealTimes.includes(t.value) ? 'var(--bronze)' : 'rgba(255,255,255,0.06)',
+                    color: selectedMealTimes.includes(t.value) ? '#0D0F12' : 'var(--text-secondary)',
+                    border: `1px solid ${selectedMealTimes.includes(t.value) ? 'transparent' : 'var(--border-soft)'}`,
                   }}
                 >
                   {t.label}
@@ -148,9 +149,9 @@ export function RecipeForm({ open, onClose }: RecipeFormProps) {
                     type="button"
                     onClick={() => removeIngredient(i)}
                     className="p-2 rounded-xl"
-                    style={{ background: '#FEF2F2' }}
+                    style={{ background: 'var(--danger-soft)' }}
                   >
-                    <X size={16} color="#DC2626" />
+                    <X size={16} color="var(--danger)" />
                   </button>
                 )}
               </div>
@@ -159,7 +160,7 @@ export function RecipeForm({ open, onClose }: RecipeFormProps) {
               type="button"
               onClick={addIngredient}
               className="flex items-center gap-2 py-2 text-sm font-medium"
-              style={{ color: '#C8922A' }}
+              style={{ color: 'var(--bronze)' }}
             >
               <Plus size={16} /> إضافة مكون
             </button>
@@ -173,7 +174,7 @@ export function RecipeForm({ open, onClose }: RecipeFormProps) {
               <div key={i} className="flex gap-2 items-start">
                 <span
                   className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-3"
-                  style={{ background: '#FFF7ED', color: '#C8922A' }}
+                  style={{ background: 'rgba(176,141,87,0.18)', color: 'var(--bronze)' }}
                 >
                   {i + 1}
                 </span>
@@ -188,9 +189,9 @@ export function RecipeForm({ open, onClose }: RecipeFormProps) {
                     type="button"
                     onClick={() => removeStep(i)}
                     className="p-2 rounded-xl mt-1"
-                    style={{ background: '#FEF2F2' }}
+                    style={{ background: 'var(--danger-soft)' }}
                   >
-                    <X size={16} color="#DC2626" />
+                    <X size={16} color="var(--danger)" />
                   </button>
                 )}
               </div>
@@ -199,7 +200,7 @@ export function RecipeForm({ open, onClose }: RecipeFormProps) {
               type="button"
               onClick={addStep}
               className="flex items-center gap-2 py-2 text-sm font-medium"
-              style={{ color: '#C8922A' }}
+              style={{ color: 'var(--bronze)' }}
             >
               <Plus size={16} /> إضافة خطوة
             </button>

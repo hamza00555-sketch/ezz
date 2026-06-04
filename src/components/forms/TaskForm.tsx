@@ -153,7 +153,7 @@ export function TaskForm({ open, onClose }: TaskFormProps) {
         </div>
 
         <label className="flex items-center gap-3 p-3 rounded-xl cursor-pointer"
-          style={{ background: '#FAF7F2', border: '1px solid var(--border)' }}>
+          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border-soft)' }}>
           <input
             type="checkbox"
             checked={isRecurring}
@@ -161,8 +161,8 @@ export function TaskForm({ open, onClose }: TaskFormProps) {
             className="w-5 h-5 rounded"
           />
           <div>
-            <p className="text-sm font-medium" style={{ color: '#1C1917' }}>مهمة متكررة</p>
-            <p className="text-xs" style={{ color: '#78716C' }}>تتكرر بشكل منتظم</p>
+            <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>مهمة متكررة</p>
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>تتكرر بشكل منتظم</p>
           </div>
         </label>
 
