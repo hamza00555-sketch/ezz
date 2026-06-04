@@ -348,9 +348,9 @@ const mockMealPlans: MealPlan[] = [
     id: 'mp-1',
     familyGroupId: FAMILY_GROUP_ID,
     date: new Date().toISOString().split('T')[0],
-    breakfast: 'بيض مع خبز',
-    lunch: 'كبسة دجاج',
-    dinner: 'شوربة عدس',
+    breakfast: ['بيض مع خبز', 'لحوح مع العسل', 'شكشوكة'],
+    lunch: ['كبسة دجاج', 'مندي لحم', 'زربيان حضرمي'],
+    dinner: ['شوربة عدس', 'حمص مع خبز'],
     createdBy: 'member-2',
     updatedAt: new Date().toISOString(),
   },
@@ -523,7 +523,8 @@ interface AppState {
   addExpense: (expense: Omit<Expense, 'id' | 'createdAt' | 'updatedAt'>) => void;
 
   // Meal plan actions
-  setMealPlan: (date: string, meal: 'breakfast' | 'lunch' | 'dinner', value: string) => void;
+  addMealOption: (date: string, meal: 'breakfast' | 'lunch' | 'dinner', option: string) => void;
+  removeMealOption: (date: string, meal: 'breakfast' | 'lunch' | 'dinner', option: string) => void;
 
   // Recipe actions
   addRecipe: (recipe: Omit<Recipe, 'id' | 'createdAt' | 'updatedAt'>) => void;
@@ -694,14 +695,16 @@ export const useAppStore = create<AppState>((set, get) => ({
     }
   },
 
-  setMealPlan: (date, meal, value) => {
+  addMealOption: (date, meal, option) => {
+    if (!option.trim()) return;
     const { mealPlans, currentFamilyGroupId, currentUserId } = get();
     const existing = mealPlans.find((p) => p.familyGroupId === currentFamilyGroupId && p.date === date);
     const now = new Date().toISOString();
     if (existing) {
+      if (existing[meal].includes(option)) return;
       set((state) => ({
         mealPlans: state.mealPlans.map((p) =>
-          p.id === existing.id ? { ...p, [meal]: value || undefined, updatedAt: now } : p
+          p.id === existing.id ? { ...p, [meal]: [...p[meal], option], updatedAt: now } : p
         ),
       }));
     } else {
@@ -709,12 +712,34 @@ export const useAppStore = create<AppState>((set, get) => ({
         id: `mp-${generateId()}`,
         familyGroupId: currentFamilyGroupId,
         date,
-        [meal]: value || undefined,
+        breakfast: meal === 'breakfast' ? [option] : [],
+        lunch:     meal === 'lunch'     ? [option] : [],
+        dinner:    meal === 'dinner'    ? [option] : [],
         createdBy: currentUserId,
         updatedAt: now,
       };
       set((state) => ({ mealPlans: [...state.mealPlans, newPlan] }));
     }
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      import('@/lib/supabase/db').then(({ dbSetMealPlan }) => {
+        const plan = get().mealPlans.find((p) => p.familyGroupId === currentFamilyGroupId && p.date === date);
+        if (plan) dbSetMealPlan(plan);
+      });
+    }
+  },
+
+  removeMealOption: (date, meal, option) => {
+    const { mealPlans, currentFamilyGroupId } = get();
+    const existing = mealPlans.find((p) => p.familyGroupId === currentFamilyGroupId && p.date === date);
+    if (!existing) return;
+    const now = new Date().toISOString();
+    set((state) => ({
+      mealPlans: state.mealPlans.map((p) =>
+        p.id === existing.id
+          ? { ...p, [meal]: p[meal].filter((o) => o !== option), updatedAt: now }
+          : p
+      ),
+    }));
     if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
       import('@/lib/supabase/db').then(({ dbSetMealPlan }) => {
         const plan = get().mealPlans.find((p) => p.familyGroupId === currentFamilyGroupId && p.date === date);

@@ -7,7 +7,7 @@ import { Tabs } from '@/components/shared/Tabs';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { useAppStore } from '@/store/appStore';
 import { categoryLabels } from '@/lib/utils';
-import { Clock, Heart, ChefHat, CheckCircle2, Circle, FileText, X } from 'lucide-react';
+import { Clock, Heart, ChefHat, CheckCircle2, Circle, FileText, X, RefreshCw } from 'lucide-react';
 import type { ShortagePriority, MealTime } from '@/types';
 
 type KitchenTab = 'today' | 'week' | 'shortages' | 'recipes';
@@ -23,7 +23,7 @@ const shortagePriorityLabels: Record<ShortagePriority, string> = {
   urgent: 'عاجل', high: 'مهم', medium: 'متوسط', low: 'عادي',
 };
 const mealLabels: Record<MealSlot, string> = { breakfast: 'فطور', lunch: 'غداء', dinner: 'عشاء' };
-const mealIcons: Record<MealSlot, string>  = { breakfast: '🌅',  lunch: '☀️',   dinner: '🌙'   };
+const mealIcons:  Record<MealSlot, string>  = { breakfast: '🌅',  lunch: '☀️',   dinner: '🌙'  };
 const dayLabels = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
 const allMealTimes: { key: MealTime; label: string }[] = [
   { key: 'breakfast', label: 'فطور' },
@@ -60,7 +60,7 @@ const dishes: Record<MealSlot, string[]> = {
   ],
 };
 
-function pickSuggestions(meal: MealSlot, count = 4, exclude: string[] = []): string[] {
+function pickSuggestions(meal: MealSlot, count = 5, exclude: string[] = []): string[] {
   const pool = dishes[meal].filter((d) => !exclude.includes(d));
   return [...pool].sort(() => Math.random() - 0.5).slice(0, count);
 }
@@ -77,23 +77,18 @@ interface ParsedRecipe {
 function parseRecipeText(raw: string): ParsedRecipe | null {
   const lines = raw.split('\n').map((l) => l.trim()).filter(Boolean);
   if (!lines.length) return null;
-
   const name = lines[0].replace(/^[#*\-\•‏]+\s*/, '').trim();
   const ingredients: string[] = [];
   const steps: string[] = [];
   let mode: 'none' | 'ing' | 'steps' = 'none';
-
   const ingRe  = /مقادير|المقادير|مكونات|المكونات|الكميات|ingredients/i;
   const stepRe = /طريقة|الطريقة|الطريقه|التحضير|خطوات|الخطوات|steps|الطبخ|الطهي/i;
-
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i];
     if (ingRe.test(line))  { mode = 'ing';   continue; }
     if (stepRe.test(line)) { mode = 'steps'; continue; }
-
     const clean = line.replace(/^[\d.\-\•*●•‏]+\s*/, '').trim();
     if (!clean) continue;
-
     if (mode === 'ing') {
       ingredients.push(clean);
     } else if (mode === 'steps') {
@@ -106,7 +101,6 @@ function parseRecipeText(raw: string): ParsedRecipe | null {
       }
     }
   }
-
   return { name, ingredients, steps, mealTime: [] };
 }
 
@@ -115,12 +109,17 @@ function parseRecipeText(raw: string): ParsedRecipe | null {
 export default function KitchenPage() {
   const [activeTab, setActiveTab] = useState<KitchenTab>('today');
 
-  // Inline meal editing
+  // Today: which index in each meal's options array is currently shown
+  const [mealIndices, setMealIndices] = useState<Record<MealSlot, number>>({
+    breakfast: 0, lunch: 0, dinner: 0,
+  });
+
+  // Week: inline editing to add a new option to a specific cell
   const [editingCell, setEditingCell] = useState<{ date: string; meal: MealSlot } | null>(null);
   const [editValue, setEditValue]     = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
 
-  // Recipe import sheet
+  // Import recipe sheet
   const [importOpen, setImportOpen]         = useState(false);
   const [importText, setImportText]         = useState('');
   const [parsed, setParsed]                 = useState<ParsedRecipe | null>(null);
@@ -130,7 +129,7 @@ export default function KitchenPage() {
   const {
     shortages, recipes, mealPlans, members,
     currentFamilyGroupId, currentUserId,
-    toggleShortageStatus, setMealPlan, addRecipe,
+    toggleShortageStatus, addMealOption, removeMealOption, addRecipe,
   } = useAppStore();
 
   const currentMember = members.find((m) => m.id === currentUserId);
@@ -159,27 +158,44 @@ export default function KitchenPage() {
 
   const meals: MealSlot[] = ['breakfast', 'lunch', 'dinner'];
 
-  function startEdit(date: string, meal: MealSlot, currentValue = '') {
+  // ─── Today tab handlers ───────────────────────────────────────────────────
+
+  function rerollMeal(meal: MealSlot) {
+    const opts = todayPlan?.[meal] ?? [];
+    if (opts.length <= 1) return;
+    setMealIndices((prev) => ({
+      ...prev,
+      [meal]: (prev[meal] + 1) % opts.length,
+    }));
+  }
+
+  // ─── Week tab handlers ────────────────────────────────────────────────────
+
+  function startAdd(date: string, meal: MealSlot, existingOptions: string[]) {
     setEditingCell({ date, meal });
-    setEditValue(currentValue);
-    setSuggestions(pickSuggestions(meal, 4, currentValue ? [currentValue] : []));
+    setEditValue('');
+    setSuggestions(pickSuggestions(meal, 5, existingOptions));
   }
 
-  function saveEdit() {
+  function saveAdd() {
     if (!editingCell) return;
-    setMealPlan(editingCell.date, editingCell.meal, editValue.trim());
+    if (editValue.trim()) {
+      addMealOption(editingCell.date, editingCell.meal, editValue.trim());
+    }
     setEditingCell(null);
     setEditValue('');
     setSuggestions([]);
   }
 
-  function chipSave(s: string) {
+  function chipAdd(s: string) {
     if (!editingCell) return;
-    setMealPlan(editingCell.date, editingCell.meal, s);
+    addMealOption(editingCell.date, editingCell.meal, s);
     setEditingCell(null);
     setEditValue('');
     setSuggestions([]);
   }
+
+  // ─── Import handlers ──────────────────────────────────────────────────────
 
   function closeImport() {
     setImportOpen(false);
@@ -187,15 +203,6 @@ export default function KitchenPage() {
     setParsed(null);
     setParsedName('');
     setParsedMealTime([]);
-  }
-
-  function handleImportParse() {
-    const result = parseRecipeText(importText);
-    if (result) {
-      setParsed(result);
-      setParsedName(result.name);
-      setParsedMealTime([]);
-    }
   }
 
   function handleImportSave() {
@@ -213,149 +220,86 @@ export default function KitchenPage() {
     setActiveTab('recipes');
   }
 
-  // ─── Inline meal row (used inside day cards) ─────────────────────────────────
-  // Returned as JSX expression, not a React component, to avoid hook rules issues
-
-  function mealRow(dateStr: string, meal: MealSlot, value?: string) {
-    const isEditing = editingCell?.date === dateStr && editingCell?.meal === meal;
-    return (
-      <div key={meal}>
-        <div
-          style={{
-            display: 'flex', alignItems: 'center', gap: 10,
-            padding: '7px 0',
-            cursor: canEdit && !isEditing ? 'pointer' : 'default',
-            borderBottom: '1px solid rgba(255,255,255,0.04)',
-          }}
-          onClick={() => canEdit && !isEditing && startEdit(dateStr, meal, value)}
-        >
-          <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', width: 36, flexShrink: 0 }}>
-            {mealLabels[meal]}
-          </span>
-          {isEditing ? (
-            <input
-              autoFocus
-              value={editValue}
-              onChange={(e) => setEditValue(e.target.value)}
-              onBlur={saveEdit}
-              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); saveEdit(); } }}
-              placeholder="اسم الوجبة..."
-              style={{
-                flex: 1, background: 'transparent', border: 'none',
-                borderBottom: '1.5px solid var(--accent-strong)',
-                color: 'var(--text-primary)', fontSize: 13,
-                outline: 'none', padding: '2px 0',
-                fontFamily: 'inherit', direction: 'rtl',
-              }}
-            />
-          ) : (
-            <span style={{ flex: 1, fontSize: 13, color: value ? 'var(--text-primary)' : 'rgba(255,255,255,0.2)' }}>
-              {value || (canEdit ? '+ أضف' : '—')}
-            </span>
-          )}
-        </div>
-        {isEditing && (
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', padding: '6px 0 8px 0' }}>
-            {suggestions.map((s) => (
-              <button
-                key={s}
-                onPointerDown={(e) => e.preventDefault()}
-                onClick={() => chipSave(s)}
-                style={{
-                  fontSize: 11, padding: '4px 12px', borderRadius: 20,
-                  background: 'rgba(163,177,138,0.12)',
-                  color: 'var(--accent-strong)',
-                  border: '1px solid rgba(163,177,138,0.25)',
-                  cursor: 'pointer', fontFamily: 'inherit',
-                }}
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  }
-
   return (
     <AppShell>
       <PageHeader title="المطبخ" />
       <Tabs tabs={tabs} active={activeTab} onChange={(k) => setActiveTab(k as KitchenTab)} />
 
-      <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
 
         {/* ─── TODAY ────────────────────────────────────────────────────────────── */}
         {activeTab === 'today' && (
           <>
-            {!canEdit && (
-              <p style={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', paddingBottom: 4 }}>
-                لديك صلاحية العرض فقط — الأدمن يستطيع منح صلاحية التعديل
-              </p>
-            )}
+            <p style={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', paddingBottom: 2 }}>
+              وجبات اليوم — يُختار عشوائياً من خيارات الأسبوع
+            </p>
             {meals.map((meal) => {
-              const value = todayPlan?.[meal];
-              const isEditing = editingCell?.date === todayStr && editingCell?.meal === meal;
+              const options = todayPlan?.[meal] ?? [];
+              const idx = Math.min(mealIndices[meal], options.length - 1);
+              const selected = options[idx] ?? null;
+              const others   = options.filter((_, i) => i !== idx);
+
               return (
                 <div
                   key={meal}
                   style={{
-                    padding: 16, borderRadius: 20,
+                    padding: 18, borderRadius: 22,
                     background: 'var(--surface-card)',
-                    border: `1px solid ${isEditing ? 'rgba(163,177,138,0.35)' : 'var(--border-soft)'}`,
-                    cursor: canEdit && !isEditing ? 'pointer' : 'default',
+                    border: '1px solid var(--border-soft)',
                   }}
-                  onClick={() => canEdit && !isEditing && startEdit(todayStr, meal, value)}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  {/* Meal header */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
                     <span style={{ fontSize: 24 }}>{mealIcons[meal]}</span>
-                    <div style={{ flex: 1 }}>
-                      <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4 }}>
-                        {mealLabels[meal]}
-                      </p>
-                      {isEditing ? (
-                        <input
-                          autoFocus
-                          value={editValue}
-                          onChange={(e) => setEditValue(e.target.value)}
-                          onBlur={saveEdit}
-                          onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); saveEdit(); } }}
-                          placeholder="اكتب اسم الوجبة..."
-                          style={{
-                            width: '100%', background: 'transparent', border: 'none',
-                            borderBottom: '1.5px solid var(--accent-strong)',
-                            color: 'var(--text-primary)', fontSize: 15,
-                            outline: 'none', padding: '2px 0',
-                            fontFamily: 'inherit', direction: 'rtl',
-                            boxSizing: 'border-box',
-                          }}
-                        />
-                      ) : (
-                        <p style={{ fontSize: 15, color: value ? 'var(--text-primary)' : 'rgba(255,255,255,0.22)' }}>
-                          {value || (canEdit ? 'اضغط للإضافة' : 'لم يُحدد')}
-                        </p>
-                      )}
-                    </div>
+                    <p style={{ flex: 1, fontSize: 13, fontWeight: 700, color: 'var(--text-secondary)' }}>
+                      {mealLabels[meal]}
+                    </p>
+                    {options.length > 1 && (
+                      <button
+                        onClick={() => rerollMeal(meal)}
+                        title="خيار آخر"
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 5,
+                          padding: '5px 12px', borderRadius: 20,
+                          background: 'rgba(255,255,255,0.07)',
+                          border: '1px solid rgba(255,255,255,0.10)',
+                          cursor: 'pointer', fontFamily: 'inherit',
+                        }}
+                      >
+                        <RefreshCw size={13} color="var(--text-muted)" />
+                        <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>غيّر</span>
+                      </button>
+                    )}
                   </div>
-                  {isEditing && (
-                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 10 }}>
-                      {suggestions.map((s) => (
-                        <button
-                          key={s}
-                          onPointerDown={(e) => e.preventDefault()}
-                          onClick={() => chipSave(s)}
-                          style={{
-                            fontSize: 12, padding: '5px 14px', borderRadius: 20,
-                            background: 'rgba(163,177,138,0.12)',
-                            color: 'var(--accent-strong)',
-                            border: '1px solid rgba(163,177,138,0.25)',
-                            cursor: 'pointer', fontFamily: 'inherit',
-                          }}
-                        >
-                          {s}
-                        </button>
-                      ))}
-                    </div>
+
+                  {/* Selected dish */}
+                  {selected ? (
+                    <>
+                      <p style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8 }}>
+                        {selected}
+                      </p>
+                      {others.length > 0 && (
+                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                          {others.map((opt) => (
+                            <span
+                              key={opt}
+                              style={{
+                                fontSize: 11, padding: '3px 10px', borderRadius: 20,
+                                background: 'rgba(255,255,255,0.05)',
+                                color: 'var(--text-muted)',
+                                border: '1px solid rgba(255,255,255,0.06)',
+                              }}
+                            >
+                              {opt}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.2)' }}>
+                      لم تُضَف خيارات — اذهب لتاب الأسبوع وأضف وجبات اليوم
+                    </p>
                   )}
                 </div>
               );
@@ -367,8 +311,13 @@ export default function KitchenPage() {
         {activeTab === 'week' && (
           <>
             {!canEdit && (
-              <p style={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', paddingBottom: 4 }}>
+              <p style={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', paddingBottom: 2 }}>
                 لديك صلاحية العرض فقط
+              </p>
+            )}
+            {canEdit && (
+              <p style={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', paddingBottom: 2 }}>
+                وزّع الوجبات على الأسبوع — كل خانة تقبل أكثر من خيار
               </p>
             )}
             {weekDays.map(({ date, dateStr, plan, dayLabel }) => {
@@ -377,12 +326,13 @@ export default function KitchenPage() {
                 <div
                   key={dateStr}
                   style={{
-                    padding: '12px 16px', borderRadius: 20,
+                    padding: '14px 16px', borderRadius: 22,
                     background: isToday ? 'rgba(176,141,87,0.08)' : 'var(--surface-card)',
                     border: `1px solid ${isToday ? 'rgba(176,141,87,0.35)' : 'var(--border-soft)'}`,
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  {/* Day header */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                     <span style={{ fontSize: 14, fontWeight: 700, color: isToday ? 'var(--bronze)' : 'var(--text-primary)' }}>
                       {dayLabel}
                     </span>
@@ -395,8 +345,112 @@ export default function KitchenPage() {
                       </span>
                     )}
                   </div>
-                  <div>
-                    {meals.map((meal) => mealRow(dateStr, meal, plan?.[meal]))}
+
+                  {/* Meal rows */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {meals.map((meal) => {
+                      const options = plan?.[meal] ?? [];
+                      const isEditing = editingCell?.date === dateStr && editingCell?.meal === meal;
+
+                      return (
+                        <div key={meal}>
+                          {/* Label + chips row */}
+                          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                            <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', paddingTop: 4, width: 34, flexShrink: 0 }}>
+                              {mealLabels[meal]}
+                            </span>
+                            <div style={{ flex: 1, display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
+                              {/* Existing options */}
+                              {options.map((opt) => (
+                                <div
+                                  key={opt}
+                                  style={{
+                                    display: 'flex', alignItems: 'center', gap: 4,
+                                    padding: '4px 10px', borderRadius: 20,
+                                    background: 'rgba(163,177,138,0.12)',
+                                    border: '1px solid rgba(163,177,138,0.22)',
+                                  }}
+                                >
+                                  <span style={{ fontSize: 12, color: 'var(--accent-strong)' }}>{opt}</span>
+                                  {canEdit && (
+                                    <button
+                                      onClick={() => removeMealOption(dateStr, meal, opt)}
+                                      style={{
+                                        background: 'none', border: 'none', cursor: 'pointer',
+                                        padding: '0 0 0 2px', lineHeight: 1,
+                                        color: 'rgba(163,177,138,0.5)', fontSize: 14,
+                                      }}
+                                    >
+                                      ×
+                                    </button>
+                                  )}
+                                </div>
+                              ))}
+
+                              {/* Add button / inline input */}
+                              {canEdit && (
+                                isEditing ? (
+                                  <input
+                                    autoFocus
+                                    value={editValue}
+                                    onChange={(e) => setEditValue(e.target.value)}
+                                    onBlur={saveAdd}
+                                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); saveAdd(); } if (e.key === 'Escape') { setEditingCell(null); } }}
+                                    placeholder="اسم الوجبة..."
+                                    style={{
+                                      background: 'transparent', border: 'none',
+                                      borderBottom: '1.5px solid var(--accent-strong)',
+                                      color: 'var(--text-primary)', fontSize: 12,
+                                      outline: 'none', padding: '3px 2px',
+                                      fontFamily: 'inherit', direction: 'rtl',
+                                      width: 130,
+                                    }}
+                                  />
+                                ) : (
+                                  <button
+                                    onClick={() => startAdd(dateStr, meal, options)}
+                                    style={{
+                                      fontSize: 11, padding: '3px 10px', borderRadius: 20,
+                                      background: 'transparent',
+                                      border: '1px dashed rgba(255,255,255,0.18)',
+                                      color: 'var(--text-muted)', cursor: 'pointer',
+                                      fontFamily: 'inherit',
+                                    }}
+                                  >
+                                    + أضف
+                                  </button>
+                                )
+                              )}
+                              {!canEdit && options.length === 0 && (
+                                <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.18)' }}>—</span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* AI suggestion chips — only when editing this cell */}
+                          {isEditing && suggestions.length > 0 && (
+                            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 7, paddingRight: 42 }}>
+                              {suggestions.map((s) => (
+                                <button
+                                  key={s}
+                                  onPointerDown={(e) => e.preventDefault()}
+                                  onClick={() => chipAdd(s)}
+                                  style={{
+                                    fontSize: 11, padding: '4px 12px', borderRadius: 20,
+                                    background: 'rgba(176,141,87,0.12)',
+                                    color: 'var(--bronze)',
+                                    border: '1px solid rgba(176,141,87,0.25)',
+                                    cursor: 'pointer', fontFamily: 'inherit',
+                                  }}
+                                >
+                                  {s}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               );
@@ -482,8 +536,7 @@ export default function KitchenPage() {
                   width: '100%', padding: '12px 16px', borderRadius: 16,
                   background: 'rgba(232,121,249,0.08)',
                   border: '1px solid rgba(232,121,249,0.25)',
-                  cursor: 'pointer', marginBottom: 4,
-                  fontFamily: 'inherit',
+                  cursor: 'pointer', marginBottom: 4, fontFamily: 'inherit',
                 }}
                 className="active:scale-[0.98]"
               >
@@ -581,31 +634,30 @@ export default function KitchenPage() {
               <>
                 <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 10, lineHeight: 1.6 }}>
                   الصق نص الوصفة — سيُستخرج الاسم والمقادير والخطوات تلقائياً.
-                  يعمل مع نصوص بالعربي تحتوي على: المقادير / الطريقة
+                  يعمل مع نصوص تحتوي على: المقادير / الطريقة
                 </p>
                 <textarea
                   value={importText}
                   onChange={(e) => setImportText(e.target.value)}
-                  placeholder={`كبسة دجاج\n\nالمقادير:\n- دجاج كامل\n- 3 أكواب رز بسمتي\n- بهارات كبسة\n\nالطريقة:\n1. يُسلق الدجاج مع البهارات والبصل\n2. يُقلى البصل والثوم بالزبدة\n3. تُضاف الطماطم والبهارات ثم الرز`}
+                  placeholder={`كبسة دجاج\n\nالمقادير:\n- دجاج كامل\n- 3 أكواب رز بسمتي\n- بهارات كبسة\n\nالطريقة:\n1. يُسلق الدجاج مع البهارات\n2. يُقلى البصل والثوم بالزبدة`}
                   style={{
-                    width: '100%', height: 220, padding: 14,
-                    borderRadius: 16, background: 'var(--surface-card)',
-                    border: '1px solid var(--border-soft)',
+                    width: '100%', height: 220, padding: 14, borderRadius: 16,
+                    background: 'var(--surface-card)', border: '1px solid var(--border-soft)',
                     color: 'var(--text-primary)', fontSize: 13,
                     fontFamily: 'inherit', direction: 'rtl',
-                    resize: 'none', outline: 'none',
-                    boxSizing: 'border-box',
+                    resize: 'none', outline: 'none', boxSizing: 'border-box',
                   }}
                 />
                 <button
-                  onClick={handleImportParse}
+                  onClick={() => {
+                    const result = parseRecipeText(importText);
+                    if (result) { setParsed(result); setParsedName(result.name); setParsedMealTime([]); }
+                  }}
                   disabled={!importText.trim()}
                   style={{
-                    marginTop: 12, width: '100%', padding: 14,
-                    borderRadius: 16, fontWeight: 700, fontSize: 14,
-                    background: importText.trim()
-                      ? 'linear-gradient(135deg, #E879F9, #C026D3)'
-                      : 'rgba(255,255,255,0.07)',
+                    marginTop: 12, width: '100%', padding: 14, borderRadius: 16,
+                    fontWeight: 700, fontSize: 14,
+                    background: importText.trim() ? 'linear-gradient(135deg, #E879F9, #C026D3)' : 'rgba(255,255,255,0.07)',
                     color: importText.trim() ? '#fff' : 'var(--text-muted)',
                     border: 'none', cursor: importText.trim() ? 'pointer' : 'not-allowed',
                     fontFamily: 'inherit',
@@ -617,29 +669,22 @@ export default function KitchenPage() {
               </>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                {/* Name */}
                 <div>
                   <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 6, fontWeight: 600 }}>اسم الوصفة</p>
                   <input
                     value={parsedName}
                     onChange={(e) => setParsedName(e.target.value)}
                     style={{
-                      width: '100%', padding: '10px 14px',
-                      borderRadius: 12, background: 'var(--surface-card)',
-                      border: '1px solid var(--border-soft)',
+                      width: '100%', padding: '10px 14px', borderRadius: 12,
+                      background: 'var(--surface-card)', border: '1px solid var(--border-soft)',
                       color: 'var(--text-primary)', fontSize: 15, fontWeight: 600,
-                      fontFamily: 'inherit', direction: 'rtl', outline: 'none',
-                      boxSizing: 'border-box',
+                      fontFamily: 'inherit', direction: 'rtl', outline: 'none', boxSizing: 'border-box',
                     }}
                   />
                 </div>
-
-                {/* Ingredients */}
                 {parsed.ingredients.length > 0 && (
                   <div>
-                    <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 8, fontWeight: 600 }}>
-                      المكونات ({parsed.ingredients.length})
-                    </p>
+                    <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 8, fontWeight: 600 }}>المكونات ({parsed.ingredients.length})</p>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                       {parsed.ingredients.map((ing, i) => (
                         <span key={i} style={{ fontSize: 12, padding: '4px 10px', borderRadius: 20, background: 'rgba(255,255,255,0.07)', color: 'var(--text-secondary)' }}>
@@ -649,13 +694,9 @@ export default function KitchenPage() {
                     </div>
                   </div>
                 )}
-
-                {/* Steps */}
                 {parsed.steps.length > 0 && (
                   <div>
-                    <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 8, fontWeight: 600 }}>
-                      الخطوات ({parsed.steps.length})
-                    </p>
+                    <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 8, fontWeight: 600 }}>الخطوات ({parsed.steps.length})</p>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                       {parsed.steps.map((step, i) => (
                         <div key={i} style={{ display: 'flex', gap: 8 }}>
@@ -666,8 +707,6 @@ export default function KitchenPage() {
                     </div>
                   </div>
                 )}
-
-                {/* Meal time selector */}
                 <div>
                   <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 8, fontWeight: 600 }}>وقت الوجبة</p>
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -676,9 +715,7 @@ export default function KitchenPage() {
                       return (
                         <button
                           key={mt.key}
-                          onClick={() => setParsedMealTime((prev) =>
-                            active ? prev.filter((x) => x !== mt.key) : [...prev, mt.key]
-                          )}
+                          onClick={() => setParsedMealTime((prev) => active ? prev.filter((x) => x !== mt.key) : [...prev, mt.key])}
                           style={{
                             fontSize: 13, padding: '6px 16px', borderRadius: 20, cursor: 'pointer',
                             background: active ? 'rgba(163,177,138,0.18)' : 'var(--surface-card)',
@@ -693,16 +730,13 @@ export default function KitchenPage() {
                     })}
                   </div>
                 </div>
-
-                {/* Action buttons */}
                 <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
                   <button
                     onClick={() => setParsed(null)}
                     style={{
                       flex: 1, padding: 12, borderRadius: 14, fontWeight: 600,
                       background: 'rgba(255,255,255,0.07)', color: 'var(--text-secondary)',
-                      border: '1px solid var(--border-soft)', cursor: 'pointer',
-                      fontFamily: 'inherit', fontSize: 13,
+                      border: '1px solid var(--border-soft)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13,
                     }}
                   >
                     تعديل النص
@@ -712,8 +746,7 @@ export default function KitchenPage() {
                     style={{
                       flex: 2, padding: 12, borderRadius: 14, fontWeight: 700,
                       background: 'linear-gradient(135deg, #E879F9, #C026D3)',
-                      color: '#fff', border: 'none', cursor: 'pointer',
-                      fontFamily: 'inherit', fontSize: 14,
+                      color: '#fff', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 14,
                     }}
                     className="active:scale-[0.98]"
                   >

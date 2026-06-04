@@ -174,9 +174,9 @@ export interface MealPlan {
   id: string;
   familyGroupId: string;
   date: string; // ISO date
-  breakfast?: string; // recipe name or free text
-  lunch?: string;
-  dinner?: string;
+  breakfast: string[]; // list of options — today tab picks one randomly
+  lunch: string[];
+  dinner: string[];
   createdBy: string;
   updatedAt: string;
 }

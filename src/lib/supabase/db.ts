@@ -243,9 +243,9 @@ function toMealPlan(r: any): MealPlan {
     id: r.id,
     familyGroupId: r.family_group_id,
     date: r.date,
-    breakfast: r.breakfast,
-    lunch: r.lunch,
-    dinner: r.dinner,
+    breakfast: r.breakfast ?? [],
+    lunch: r.lunch ?? [],
+    dinner: r.dinner ?? [],
     createdBy: r.created_by ?? '',
     updatedAt: r.updated_at,
   };
