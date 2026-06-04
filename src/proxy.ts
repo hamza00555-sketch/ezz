@@ -5,6 +5,18 @@ const PUBLIC_PATHS = ['/login', '/signup', '/auth/callback', '/invite'];
 
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
+  const pathname = request.nextUrl.pathname;
+
+  // DEMO_REVIEW ── visiting /demo-dashboard sets a 2-hour bypass cookie and
+  // redirects to /dashboard. Remove this block + the isDemoReview check below
+  // (and DemoReviewBanner from AppShell) to revoke demo access entirely.
+  if (pathname === '/demo-dashboard') {
+    const res = NextResponse.redirect(new URL('/dashboard', request.url));
+    res.cookies.set('demo_review', '1', { maxAge: 7200, path: '/', sameSite: 'strict' });
+    return res;
+  }
+  if (request.cookies.get('demo_review')?.value === '1') return supabaseResponse;
+  // ── END DEMO_REVIEW ────────────────────────────────────────────────────────
 
   // Skip if Supabase env vars not configured (demo mode)
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
@@ -29,7 +41,6 @@ export async function proxy(request: NextRequest) {
   );
 
   const { data: { user } } = await supabase.auth.getUser();
-  const pathname = request.nextUrl.pathname;
 
   const isPublic = PUBLIC_PATHS.some((p) => pathname.startsWith(p));
 
