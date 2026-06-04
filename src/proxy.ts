@@ -34,11 +34,23 @@ export async function proxy(request: NextRequest) {
   const isPublic = PUBLIC_PATHS.some((p) => pathname.startsWith(p));
 
   if (!user && !isPublic) {
-    return NextResponse.redirect(new URL('/login', request.url));
+    return NextResponse.redirect(new URL(`/login?next=${pathname}`, request.url));
   }
 
   if (user && isPublic && !pathname.startsWith('/auth')) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
+  }
+
+  // Authenticated user with no family → send to onboarding
+  if (user && !pathname.startsWith('/onboarding') && !pathname.startsWith('/auth')) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('family_group_id')
+      .eq('id', user.id)
+      .single();
+    if (!profile?.family_group_id) {
+      return NextResponse.redirect(new URL('/onboarding', request.url));
+    }
   }
 
   return supabaseResponse;

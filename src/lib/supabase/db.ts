@@ -415,12 +415,8 @@ export async function dbAddExpense(expense: Omit<Expense, 'id' | 'createdAt' | '
 
 export async function dbConfirmAnnouncement(annId: string, userId: string) {
   const sb = createClient();
-  const { data: ann } = await sb.from('announcements').select('confirmed_by').eq('id', annId).single();
-  if (!ann) return;
-  const confirmedBy: string[] = ann.confirmed_by ?? [];
-  if (!confirmedBy.includes(userId)) {
-    await sb.from('announcements').update({ confirmed_by: [...confirmedBy, userId] }).eq('id', annId);
-  }
+  // Atomic append — avoids lost-update if two members confirm simultaneously
+  await sb.rpc('append_announcement_confirmation', { ann_id: annId, user_id: userId });
 }
 
 // ─── Family group creation/joining ───────────────────────────────────────────
