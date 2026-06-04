@@ -1,0 +1,50 @@
+{
+  "name": "عز — إدارة البيت العائلي",
+  "short_name": "عز",
+  "description": "تطبيق عائلي لإدارة شؤون البيت بكل حب",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0D0F12",
+  "theme_color": "#0D0F12",
+  "lang": "ar",
+  "dir": "rtl",
+  "categories": ["productivity", "lifestyle"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "المهام",
+      "short_name": "مهام",
+      "description": "عرض قائمة المهام",
+      "url": "/tasks",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "المطبخ",
+      "short_name": "مطبخ",
+      "description": "نواقص المطبخ",
+      "url": "/kitchen",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
