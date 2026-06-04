@@ -1,40 +1,92 @@
 'use client';
 
 import Link from 'next/link';
-import { ListChecks, Building2, ChefHat, Lightbulb, Users, Wallet } from 'lucide-react';
-
-const shortcuts = [
-  { href: '/tasks',        icon: ListChecks, label: 'المهام',    color: 'var(--c-green)',  bg: 'var(--c-green-soft)' },
-  { href: '/home-section', icon: Building2,  label: 'البيت',     color: '#1D4ED8',         bg: '#EFF6FF'             },
-  { href: '/kitchen',      icon: ChefHat,    label: 'المطبخ',    color: '#B45309',         bg: 'var(--c-amber-soft)' },
-  { href: '/more/wishes',  icon: Lightbulb,  label: 'الأفكار',   color: 'var(--c-gold)',   bg: 'var(--c-gold-light)' },
-  { href: '/more/family',  icon: Users,      label: 'العائلة',   color: '#7C3AED',         bg: '#F5F3FF'             },
-  { href: '/more/expenses',icon: Wallet,     label: 'المصاريف',  color: 'var(--c-red)',    bg: 'var(--c-red-soft)'   },
-];
+import { useAppStore } from '@/store/appStore';
+import { isOverdue } from '@/lib/utils';
 
 export function QuickShortcuts() {
+  const { tasks, shortages, expenses, wallets, currentFamilyGroupId } = useAppStore();
+
+  const pendingTasks = tasks.filter(
+    (t) =>
+      t.familyGroupId === currentFamilyGroupId &&
+      !['done', 'cancelled'].includes(t.status)
+  ).length;
+
+  const missingItems = shortages.filter(
+    (s) => s.familyGroupId === currentFamilyGroupId && s.status === 'missing'
+  ).length;
+
+  const totalSpent = expenses
+    .filter((e) => e.familyGroupId === currentFamilyGroupId)
+    .reduce((sum, e) => sum + e.amount, 0);
+
+  const stats = [
+    {
+      href: '/tasks',
+      label: 'المهام',
+      value: pendingTasks,
+      unit: 'معلقة',
+      color: pendingTasks === 0 ? 'var(--success)' : 'var(--text-primary)',
+      sub: pendingTasks === 0 ? 'كلها مكتملة' : `${pendingTasks} مهمة`,
+    },
+    {
+      href: '/kitchen',
+      label: 'المطبخ',
+      value: missingItems,
+      unit: 'ناقص',
+      color: missingItems > 0 ? 'var(--warning)' : 'var(--success)',
+      sub: missingItems === 0 ? 'المطبخ فل الفل' : `${missingItems} صنف`,
+    },
+    {
+      href: '/more/expenses',
+      label: 'المصاريف',
+      value: totalSpent,
+      unit: 'ريال',
+      color: 'var(--text-primary)',
+      sub: 'هذا الشهر',
+      isAmount: true,
+    },
+  ];
+
   return (
-    <div className="px-4 mb-8">
-      <h2 className="text-[15px] font-bold mb-3" style={{ color: 'var(--foreground)' }}>اختصارات</h2>
-      <div className="grid grid-cols-3 gap-2.5">
-        {shortcuts.map((s) => {
-          const Icon = s.icon;
-          return (
-            <Link
-              key={s.href}
-              href={s.href}
-              className="flex flex-col items-center gap-2 p-3.5 rounded-[18px] active:scale-95 transition-transform"
-              style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-xs)' }}
+    <div style={{ padding: `0 var(--page-px)`, marginBottom: 32 }}>
+      <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 12, letterSpacing: '0.04em' }}>
+        لمحة اليوم
+      </p>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+        {stats.map((s) => (
+          <Link
+            key={s.href}
+            href={s.href}
+            style={{
+              display: 'block',
+              background: 'var(--surface-card)',
+              border: '1px solid var(--border-soft)',
+              borderRadius: 20,
+              padding: '14px 12px',
+              textDecoration: 'none',
+              transition: 'background 0.15s ease',
+            }}
+            className="active:scale-[0.97]"
+          >
+            <p
+              style={{
+                fontSize: s.isAmount ? 16 : 22,
+                fontWeight: 800,
+                color: s.color,
+                lineHeight: 1,
+                marginBottom: 4,
+              }}
             >
-              <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: s.bg }}>
-                <Icon size={18} color={s.color} strokeWidth={1.8} />
-              </div>
-              <span className="text-[12px] font-medium" style={{ color: 'var(--foreground)' }}>
-                {s.label}
-              </span>
-            </Link>
-          );
-        })}
+              {s.isAmount ? s.value.toLocaleString('ar-SA') : s.value}
+            </p>
+            <p style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 2 }}>
+              {s.label}
+            </p>
+            <p style={{ fontSize: 10, color: 'var(--text-muted)' }}>{s.sub}</p>
+          </Link>
+        ))}
       </div>
     </div>
   );

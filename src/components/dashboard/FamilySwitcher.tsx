@@ -20,27 +20,57 @@ export function FamilySwitcher() {
   if (!group) return null;
 
   return (
-    <div className="px-4 pb-5" style={{ paddingTop: 'max(20px, env(safe-area-inset-top, 20px))' }}>
-      {/* Top bar */}
-      <div className="flex items-center justify-between mb-5">
+    <div
+      style={{
+        padding: `max(24px, env(safe-area-inset-top, 24px)) var(--page-px) 20px`,
+      }}
+    >
+      {/* Top row: family pill + avatar/bell */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+        {/* Family switcher */}
         <button
-          className="flex items-center gap-2 py-2 px-3 rounded-2xl active:scale-[0.97] transition-transform"
-          style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-xs)' }}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            padding: '8px 12px',
+            borderRadius: 20,
+            background: 'rgba(255,255,255,0.07)',
+            border: '1px solid rgba(255,255,255,0.10)',
+            cursor: 'pointer',
+            transition: 'background 0.15s ease',
+          }}
+          className="active:scale-[0.97]"
         >
-          <span className="text-base leading-none">{group.emoji}</span>
-          <span className="text-sm font-semibold" style={{ color: 'var(--foreground)' }}>{group.name}</span>
-          <ChevronDown size={13} strokeWidth={2.2} color="var(--foreground-muted)" />
+          <span style={{ fontSize: 15, lineHeight: 1 }}>{group.emoji}</span>
+          <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
+            {group.name}
+          </span>
+          <ChevronDown size={12} strokeWidth={2.5} color="var(--text-muted)" />
         </button>
 
+        {/* Bell */}
         <button
-          className="relative w-10 h-10 rounded-2xl flex items-center justify-center active:scale-[0.97] transition-transform"
-          style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-xs)' }}
+          style={{
+            width: 40, height: 40,
+            borderRadius: 16,
+            background: 'rgba(255,255,255,0.07)',
+            border: '1px solid rgba(255,255,255,0.10)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer',
+            position: 'relative',
+          }}
+          className="active:scale-95"
         >
-          <Bell size={18} strokeWidth={1.8} color="var(--foreground)" />
+          <Bell size={17} strokeWidth={1.8} color="var(--text-secondary)" />
           {unread > 0 && (
             <span
-              className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold text-white"
-              style={{ background: 'var(--c-red)' }}
+              style={{
+                position: 'absolute', top: -3, right: -3,
+                width: 16, height: 16,
+                borderRadius: '50%',
+                background: 'var(--danger)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 9, fontWeight: 700, color: '#fff',
+              }}
             >
               {unread}
             </span>
@@ -49,12 +79,12 @@ export function FamilySwitcher() {
       </div>
 
       {/* Greeting */}
-      <p className="text-[13px] mb-1" style={{ color: 'var(--foreground-muted)' }}>
+      <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 4 }}>
         {format(today, 'EEEE، dd MMMM', { locale: ar })}
       </p>
-      <h1 className="text-[25px] font-bold leading-tight" style={{ color: 'var(--foreground)' }}>
+      <h1 style={{ fontSize: 26, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.2 }}>
         {greeting}،{' '}
-        <span style={{ color: 'var(--c-green)' }}>{me?.name.split(' ')[0]}</span>
+        <span style={{ color: 'var(--accent-strong)' }}>{me?.name.split(' ')[0]}</span>
       </h1>
     </div>
   );

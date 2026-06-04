@@ -13,12 +13,8 @@ export function PinnedAnnouncements() {
   if (pinned.length === 0) return null;
 
   return (
-    <div className="px-4 mb-5">
-      <h2 className="text-[15px] font-bold mb-3" style={{ color: 'var(--foreground)' }}>
-        إعلانات مثبّتة
-      </h2>
-
-      <div className="flex flex-col gap-2">
+    <div style={{ padding: `0 var(--page-px)`, marginBottom: 24 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {pinned.map((ann) => {
           const publisher = members.find((m) => m.id === ann.publishedBy);
           const confirmed = ann.confirmedBy.includes(currentUserId);
@@ -26,29 +22,32 @@ export function PinnedAnnouncements() {
           return (
             <div
               key={ann.id}
-              className="p-4"
               style={{
-                background: 'linear-gradient(135deg, var(--c-gold-light), #FDF4E3)',
-                border: '1px solid rgba(201,164,92,0.3)',
-                borderRadius: 'var(--card-radius)',
+                background: 'linear-gradient(135deg, rgba(176,141,87,0.12), rgba(176,141,87,0.06))',
+                border: '1px solid rgba(176,141,87,0.25)',
+                borderRadius: 20,
+                padding: '16px',
               }}
             >
-              <div className="flex items-start gap-3">
+              <div style={{ display: 'flex', gap: 12, marginBottom: ann.requiresConfirmation ? 14 : 0 }}>
                 <div
-                  className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                  style={{ background: 'rgba(201,164,92,0.2)' }}
+                  style={{
+                    width: 36, height: 36, borderRadius: 12, flexShrink: 0,
+                    background: 'rgba(176,141,87,0.18)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}
                 >
-                  <Megaphone size={16} color="var(--c-gold)" strokeWidth={1.8} />
+                  <Megaphone size={16} color="var(--bronze)" strokeWidth={1.8} />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold mb-1" style={{ color: 'var(--foreground)' }}>
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
                     {ann.title}
                   </p>
-                  <p className="text-sm leading-relaxed" style={{ color: 'var(--foreground-muted)' }}>
+                  <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
                     {ann.message}
                   </p>
                   {publisher && (
-                    <p className="text-[11px] mt-2" style={{ color: 'var(--foreground-faint)' }}>
+                    <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>
                       نشره {publisher.name}
                     </p>
                   )}
@@ -56,26 +55,32 @@ export function PinnedAnnouncements() {
               </div>
 
               {ann.requiresConfirmation && (
-                <div className="mt-3">
-                  {confirmed ? (
-                    <div
-                      className="flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-semibold"
-                      style={{ background: 'var(--c-green-soft)', color: 'var(--c-green)' }}
-                    >
-                      <Check size={13} strokeWidth={2.5} />
-                      تم تأكيد القراءة
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => confirmAnnouncement(ann.id, currentUserId)}
-                      className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-semibold active:scale-[0.98] transition-transform"
-                      style={{ background: 'var(--c-gold)', color: '#fff' }}
-                    >
-                      <Check size={13} strokeWidth={2.5} />
-                      تأكيد القراءة
-                    </button>
-                  )}
-                </div>
+                confirmed ? (
+                  <div
+                    style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                      padding: '9px 0', borderRadius: 12,
+                      background: 'var(--success-soft)', color: 'var(--success)',
+                      fontSize: 12, fontWeight: 600,
+                    }}
+                  >
+                    <Check size={13} strokeWidth={2.5} /> تم تأكيد القراءة
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => confirmAnnouncement(ann.id, currentUserId)}
+                    style={{
+                      width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                      padding: '10px 0', borderRadius: 12,
+                      background: 'rgba(176,141,87,0.22)',
+                      border: '1px solid rgba(176,141,87,0.35)',
+                      color: 'var(--bronze)', fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                    }}
+                    className="active:scale-[0.98]"
+                  >
+                    <Check size={13} strokeWidth={2.5} /> تأكيد القراءة
+                  </button>
+                )
               )}
             </div>
           );

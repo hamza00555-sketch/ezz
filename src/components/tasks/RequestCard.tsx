@@ -15,10 +15,10 @@ const typeConfig: Record<string, { label: string; emoji: string }> = {
 };
 
 const statusStyle: Record<string, { badge: string; text: string; label: string }> = {
-  pending:   { badge: 'var(--c-amber-soft)', text: '#92400E',         label: 'بانتظار الرد'  },
-  accepted:  { badge: 'var(--c-green-soft)', text: 'var(--c-green)',  label: 'مقبول'         },
-  rejected:  { badge: 'var(--c-red-soft)',   text: 'var(--c-red)',    label: 'مرفوض'         },
-  converted: { badge: '#EFF6FF',             text: '#1D4ED8',         label: 'تحوّل لمهمة'  },
+  pending:   { badge: 'var(--warning-soft)',  text: 'var(--warning)',  label: 'بانتظار الرد'  },
+  accepted:  { badge: 'var(--success-soft)',  text: 'var(--success)',  label: 'مقبول'         },
+  rejected:  { badge: 'var(--danger-soft)',   text: 'var(--danger)',   label: 'مرفوض'         },
+  converted: { badge: 'var(--info-soft)',     text: 'var(--info)',     label: 'تحوّل لمهمة'  },
 };
 
 interface RequestCardProps {
@@ -37,49 +37,54 @@ export function RequestCard({ request, currentUserId }: RequestCardProps) {
 
   return (
     <div
-      className="overflow-hidden"
       style={{
-        background: 'var(--surface)',
-        border: `1px solid ${isPending && isRecipient ? 'rgba(242,169,59,0.35)' : 'var(--border)'}`,
-        borderRadius: 'var(--card-radius)',
-        boxShadow: 'var(--shadow-xs)',
+        background: 'var(--surface-card)',
+        border: `1px solid ${isPending && isRecipient ? 'rgba(253,186,116,0.30)' : 'var(--border-soft)'}`,
+        borderRadius: 20,
+        overflow: 'hidden',
       }}
     >
-      {/* Top: from→to */}
+      {/* Header strip for incoming pending requests */}
       {isRecipient && isPending && (
         <div
-          className="px-4 py-2 flex items-center gap-2"
-          style={{ background: 'var(--c-amber-soft)', borderBottom: '1px solid rgba(242,169,59,0.2)' }}
+          style={{
+            padding: '8px 16px',
+            display: 'flex', alignItems: 'center', gap: 8,
+            background: 'var(--warning-soft)',
+            borderBottom: '1px solid rgba(253,186,116,0.20)',
+          }}
         >
-          <span className="text-xs font-semibold" style={{ color: '#92400E' }}>
+          <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--warning)' }}>
             {type.emoji} طلب {type.label} من {from?.name}
           </span>
         </div>
       )}
 
-      <div className="p-3.5">
-        <div className="flex items-start gap-3">
+      <div style={{ padding: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
           {from && <MemberAvatar name={from.name} size="sm" />}
-          <div className="flex-1 min-w-0">
-            <p className="text-[14px] font-semibold" style={{ color: 'var(--foreground)' }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>
               {request.title}
             </p>
             {request.description && (
-              <p className="text-[12px] mt-0.5 line-clamp-2" style={{ color: 'var(--foreground-muted)' }}>
+              <p style={{ fontSize: 12, marginTop: 2, color: 'var(--text-secondary)', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const }}>
                 {request.description}
               </p>
             )}
-            <div className="flex items-center gap-2 mt-2">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
               <span
-                className="badge"
-                style={{ background: sStyle.badge, color: sStyle.text }}
+                style={{
+                  fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 10,
+                  background: sStyle.badge, color: sStyle.text,
+                }}
               >
                 {sStyle.label}
               </span>
               {!isRecipient && (
-                <span className="flex items-center gap-1 text-[11px]" style={{ color: 'var(--foreground-faint)' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'var(--text-muted)' }}>
                   <span>{type.emoji} {type.label}</span>
-                  <ArrowLeftRight size={9} className="mx-0.5" />
+                  <ArrowLeftRight size={9} style={{ marginInline: 2 }} />
                   <span>{to?.name}</span>
                 </span>
               )}
@@ -88,25 +93,37 @@ export function RequestCard({ request, currentUserId }: RequestCardProps) {
         </div>
 
         {isRecipient && isPending && (
-          <div className="flex gap-2 mt-3.5">
+          <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
             <button
               onClick={() => updateRequestStatus(request.id, 'accepted')}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold"
-              style={{ background: 'var(--c-green-soft)', color: 'var(--c-green)' }}
+              style={{
+                flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                padding: '10px 0', borderRadius: 12,
+                background: 'var(--success-soft)', color: 'var(--success)',
+                fontSize: 12, fontWeight: 600, cursor: 'pointer', border: 'none',
+              }}
             >
               <Check size={13} strokeWidth={2.5} /> قبول
             </button>
             <button
               onClick={() => updateRequestStatus(request.id, 'converted')}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold"
-              style={{ background: '#EFF6FF', color: '#1D4ED8' }}
+              style={{
+                flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                padding: '10px 0', borderRadius: 12,
+                background: 'var(--info-soft)', color: 'var(--info)',
+                fontSize: 12, fontWeight: 600, cursor: 'pointer', border: 'none',
+              }}
             >
               تحويل لمهمة
             </button>
             <button
               onClick={() => updateRequestStatus(request.id, 'rejected')}
-              className="w-9 flex items-center justify-center py-2 rounded-xl"
-              style={{ background: 'var(--c-red-soft)', color: 'var(--c-red)' }}
+              style={{
+                width: 40, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                padding: '10px 0', borderRadius: 12,
+                background: 'var(--danger-soft)', color: 'var(--danger)',
+                cursor: 'pointer', border: 'none',
+              }}
             >
               <X size={13} strokeWidth={2.5} />
             </button>

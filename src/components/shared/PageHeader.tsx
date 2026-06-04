@@ -9,16 +9,20 @@ interface PageHeaderProps {
 export function PageHeader({ title, subtitle, action }: PageHeaderProps) {
   return (
     <div
-      className="sticky top-0 z-20 px-4 pt-4 pb-3.5"
-      style={{ background: 'var(--background)', borderBottom: '1px solid var(--border)' }}
+      style={{
+        position: 'sticky', top: 0, zIndex: 20,
+        padding: '16px 16px 14px',
+        background: 'var(--bg-app)',
+        borderBottom: '1px solid var(--border-soft)',
+      }}
     >
-      <div className="flex items-center justify-between">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <h1 className="text-[19px] font-bold" style={{ color: 'var(--foreground)' }}>
+          <h1 style={{ fontSize: 19, fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.2 }}>
             {title}
           </h1>
           {subtitle && (
-            <p className="text-[13px] mt-0.5" style={{ color: 'var(--foreground-muted)' }}>
+            <p style={{ fontSize: 13, marginTop: 2, color: 'var(--text-muted)' }}>
               {subtitle}
             </p>
           )}

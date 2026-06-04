@@ -8,21 +8,21 @@ import { formatArabicDate, isOverdue, taskStatusLabels, categoryLabels, cn } fro
 import type { Task } from '@/types';
 
 const priorityConfig: Record<string, { bar: string; badge: string; badgeText: string }> = {
-  urgent: { bar: 'var(--c-red)',   badge: 'var(--c-red-soft)',   badgeText: 'var(--c-red)'   },
-  high:   { bar: 'var(--c-amber)', badge: 'var(--c-amber-soft)', badgeText: '#92400E'         },
-  medium: { bar: '#CBD5E1',        badge: '#F2F4F7',             badgeText: 'var(--c-muted)'  },
-  low:    { bar: '#E2E8F0',        badge: '#F8FAFC',             badgeText: '#94A3B8'         },
+  urgent: { bar: 'var(--danger)',            badge: 'var(--danger-soft)',           badgeText: 'var(--danger)'   },
+  high:   { bar: 'var(--warning)',           badge: 'var(--warning-soft)',          badgeText: 'var(--warning)'  },
+  medium: { bar: 'rgba(255,255,255,0.18)',   badge: 'rgba(255,255,255,0.07)',       badgeText: 'var(--text-secondary)' },
+  low:    { bar: 'rgba(255,255,255,0.08)',   badge: 'rgba(255,255,255,0.04)',       badgeText: 'var(--text-muted)'     },
 };
 
 const statusConfig: Record<string, { badge: string; text: string }> = {
-  new:               { badge: '#F2F4F7',             text: 'var(--c-muted)'  },
-  pending_acceptance:{ badge: 'var(--c-amber-soft)', text: '#92400E'         },
-  accepted:          { badge: '#EFF6FF',             text: '#1D4ED8'         },
-  in_progress:       { badge: 'var(--c-amber-soft)', text: '#B45309'         },
-  done:              { badge: 'var(--c-green-soft)', text: 'var(--c-green)'  },
-  rejected:          { badge: 'var(--c-red-soft)',   text: 'var(--c-red)'    },
-  postponed:         { badge: '#F5F3FF',             text: '#7C3AED'         },
-  cancelled:         { badge: '#F2F4F7',             text: '#94A3B8'         },
+  new:                { badge: 'rgba(255,255,255,0.07)',   text: 'var(--text-muted)'     },
+  pending_acceptance: { badge: 'var(--warning-soft)',      text: 'var(--warning)'        },
+  accepted:           { badge: 'var(--info-soft)',         text: 'var(--info)'           },
+  in_progress:        { badge: 'var(--warning-soft)',      text: 'var(--warning)'        },
+  done:               { badge: 'var(--success-soft)',      text: 'var(--success)'        },
+  rejected:           { badge: 'var(--danger-soft)',       text: 'var(--danger)'         },
+  postponed:          { badge: 'rgba(167,130,255,0.12)',   text: '#A782FF'               },
+  cancelled:          { badge: 'rgba(255,255,255,0.05)',   text: 'var(--text-muted)'     },
 };
 
 interface TaskCardProps {
@@ -50,34 +50,36 @@ export function TaskCard({ task, showAssignee = true }: TaskCardProps) {
 
   return (
     <div
-      className={cn('flex items-stretch transition-all', isDone && 'opacity-60')}
       style={{
-        background: 'var(--surface)',
-        border: `1px solid ${overdue && !isDone ? 'rgba(217,74,74,0.3)' : 'var(--border)'}`,
-        borderRadius: 'var(--card-radius)',
-        boxShadow: 'var(--shadow-xs)',
+        display: 'flex',
+        background: 'var(--surface-card)',
+        border: `1px solid ${overdue && !isDone ? 'rgba(249,112,102,0.30)' : 'var(--border-soft)'}`,
+        borderRadius: 20,
         overflow: 'hidden',
+        opacity: isDone ? 0.6 : 1,
+        transition: 'opacity 0.2s ease',
       }}
     >
       {/* Priority bar */}
-      <div className="w-1 flex-shrink-0" style={{ background: isDone ? 'var(--c-green)' : pCfg.bar }} />
+      <div style={{ width: 4, flexShrink: 0, background: isDone ? 'var(--success)' : pCfg.bar }} />
 
       {/* Content */}
-      <div className="flex-1 p-3.5 min-w-0">
-        <div className="flex items-start gap-3">
+      <div style={{ flex: 1, padding: '14px 14px 14px 12px', minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
           {/* Checkbox */}
           <button
             onClick={handleToggle}
-            className={cn(
-              'mt-0.5 w-[22px] h-[22px] rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all',
-              bouncing && 'check-bounce',
-              isDone
-                ? 'border-[var(--c-green)]'
-                : overdue
-                ? 'border-[var(--c-red)]'
-                : 'border-[var(--border)]'
-            )}
-            style={isDone ? { background: 'var(--c-green)' } : {}}
+            className={cn(bouncing && 'check-bounce')}
+            style={{
+              marginTop: 2,
+              width: 22, height: 22,
+              borderRadius: '50%',
+              border: `2px solid ${isDone ? 'var(--success)' : overdue ? 'var(--danger)' : 'rgba(255,255,255,0.20)'}`,
+              background: isDone ? 'var(--success)' : 'transparent',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0, cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }}
           >
             {isDone && (
               <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
@@ -87,25 +89,30 @@ export function TaskCard({ task, showAssignee = true }: TaskCardProps) {
           </button>
 
           {/* Title + meta */}
-          <div className="flex-1 min-w-0">
+          <div style={{ flex: 1, minWidth: 0 }}>
             <p
-              className={cn('text-[14px] font-medium leading-snug', isDone && 'line-through')}
-              style={{ color: isDone ? 'var(--foreground-muted)' : 'var(--foreground)' }}
+              style={{
+                fontSize: 14, fontWeight: 600, lineHeight: 1.4,
+                color: isDone ? 'var(--text-muted)' : 'var(--text-primary)',
+                textDecoration: isDone ? 'line-through' : 'none',
+              }}
             >
               {task.title}
             </p>
 
             {task.description && (
-              <p className="text-[12px] mt-0.5 line-clamp-1" style={{ color: 'var(--foreground-muted)' }}>
+              <p style={{ fontSize: 12, marginTop: 2, color: 'var(--text-muted)', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical' as const }}>
                 {task.description}
               </p>
             )}
 
-            <div className="flex items-center flex-wrap gap-1.5 mt-2">
+            <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
               {/* Status badge */}
               <span
-                className="badge"
-                style={{ background: sCfg.badge, color: sCfg.text }}
+                style={{
+                  fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 10,
+                  background: sCfg.badge, color: sCfg.text,
+                }}
               >
                 {taskStatusLabels[task.status]}
               </span>
@@ -113,8 +120,11 @@ export function TaskCard({ task, showAssignee = true }: TaskCardProps) {
               {/* Due date */}
               {task.dueDate && (
                 <span
-                  className="flex items-center gap-1 text-[11px]"
-                  style={{ color: overdue && !isDone ? 'var(--c-red)' : 'var(--foreground-muted)' }}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 4,
+                    fontSize: 11,
+                    color: overdue && !isDone ? 'var(--danger)' : 'var(--text-muted)',
+                  }}
                 >
                   <Clock size={10} />
                   {overdue && !isDone ? 'متأخرة · ' : ''}{formatArabicDate(task.dueDate)}
@@ -123,14 +133,14 @@ export function TaskCard({ task, showAssignee = true }: TaskCardProps) {
 
               {/* Category */}
               {task.category && (
-                <span className="text-[11px]" style={{ color: 'var(--foreground-faint)' }}>
+                <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
                   {categoryLabels[task.category] || task.category}
                 </span>
               )}
 
               {/* Recurring */}
               {task.isRecurring && (
-                <span className="flex items-center gap-0.5 text-[11px]" style={{ color: 'var(--foreground-faint)' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'var(--text-muted)' }}>
                   <RotateCcw size={9} /> متكررة
                 </span>
               )}
@@ -143,7 +153,7 @@ export function TaskCard({ task, showAssignee = true }: TaskCardProps) {
 
         {/* Creator */}
         {creator && creator.id !== task.assignedTo && (
-          <p className="text-[11px] mt-2 pe-2" style={{ color: 'var(--foreground-faint)' }}>
+          <p style={{ fontSize: 11, marginTop: 8, paddingInlineEnd: 8, color: 'var(--text-muted)' }}>
             أنشأها {creator.name}
           </p>
         )}

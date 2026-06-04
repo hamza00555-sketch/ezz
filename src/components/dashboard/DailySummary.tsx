@@ -4,32 +4,90 @@ import { CheckSquare, ShoppingCart, Wallet, Megaphone } from 'lucide-react';
 import { useAppStore } from '@/store/appStore';
 
 const actions = [
-  { key: 'task',         icon: CheckSquare,  label: 'مهمة',    color: 'var(--c-green)', bg: 'var(--c-green-soft)' },
-  { key: 'shortage',     icon: ShoppingCart, label: 'نقص',     color: '#B45309',        bg: 'var(--c-amber-soft)' },
-  { key: 'expense',      icon: Wallet,       label: 'مصروف',   color: 'var(--c-muted)', bg: '#F2F4F7'             },
-  { key: 'announcement', icon: Megaphone,    label: 'إعلان',   color: 'var(--c-dark)',  bg: '#EAECF0'             },
+  {
+    key: 'task',
+    icon: CheckSquare,
+    label: 'مهمة',
+    sub: 'جديدة',
+    color: 'var(--accent-strong)',
+    bg: 'rgba(163,177,138,0.10)',
+    border: 'rgba(163,177,138,0.20)',
+  },
+  {
+    key: 'shortage',
+    icon: ShoppingCart,
+    label: 'نقص',
+    sub: 'مطبخ',
+    color: 'var(--warning)',
+    bg: 'var(--warning-soft)',
+    border: 'rgba(253,186,116,0.25)',
+  },
+  {
+    key: 'expense',
+    icon: Wallet,
+    label: 'مصروف',
+    sub: 'تسجيل',
+    color: 'var(--info)',
+    bg: 'var(--info-soft)',
+    border: 'rgba(125,211,252,0.20)',
+  },
+  {
+    key: 'announcement',
+    icon: Megaphone,
+    label: 'إعلان',
+    sub: 'عائلي',
+    color: 'var(--bronze)',
+    bg: 'rgba(176,141,87,0.10)',
+    border: 'rgba(176,141,87,0.22)',
+  },
 ];
 
 export function DailySummary() {
   const { setActiveQuickForm } = useAppStore();
 
   return (
-    <div className="px-4 mb-5">
-      <p className="text-[13px] font-semibold mb-3" style={{ color: 'var(--foreground-muted)' }}>إضافة سريع</p>
-      <div className="grid grid-cols-4 gap-2.5">
+    <div style={{ padding: `0 var(--page-px)`, marginBottom: 24 }}>
+      <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 12, letterSpacing: '0.04em' }}>
+        إضافة سريع
+      </p>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
         {actions.map((action) => {
           const Icon = action.icon;
           return (
             <button
               key={action.key}
               onClick={() => setActiveQuickForm(action.key)}
-              className="flex flex-col items-center gap-2 py-3.5 rounded-[18px] active:scale-95 transition-transform"
-              style={{ background: action.bg }}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 12,
+                padding: '14px 16px',
+                borderRadius: 20,
+                background: action.bg,
+                border: `1px solid ${action.border}`,
+                cursor: 'pointer',
+                transition: 'transform 0.12s ease',
+                textAlign: 'right',
+              }}
+              className="active:scale-[0.97]"
             >
-              <Icon size={20} color={action.color} strokeWidth={1.8} />
-              <span className="text-[11px] font-semibold leading-none" style={{ color: action.color }}>
-                {action.label}
-              </span>
+              <div
+                style={{
+                  width: 38, height: 38,
+                  borderRadius: 12,
+                  background: `rgba(${action.color === 'var(--accent-strong)' ? '163,177,138' : '255,255,255'}, 0.10)`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <Icon size={18} color={action.color} strokeWidth={1.8} />
+              </div>
+              <div>
+                <p style={{ fontSize: 14, fontWeight: 700, color: action.color, lineHeight: 1.2 }}>
+                  {action.label}
+                </p>
+                <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+                  {action.sub}
+                </p>
+              </div>
             </button>
           );
         })}

@@ -4,14 +4,14 @@ import { taskStatusLabels } from '@/lib/utils';
 import type { TaskStatus } from '@/types';
 
 const statusStyle: Record<TaskStatus, { bg: string; color: string }> = {
-  new:                { bg: '#F2F4F7',             color: '#667085'         },
-  pending_acceptance: { bg: 'var(--c-amber-soft)', color: '#92400E'         },
-  accepted:           { bg: '#EFF6FF',             color: '#1D4ED8'         },
-  in_progress:        { bg: 'var(--c-amber-soft)', color: '#B45309'         },
-  done:               { bg: 'var(--c-green-soft)', color: 'var(--c-green)'  },
-  rejected:           { bg: 'var(--c-red-soft)',   color: 'var(--c-red)'    },
-  postponed:          { bg: '#F5F3FF',             color: '#7C3AED'         },
-  cancelled:          { bg: '#F2F4F7',             color: '#94A3B8'         },
+  new:                { bg: 'rgba(255,255,255,0.07)',        color: 'var(--text-muted)'     },
+  pending_acceptance: { bg: 'var(--warning-soft)',           color: 'var(--warning)'        },
+  accepted:           { bg: 'var(--info-soft)',              color: 'var(--info)'           },
+  in_progress:        { bg: 'var(--warning-soft)',           color: 'var(--warning)'        },
+  done:               { bg: 'var(--success-soft)',           color: 'var(--success)'        },
+  rejected:           { bg: 'var(--danger-soft)',            color: 'var(--danger)'         },
+  postponed:          { bg: 'rgba(167,130,255,0.12)',        color: '#A782FF'               },
+  cancelled:          { bg: 'rgba(255,255,255,0.05)',        color: 'var(--text-muted)'     },
 };
 
 export function TaskStatusBadge({ status }: { status: TaskStatus }) {

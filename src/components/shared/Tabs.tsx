@@ -1,7 +1,5 @@
 'use client';
 
-import { cn } from '@/lib/utils';
-
 interface Tab {
   key: string;
   label: string;
@@ -17,46 +15,59 @@ interface TabsProps {
 export function Tabs({ tabs, active, onChange }: TabsProps) {
   return (
     <div
-      className="flex sticky top-0 z-10 px-4 gap-1 overflow-x-auto"
       style={{
-        background: 'var(--background)',
-        borderBottom: '1px solid var(--border)',
-        paddingTop: 10,
-        paddingBottom: 10,
-        scrollbarWidth: 'none',
+        position: 'sticky', top: 0, zIndex: 10,
+        padding: '12px 16px',
+        background: 'var(--bg-app)',
+        borderBottom: '1px solid var(--border-soft)',
       }}
     >
-      {tabs.map((tab) => {
-        const isActive = active === tab.key;
-        return (
-          <button
-            key={tab.key}
-            onClick={() => onChange(tab.key)}
-            className={cn(
-              'flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap flex-shrink-0',
-            )}
-            style={
-              isActive
-                ? { background: 'var(--c-green)', color: '#fff' }
-                : { background: 'transparent', color: 'var(--foreground-muted)' }
-            }
-          >
-            {tab.label}
-            {tab.count !== undefined && tab.count > 0 && (
-              <span
-                className="text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center"
-                style={
-                  isActive
-                    ? { background: 'rgba(255,255,255,0.25)', color: '#fff' }
-                    : { background: 'var(--border)', color: 'var(--foreground-muted)' }
-                }
-              >
-                {tab.count}
-              </span>
-            )}
-          </button>
-        );
-      })}
+      <div
+        style={{
+          display: 'flex', gap: 6,
+          overflowX: 'auto', scrollbarWidth: 'none',
+          padding: '2px 0',
+        }}
+      >
+        {tabs.map((tab) => {
+          const isActive = active === tab.key;
+          return (
+            <button
+              key={tab.key}
+              onClick={() => onChange(tab.key)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '7px 16px',
+                borderRadius: 20,
+                fontSize: 13,
+                fontWeight: isActive ? 700 : 400,
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
+                cursor: 'pointer',
+                border: 'none',
+                transition: 'all 0.2s ease',
+                background: isActive ? 'rgba(163,177,138,0.18)' : 'transparent',
+                color: isActive ? 'var(--accent-strong)' : 'var(--text-muted)',
+              }}
+            >
+              {tab.label}
+              {tab.count !== undefined && tab.count > 0 && (
+                <span
+                  style={{
+                    fontSize: 10, fontWeight: 700,
+                    padding: '1px 6px', borderRadius: 10,
+                    background: isActive ? 'rgba(199,231,123,0.25)' : 'rgba(255,255,255,0.07)',
+                    color: isActive ? 'var(--accent-strong)' : 'var(--text-muted)',
+                    minWidth: 18, textAlign: 'center',
+                  }}
+                >
+                  {tab.count}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

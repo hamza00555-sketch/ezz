@@ -9,22 +9,32 @@ interface EmptyStateProps {
 
 export function EmptyState({ icon = '📭', title, description, action }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+    <div
+      style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        justifyContent: 'center', padding: '56px 24px', textAlign: 'center',
+      }}
+    >
       <div
-        className="w-20 h-20 rounded-3xl flex items-center justify-center mb-4 text-4xl"
-        style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+        style={{
+          width: 72, height: 72, borderRadius: 24,
+          background: 'rgba(255,255,255,0.05)',
+          border: '1px solid rgba(255,255,255,0.08)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 32, marginBottom: 16,
+        }}
       >
         {icon}
       </div>
-      <h3 className="text-base font-bold mb-1.5" style={{ color: 'var(--foreground)' }}>
+      <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6 }}>
         {title}
       </h3>
       {description && (
-        <p className="text-sm" style={{ color: 'var(--foreground-muted)' }}>
+        <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.5 }}>
           {description}
         </p>
       )}
-      {action && <div className="mt-5">{action}</div>}
+      {action && <div style={{ marginTop: 20 }}>{action}</div>}
     </div>
   );
 }

@@ -13,14 +13,14 @@ import { RecipeForm } from '@/components/forms/RecipeForm';
 import { AnnouncementForm } from '@/components/forms/AnnouncementForm';
 
 const quickAddItems = [
-  { key: 'task',         icon: CheckSquare,  label: 'مهمة',     color: 'var(--c-green)',  bg: 'var(--c-green-soft)' },
-  { key: 'request',      icon: MessageSquare,label: 'طلب',      color: '#7C3AED',         bg: '#F5F3FF' },
-  { key: 'wish',         icon: Lightbulb,    label: 'فكرة',     color: 'var(--c-amber)',  bg: 'var(--c-amber-soft)' },
-  { key: 'home_item',    icon: Building2,    label: 'ممتلكات',  color: 'var(--c-green)',  bg: 'var(--c-green-soft)' },
-  { key: 'document',     icon: FileText,     label: 'وثيقة',    color: 'var(--c-red)',    bg: 'var(--c-red-soft)' },
-  { key: 'shortage',     icon: ShoppingCart, label: 'نقص',      color: 'var(--c-amber)',  bg: 'var(--c-amber-soft)' },
-  { key: 'recipe',       icon: BookOpen,     label: 'وصفة',     color: '#DB2777',         bg: '#FDF2F8' },
-  { key: 'announcement', icon: Megaphone,    label: 'إعلان',    color: 'var(--c-dark)',   bg: '#F2F4F7' },
+  { key: 'task',         icon: CheckSquare,  label: 'مهمة',    color: 'var(--accent)',   bg: 'rgba(163,177,138,0.14)' },
+  { key: 'request',      icon: MessageSquare,label: 'طلب',     color: 'var(--info)',     bg: 'var(--info-soft)'       },
+  { key: 'wish',         icon: Lightbulb,    label: 'فكرة',    color: 'var(--warning)',  bg: 'var(--warning-soft)'    },
+  { key: 'home_item',    icon: Building2,    label: 'ممتلكات', color: 'var(--accent)',   bg: 'rgba(163,177,138,0.10)' },
+  { key: 'document',     icon: FileText,     label: 'وثيقة',   color: 'var(--danger)',   bg: 'var(--danger-soft)'     },
+  { key: 'shortage',     icon: ShoppingCart, label: 'نقص',     color: 'var(--warning)',  bg: 'var(--warning-soft)'    },
+  { key: 'recipe',       icon: BookOpen,     label: 'وصفة',    color: '#E879F9',         bg: 'rgba(232,121,249,0.10)' },
+  { key: 'announcement', icon: Megaphone,    label: 'إعلان',   color: 'var(--bronze)',   bg: 'rgba(176,141,87,0.12)'  },
 ];
 
 type FormKey = 'task' | 'request' | 'wish' | 'home_item' | 'document' | 'shortage' | 'recipe' | 'announcement' | null;
@@ -30,7 +30,6 @@ export function QuickAddButton() {
   const [activeForm, setActiveForm] = useState<FormKey>(null);
   const { activeQuickForm, setActiveQuickForm } = useAppStore();
 
-  // Handle forms triggered from Action Strip on dashboard
   useEffect(() => {
     if (activeQuickForm) {
       setActiveForm(activeQuickForm as FormKey);
@@ -53,67 +52,103 @@ export function QuickAddButton() {
       {/* FAB */}
       <button
         onClick={() => setSheetOpen((p) => !p)}
-        className="fixed z-30 transition-all duration-200 active:scale-90"
         style={{
-          bottom: `calc(var(--bottom-nav-height) + 12px + env(safe-area-inset-bottom, 0px))`,
+          position: 'fixed',
+          bottom: 'calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px))',
           left: '50%',
           transform: 'translateX(-50%)',
           width: 52,
           height: 52,
           borderRadius: 18,
-          background: sheetOpen ? 'var(--c-muted)' : 'var(--c-green)',
+          background: sheetOpen
+            ? 'rgba(255,255,255,0.12)'
+            : 'linear-gradient(135deg, var(--accent), var(--accent-strong))',
+          border: '1px solid rgba(255,255,255,0.15)',
           boxShadow: sheetOpen
-            ? '0 4px 16px rgba(102,112,133,0.35)'
-            : '0 4px 20px rgba(31,138,91,0.40)',
+            ? '0 4px 20px rgba(0,0,0,0.3)'
+            : '0 4px 24px rgba(163,177,138,0.4)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          zIndex: 31,
+          transition: 'all 0.2s ease',
+          cursor: 'pointer',
         }}
+        className="active:scale-90 transition-all"
       >
         {sheetOpen
-          ? <X size={22} color="#fff" strokeWidth={2.5} />
-          : <Plus size={26} color="#fff" strokeWidth={2.5} />
+          ? <X size={22} color="var(--text-primary)" strokeWidth={2.5} />
+          : <Plus size={26} color="#0D0F12" strokeWidth={2.8} />
         }
       </button>
 
-      {/* Sheet overlay */}
-      {sheetOpen && (
-        <div className="fixed inset-0 z-20 fade-in" onClick={() => setSheetOpen(false)}
-          style={{ background: 'rgba(16,24,40,0.35)' }} />
-      )}
-
-      {/* Quick-add grid */}
+      {/* Backdrop */}
       {sheetOpen && (
         <div
-          className="fixed z-30 slide-up"
+          className="fade-in"
           style={{
-            bottom: `calc(var(--bottom-nav-height) + 72px + env(safe-area-inset-bottom, 0px))`,
+            position: 'fixed', inset: 0, zIndex: 20,
+            background: 'rgba(0,0,0,0.6)',
+            backdropFilter: 'blur(2px)',
+            WebkitBackdropFilter: 'blur(2px)',
+          }}
+          onClick={() => setSheetOpen(false)}
+        />
+      )}
+
+      {/* Sheet */}
+      {sheetOpen && (
+        <div
+          className="slide-up"
+          style={{
+            position: 'fixed',
+            bottom: 'calc(var(--bottom-nav-height) + 64px + env(safe-area-inset-bottom, 0px))',
             left: '50%',
             transform: 'translateX(-50%)',
             width: 'calc(100vw - 32px)',
             maxWidth: 400,
-            background: 'var(--surface)',
-            borderRadius: 24,
+            background: 'rgba(21,24,29,0.95)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
+            borderRadius: 28,
             padding: '16px 12px 12px',
-            boxShadow: 'var(--shadow-lg)',
-            border: '1px solid var(--border)',
+            border: '1px solid rgba(255,255,255,0.12)',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+            zIndex: 30,
           }}
         >
-          <p className="text-xs font-semibold text-center mb-3" style={{ color: 'var(--foreground-muted)' }}>
+          <p
+            style={{
+              textAlign: 'center',
+              fontSize: 12,
+              fontWeight: 600,
+              color: 'var(--text-muted)',
+              marginBottom: 12,
+              letterSpacing: '0.02em',
+            }}
+          >
             ماذا تريد تضيف؟
           </p>
-          <div className="grid grid-cols-4 gap-2">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
             {quickAddItems.map((item) => {
               const Icon = item.icon;
               return (
                 <button
                   key={item.key}
                   onClick={() => handleSelect(item.key)}
-                  className="flex flex-col items-center gap-1.5 py-3 rounded-2xl transition-transform active:scale-95"
-                  style={{ background: item.bg }}
+                  style={{
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                    padding: '12px 4px',
+                    borderRadius: 18,
+                    background: item.bg,
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    cursor: 'pointer',
+                    transition: 'transform 0.12s ease',
+                  }}
+                  className="active:scale-95"
                 >
                   <Icon size={20} color={item.color} strokeWidth={1.8} />
-                  <span className="text-[10px] font-semibold" style={{ color: item.color }}>
+                  <span style={{ fontSize: 10, fontWeight: 600, color: item.color, lineHeight: 1 }}>
                     {item.label}
                   </span>
                 </button>
@@ -123,7 +158,6 @@ export function QuickAddButton() {
         </div>
       )}
 
-      {/* Forms */}
       <TaskForm         open={activeForm === 'task'}         onClose={closeAll} />
       <RequestForm      open={activeForm === 'request'}      onClose={closeAll} />
       <WishForm         open={activeForm === 'wish'}         onClose={closeAll} />

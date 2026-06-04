@@ -1,31 +1,28 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Zap, Clock, MessageSquare } from 'lucide-react';
 import { useAppStore } from '@/store/appStore';
+import { isOverdue } from '@/lib/utils';
 
 export function HomeHealthScore() {
-  const { tasks, currentFamilyGroupId } = useAppStore();
+  const { tasks, requests, currentUserId, currentFamilyGroupId } = useAppStore();
 
   const allTasks = tasks.filter(
     (t) => t.familyGroupId === currentFamilyGroupId && t.status !== 'cancelled'
   );
-  const done = allTasks.filter((t) => t.status === 'done').length;
+  const done  = allTasks.filter((t) => t.status === 'done').length;
   const total = allTasks.length;
-  const pct = total === 0 ? 100 : Math.round((done / total) * 100);
+  const pct   = total === 0 ? 100 : Math.round((done / total) * 100);
 
-  const radius = 44;
-  const circumference = 2 * Math.PI * radius;
-  const dashOffset = circumference - (pct / 100) * circumference;
+  const urgentCount = allTasks.filter(
+    (t) => !['done', 'cancelled'].includes(t.status) &&
+      (t.priority === 'urgent' || t.priority === 'high' || isOverdue(t.dueDate))
+  ).length;
 
-  const ringColor =
-    pct >= 70 ? 'var(--c-green)' : pct >= 40 ? 'var(--c-amber)' : 'var(--c-red)';
-  const pillBg =
-    pct >= 70 ? 'var(--c-green-soft)' : pct >= 40 ? 'var(--c-amber-soft)' : 'var(--c-red-soft)';
-  const pillText =
-    pct >= 70 ? 'var(--c-green)' : pct >= 40 ? '#92400E' : 'var(--c-red)';
-  const label =
-    pct >= 80 ? 'ممتاز!' : pct >= 60 ? 'جيد جداً' : pct >= 40 ? 'تحتاج جهد' : 'يحتاج اهتمام';
+  const pendingReqs = requests.filter(
+    (r) => r.familyGroupId === currentFamilyGroupId && r.to === currentUserId && r.status === 'pending'
+  ).length;
 
   const nextTask = allTasks
     .filter((t) => !['done', 'cancelled'].includes(t.status))
@@ -34,43 +31,78 @@ export function HomeHealthScore() {
       return (o[a.priority] ?? 4) - (o[b.priority] ?? 4);
     })[0];
 
-  return (
-    <div className="mx-4 mb-5 overflow-hidden" style={{ borderRadius: 24, boxShadow: 'var(--shadow-md)' }}>
-      {/* Hero */}
-      <div className="px-5 pt-5 pb-4" style={{ background: 'linear-gradient(135deg, #101828 0%, #1A2D4A 100%)' }}>
-        <div className="flex items-center gap-5">
-          {/* Progress ring */}
-          <div className="relative flex-shrink-0 w-[88px] h-[88px]">
-            <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
-              <circle cx="50" cy="50" r={radius} fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="9" />
-              <circle
-                cx="50" cy="50" r={radius}
-                fill="none"
-                stroke={ringColor}
-                strokeWidth="9"
-                strokeLinecap="round"
-                strokeDasharray={circumference}
-                strokeDashoffset={dashOffset}
-                style={{ transition: 'stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)' }}
-              />
-            </svg>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-xl font-black text-white">{pct}%</span>
-            </div>
-          </div>
+  const radius = 42;
+  const circ   = 2 * Math.PI * radius;
+  const offset = circ - (pct / 100) * circ;
+  const ringColor = pct >= 70 ? 'var(--accent-strong)' : pct >= 40 ? 'var(--warning)' : 'var(--danger)';
 
-          {/* Info */}
-          <div className="flex-1 min-w-0">
-            <p className="text-xs mb-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
-              حالة البيت هذا الأسبوع
-            </p>
-            <p className="text-xl font-bold text-white mb-2">{label}</p>
-            <span
-              className="badge text-xs"
-              style={{ background: pillBg, color: pillText }}
-            >
-              {done} من {total} مهمة مكتملة
-            </span>
+  return (
+    <div
+      className="hero-card mx-4 mb-6"
+      style={{ padding: '24px 20px 20px', overflow: 'hidden', position: 'relative' }}
+    >
+      {/* Background glow */}
+      <div
+        style={{
+          position: 'absolute', top: -40, right: -40,
+          width: 180, height: 180, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(163,177,138,0.15), transparent 70%)',
+          pointerEvents: 'none',
+        }}
+      />
+
+      {/* Title */}
+      <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16, fontWeight: 500, letterSpacing: '0.04em' }}>
+        حالة البيت اليوم
+      </p>
+
+      {/* Main row */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 20 }}>
+        {/* Ring */}
+        <div style={{ position: 'relative', width: 84, height: 84, flexShrink: 0 }}>
+          <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
+            <circle cx="50" cy="50" r={radius} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="8" />
+            <circle
+              cx="50" cy="50" r={radius}
+              fill="none"
+              stroke={ringColor}
+              strokeWidth="8"
+              strokeLinecap="round"
+              strokeDasharray={circ}
+              strokeDashoffset={offset}
+              style={{ transition: 'stroke-dashoffset 1.4s cubic-bezier(0.4,0,0.2,1)' }}
+            />
+          </svg>
+          <div
+            style={{
+              position: 'absolute', inset: 0,
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            <span style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)' }}>{pct}%</span>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div style={{ flex: 1 }}>
+          <p style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}>
+            {done}
+            <span style={{ fontSize: 14, fontWeight: 400, color: 'var(--text-muted)' }}> / {total} مهمة</span>
+          </p>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {urgentCount > 0 && (
+              <span className="badge badge-danger" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <Zap size={10} /> {urgentCount} عاجلة
+              </span>
+            )}
+            {pendingReqs > 0 && (
+              <span className="badge badge-warning" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <MessageSquare size={10} /> {pendingReqs} طلب
+              </span>
+            )}
+            {urgentCount === 0 && pendingReqs === 0 && (
+              <span className="badge badge-success">البيت مرتب 👌</span>
+            )}
           </div>
         </div>
       </div>
@@ -79,21 +111,37 @@ export function HomeHealthScore() {
       {nextTask ? (
         <Link
           href="/tasks"
-          className="flex items-center justify-between px-4 py-3 active:opacity-80 transition-opacity"
-          style={{ background: 'var(--c-green)' }}
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '12px 14px',
+            borderRadius: 16,
+            background: 'rgba(163,177,138,0.14)',
+            border: '1px solid rgba(163,177,138,0.25)',
+            textDecoration: 'none',
+            transition: 'background 0.15s ease',
+          }}
+          className="active:opacity-80"
         >
-          <div className="min-w-0">
-            <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.65)' }}>ابدأ بأهم مهمة</p>
-            <p className="text-sm font-semibold text-white truncate">{nextTask.title}</p>
+          <div style={{ minWidth: 0 }}>
+            <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 2 }}>ابدأ بأهم مهمة</p>
+            <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--accent)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {nextTask.title}
+            </p>
           </div>
-          <ArrowLeft size={17} color="rgba(255,255,255,0.75)" className="flex-shrink-0 ms-3" />
+          <ArrowLeft size={16} color="var(--accent)" style={{ flexShrink: 0, marginRight: 8 }} />
         </Link>
       ) : (
         <div
-          className="flex items-center justify-center px-4 py-3 gap-2"
-          style={{ background: 'var(--c-green)' }}
+          style={{
+            padding: '12px 14px', borderRadius: 16,
+            background: 'rgba(134,239,172,0.10)',
+            border: '1px solid rgba(134,239,172,0.20)',
+            textAlign: 'center',
+          }}
         >
-          <span className="text-sm font-semibold text-white">البيت مرتب اليوم 👌</span>
+          <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--success)' }}>
+            كل المهام مكتملة 🎉
+          </p>
         </div>
       )}
     </div>
