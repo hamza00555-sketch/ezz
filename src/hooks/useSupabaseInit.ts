@@ -30,6 +30,10 @@ export function useSupabaseInit() {
 
       // Listen for auth changes
       const { data } = sb.auth.onAuthStateChange(async (event, sess) => {
+        if (event === 'SIGNED_OUT') {
+          window.location.href = '/login';
+          return;
+        }
         if (sess?.user) {
           const { data: profile } = await sb
             .from('profiles')

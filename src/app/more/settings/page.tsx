@@ -2,9 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ChevronRight, Bell, BellOff, Loader } from 'lucide-react';
+import { ChevronRight, Bell, BellOff, Loader, LogOut } from 'lucide-react';
 import { AppShell } from '@/components/layout/AppShell';
 import { PageHeader } from '@/components/shared/PageHeader';
+import { MemberAvatar } from '@/components/shared/MemberAvatar';
+import { useAppStore } from '@/store/appStore';
+import { roleLabels } from '@/lib/utils';
 import { subscribeToPush, unsubscribeFromPush } from '@/lib/push';
 import { savePushSubscription, deletePushSubscription } from '@/actions/push';
 
@@ -12,6 +15,18 @@ type PushState = 'loading' | 'unsupported' | 'denied' | 'subscribed' | 'unsubscr
 
 export default function SettingsPage() {
   const [pushState, setPushState] = useState<PushState>('loading');
+  const [loggingOut, setLoggingOut] = useState(false);
+  const { members, currentUserId } = useAppStore();
+  const currentMember = members.find((m) => m.id === currentUserId);
+  const isDemo = !process.env.NEXT_PUBLIC_SUPABASE_URL;
+
+  async function handleLogout() {
+    if (isDemo) return;
+    setLoggingOut(true);
+    const { createClient } = await import('@/lib/supabase/client');
+    await createClient().auth.signOut();
+    // useSupabaseInit's onAuthStateChange handles redirect to /login
+  }
 
   useEffect(() => {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
@@ -63,6 +78,23 @@ export default function SettingsPage() {
       />
 
       <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+        {/* ── Current user ─────────────────────────────────────────────────── */}
+        {currentMember && (
+          <div style={{ padding: 16, borderRadius: 20, background: 'var(--surface-card)', border: '1px solid var(--border-soft)', display: 'flex', alignItems: 'center', gap: 14 }}>
+            <MemberAvatar name={currentMember.name} size="lg" />
+            <div style={{ flex: 1 }}>
+              <p style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>{currentMember.name}</p>
+              <p style={{ fontSize: 12, marginTop: 2, color: 'var(--text-muted)' }}>{roleLabels[currentMember.role]}</p>
+            </div>
+            {isDemo && (
+              <span style={{ fontSize: 10, padding: '3px 10px', borderRadius: 10, background: 'rgba(176,141,87,0.15)', color: 'var(--bronze)', fontWeight: 600 }}>
+                تجريبي
+              </span>
+            )}
+          </div>
+        )}
+
         {/* Notifications */}
         <div style={{ padding: 16, borderRadius: 20, background: 'var(--surface-card)', border: '1px solid var(--border-soft)' }}>
           <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 14, letterSpacing: '0.04em' }}>
@@ -105,6 +137,30 @@ export default function SettingsPage() {
             )}
           </div>
         </div>
+
+        {/* ── Logout ───────────────────────────────────────────────────────── */}
+        {!isDemo && (
+          <button
+            onClick={handleLogout}
+            disabled={loggingOut}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              width: '100%', padding: '14px 16px', borderRadius: 20,
+              background: 'rgba(220,38,38,0.08)',
+              border: '1px solid rgba(220,38,38,0.22)',
+              cursor: loggingOut ? 'not-allowed' : 'pointer',
+              fontFamily: 'inherit', opacity: loggingOut ? 0.6 : 1,
+            }}
+          >
+            {loggingOut
+              ? <Loader size={16} color="var(--danger)" className="animate-spin" />
+              : <LogOut size={16} color="var(--danger)" />
+            }
+            <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--danger)' }}>
+              {loggingOut ? 'جاري الخروج...' : 'تسجيل الخروج'}
+            </span>
+          </button>
+        )}
 
         {/* App info */}
         <div style={{ padding: 16, borderRadius: 20, background: 'var(--surface-card)', border: '1px solid var(--border-soft)' }}>
