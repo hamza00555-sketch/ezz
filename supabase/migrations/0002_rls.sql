@@ -37,7 +37,7 @@ CREATE POLICY "anyone_create_group"       ON family_groups FOR INSERT WITH CHECK
 -- PROFILES
 CREATE POLICY "members_select_profiles"  ON profiles FOR SELECT USING (family_group_id = my_family_group_id() OR id = auth.uid());
 CREATE POLICY "users_update_own_profile" ON profiles FOR UPDATE USING (id = auth.uid());
-CREATE POLICY "system_insert_profile"    ON profiles FOR INSERT WITH CHECK (id = auth.uid());
+CREATE POLICY "system_insert_profile"    ON profiles FOR INSERT WITH CHECK (true);
 
 -- Generic family-scoped helper macro used for remaining tables:
 -- "member of same family can do everything"
