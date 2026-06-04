@@ -239,13 +239,14 @@ function toRecipe(r: any): Recipe {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function toMealPlan(r: any): MealPlan {
+  const toArr = (v: unknown) => Array.isArray(v) ? v : (v ? [v as string] : []);
   return {
     id: r.id,
     familyGroupId: r.family_group_id,
     date: r.date,
-    breakfast: r.breakfast ?? [],
-    lunch: r.lunch ?? [],
-    dinner: r.dinner ?? [],
+    breakfast: toArr(r.breakfast),
+    lunch:     toArr(r.lunch),
+    dinner:    toArr(r.dinner),
     createdBy: r.created_by ?? '',
     updatedAt: r.updated_at,
   };
