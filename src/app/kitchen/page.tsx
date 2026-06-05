@@ -8,7 +8,7 @@ import { EmptyState } from '@/components/shared/EmptyState';
 import { useAppStore } from '@/store/appStore';
 import { categoryLabels } from '@/lib/utils';
 import { dishImages, dishGradient, getDishImage } from '@/lib/dishImages';
-import { Clock, Heart, ChefHat, CheckCircle2, Circle, FileText, X, RefreshCw, Image as ImageIcon } from 'lucide-react';
+import { Clock, Heart, ChefHat, CheckCircle2, Circle, FileText, X, RefreshCw, Image as ImageIcon, ChevronLeft } from 'lucide-react';
 import type { ShortagePriority, MealTime } from '@/types';
 
 type KitchenTab = 'today' | 'week' | 'shortages' | 'recipes';
@@ -115,10 +115,10 @@ export default function KitchenPage() {
     breakfast: 0, lunch: 0, dinner: 0,
   });
 
-  // Week: inline editing to add a new option to a specific cell
-  const [editingCell, setEditingCell] = useState<{ date: string; meal: MealSlot } | null>(null);
-  const [editValue, setEditValue]     = useState('');
-  const [suggestions, setSuggestions] = useState<string[]>([]);
+  // Week: picker sheet state
+  const [pickerCell, setPickerCell]   = useState<{ date: string; meal: MealSlot } | null>(null);
+  const [pickerInput, setPickerInput] = useState('');
+  const [pickerSugg, setPickerSugg]   = useState<string[]>([]);
 
   // Import recipe sheet
   const [importOpen, setImportOpen]         = useState(false);
@@ -173,28 +173,26 @@ export default function KitchenPage() {
 
   // ─── Week tab handlers ────────────────────────────────────────────────────
 
-  function startAdd(date: string, meal: MealSlot, existingOptions: string[]) {
-    setEditingCell({ date, meal });
-    setEditValue('');
-    setSuggestions(pickSuggestions(meal, 5, existingOptions));
+  function openPicker(date: string, meal: MealSlot, existingOptions: string[]) {
+    setPickerCell({ date, meal });
+    setPickerInput('');
+    setPickerSugg(pickSuggestions(meal, 8, existingOptions));
   }
 
-  function saveAdd() {
-    if (!editingCell) return;
-    if (editValue.trim()) {
-      addMealOption(editingCell.date, editingCell.meal, editValue.trim());
-    }
-    setEditingCell(null);
-    setEditValue('');
-    setSuggestions([]);
+  function closePicker() {
+    setPickerCell(null);
+    setPickerInput('');
+    setPickerSugg([]);
   }
 
-  function chipAdd(s: string) {
-    if (!editingCell) return;
-    addMealOption(editingCell.date, editingCell.meal, s);
-    setEditingCell(null);
-    setEditValue('');
-    setSuggestions([]);
+  function pickerAdd(name: string) {
+    if (!pickerCell || !name.trim()) return;
+    addMealOption(pickerCell.date, pickerCell.meal, name.trim());
+    closePicker();
+  }
+
+  function pickerSaveInput() {
+    pickerAdd(pickerInput);
   }
 
   // ─── Import handlers ──────────────────────────────────────────────────────
@@ -413,109 +411,41 @@ export default function KitchenPage() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                     {meals.map((meal) => {
                       const options = plan?.[meal] ?? [];
-                      const isEditing = editingCell?.date === dateStr && editingCell?.meal === meal;
-
                       return (
-                        <div key={meal}>
-                          {/* Label + chips row */}
-                          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-                            <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', paddingTop: 4, width: 34, flexShrink: 0 }}>
-                              {mealLabels[meal]}
-                            </span>
-                            <div style={{ flex: 1, display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
-                              {/* Existing options */}
-                              {options.map((opt) => (
-                                <div
-                                  key={opt}
-                                  style={{
-                                    display: 'flex', alignItems: 'center', gap: 4,
-                                    padding: '4px 10px', borderRadius: 20,
-                                    background: 'rgba(163,177,138,0.12)',
-                                    border: '1px solid rgba(163,177,138,0.22)',
-                                  }}
-                                >
+                        <div key={meal} style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                          <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', paddingTop: 5, width: 34, flexShrink: 0 }}>
+                            {mealLabels[meal]}
+                          </span>
+                          <div style={{ flex: 1, display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
+                            {options.map((opt) => {
+                              const optImg = getDishImage(opt);
+                              return (
+                                <div key={opt} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '3px 8px 3px 5px', borderRadius: 20, background: 'rgba(163,177,138,0.12)', border: '1px solid rgba(163,177,138,0.22)' }}>
+                                  {/* Mini image circle */}
+                                  <div style={{ width: 22, height: 22, borderRadius: '50%', overflow: 'hidden', flexShrink: 0 }}>
+                                    {optImg ? (
+                                      <img src={optImg} alt={opt} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    ) : (
+                                      <div style={{ width: '100%', height: '100%', background: dishGradient(opt) }} />
+                                    )}
+                                  </div>
                                   <span style={{ fontSize: 12, color: 'var(--accent-strong)' }}>{opt}</span>
                                   {canEdit && (
-                                    <button
-                                      onClick={() => removeMealOption(dateStr, meal, opt)}
-                                      style={{
-                                        background: 'none', border: 'none', cursor: 'pointer',
-                                        padding: '0 0 0 2px', lineHeight: 1,
-                                        color: 'rgba(163,177,138,0.5)', fontSize: 14,
-                                      }}
-                                    >
-                                      ×
-                                    </button>
+                                    <button onClick={() => removeMealOption(dateStr, meal, opt)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, lineHeight: 1, color: 'rgba(163,177,138,0.5)', fontSize: 14 }}>×</button>
                                   )}
                                 </div>
-                              ))}
-
-                              {/* Add button / inline input */}
-                              {canEdit && (
-                                isEditing ? (
-                                  <input
-                                    autoFocus
-                                    value={editValue}
-                                    onChange={(e) => setEditValue(e.target.value)}
-                                    onBlur={saveAdd}
-                                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); saveAdd(); } if (e.key === 'Escape') { setEditingCell(null); } }}
-                                    placeholder="اسم الوجبة..."
-                                    style={{
-                                      background: 'transparent', border: 'none',
-                                      borderBottom: '1.5px solid var(--accent-strong)',
-                                      color: 'var(--text-primary)', fontSize: 12,
-                                      outline: 'none', padding: '3px 2px',
-                                      fontFamily: 'inherit', direction: 'rtl',
-                                      width: 130,
-                                    }}
-                                  />
-                                ) : (
-                                  <button
-                                    onClick={() => startAdd(dateStr, meal, options)}
-                                    style={{
-                                      fontSize: 11, padding: '3px 10px', borderRadius: 20,
-                                      background: 'transparent',
-                                      border: '1px dashed rgba(67,82,56,0.22)',
-                                      color: 'var(--text-muted)', cursor: 'pointer',
-                                      fontFamily: 'inherit',
-                                    }}
-                                  >
-                                    + أضف
-                                  </button>
-                                )
-                              )}
-                              {!canEdit && options.length === 0 && (
-                                <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>—</span>
-                              )}
-                            </div>
+                              );
+                            })}
+                            {canEdit && (
+                              <button
+                                onClick={() => openPicker(dateStr, meal, options)}
+                                style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: 'transparent', border: '1px dashed rgba(67,82,56,0.22)', color: 'var(--text-muted)', cursor: 'pointer', fontFamily: 'inherit' }}
+                              >
+                                + أضف
+                              </button>
+                            )}
+                            {!canEdit && options.length === 0 && <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>—</span>}
                           </div>
-
-                          {/* AI suggestion chips — only when editing this cell */}
-                          {isEditing && suggestions.length > 0 && (
-                            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 7, paddingRight: 42 }}>
-                              {suggestions.map((s) => {
-                                const hasImg = !!getDishImage(s);
-                                return (
-                                  <button
-                                    key={s}
-                                    onPointerDown={(e) => e.preventDefault()}
-                                    onClick={() => chipAdd(s)}
-                                    style={{
-                                      display: 'flex', alignItems: 'center', gap: 5,
-                                      fontSize: 11, padding: '4px 10px', borderRadius: 20,
-                                      background: hasImg ? 'rgba(201,130,114,0.12)' : 'rgba(176,141,87,0.12)',
-                                      color: hasImg ? 'var(--kitchen-rose)' : 'var(--bronze)',
-                                      border: `1px solid ${hasImg ? 'rgba(201,130,114,0.25)' : 'rgba(176,141,87,0.25)'}`,
-                                      cursor: 'pointer', fontFamily: 'inherit',
-                                    }}
-                                  >
-                                    {hasImg && <ImageIcon size={10} strokeWidth={2} />}
-                                    {s}
-                                  </button>
-                                );
-                              })}
-                            </div>
-                          )}
                         </div>
                       );
                     })}
@@ -772,6 +702,167 @@ export default function KitchenPage() {
           </>
         )}
       </div>
+
+      {/* ─── Meal Picker Sheet ───────────────────────────────────────────────── */}
+      {pickerCell && (() => {
+        const { meal } = pickerCell;
+        const mealRecipes = myRecipes.filter(
+          (r) => r.mealTime.length === 0 || r.mealTime.includes(meal as MealTime)
+        );
+        return (
+          <>
+            <div
+              style={{ position: 'fixed', inset: 0, zIndex: 48, background: 'rgba(31,33,28,0.35)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' }}
+              onClick={closePicker}
+            />
+            <div
+              className="slide-up"
+              style={{
+                position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 49,
+                background: 'rgba(255,253,247,0.98)',
+                backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)',
+                borderRadius: '28px 28px 0 0',
+                padding: '20px 16px max(28px, env(safe-area-inset-bottom, 16px))',
+                maxHeight: '72dvh', overflowY: 'auto',
+                border: '1px solid rgba(67,82,56,0.10)',
+                boxShadow: '0 -16px 48px rgba(67,82,56,0.14)',
+              }}
+            >
+              {/* Header */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                <p style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>
+                  اختر وجبة {mealLabels[meal]}
+                </p>
+                <button onClick={closePicker} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
+                  <X size={20} color="var(--text-muted)" />
+                </button>
+              </div>
+
+              {/* Saved recipes */}
+              {mealRecipes.length > 0 && (
+                <div style={{ marginBottom: 20 }}>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.06em', marginBottom: 10 }}>
+                    من وصفاتي ({mealRecipes.length})
+                  </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {mealRecipes.map((r) => {
+                      const rIsGrad = r.imageUrl?.startsWith('linear-gradient');
+                      const rImg = !rIsGrad ? (r.imageUrl || getDishImage(r.name)) : undefined;
+                      const rGrad = rIsGrad ? r.imageUrl! : (rImg ? undefined : dishGradient(r.name));
+                      return (
+                        <button
+                          key={r.id}
+                          onClick={() => pickerAdd(r.name)}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: 12,
+                            padding: '10px 12px', borderRadius: 18, width: '100%', textAlign: 'right',
+                            background: 'var(--surface-card)',
+                            border: '1px solid var(--border-soft)',
+                            cursor: 'pointer', fontFamily: 'inherit',
+                            transition: 'transform 0.12s ease',
+                          }}
+                          className="active:scale-[0.98]"
+                        >
+                          {/* Image circle */}
+                          <div style={{ width: 44, height: 44, borderRadius: 14, overflow: 'hidden', flexShrink: 0, border: '2px solid rgba(255,255,255,0.7)', boxShadow: '0 2px 8px rgba(67,82,56,0.10)' }}>
+                            {rImg ? (
+                              <img src={rImg} alt={r.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            ) : (
+                              <div style={{ width: '100%', height: '100%', background: rGrad ?? dishGradient(r.name), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <ChefHat size={16} color="rgba(255,255,255,0.85)" strokeWidth={1.8} />
+                              </div>
+                            )}
+                          </div>
+                          {/* Info */}
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>{r.name}</p>
+                            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                              {r.prepTime && (
+                                <span style={{ fontSize: 10, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 3 }}>
+                                  <Clock size={9} />{r.prepTime} د
+                                </span>
+                              )}
+                              {r.ingredients.length > 0 && (
+                                <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>
+                                  {r.ingredients.slice(0, 2).join(' · ')}{r.ingredients.length > 2 ? '...' : ''}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <ChevronLeft size={16} color="var(--text-muted)" />
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Suggestions */}
+              {pickerSugg.length > 0 && (
+                <div style={{ marginBottom: 18 }}>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.06em', marginBottom: 10 }}>
+                    اقتراحات
+                  </p>
+                  <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
+                    {pickerSugg.map((s) => {
+                      const hasImg = !!getDishImage(s);
+                      return (
+                        <button
+                          key={s}
+                          onClick={() => pickerAdd(s)}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: 5,
+                            fontSize: 12, padding: '6px 12px', borderRadius: 20,
+                            background: hasImg ? 'rgba(201,130,114,0.10)' : 'rgba(176,141,87,0.10)',
+                            color: hasImg ? 'var(--kitchen-rose)' : 'var(--bronze)',
+                            border: `1px solid ${hasImg ? 'rgba(201,130,114,0.22)' : 'rgba(176,141,87,0.22)'}`,
+                            cursor: 'pointer', fontFamily: 'inherit',
+                          }}
+                        >
+                          {hasImg && <ImageIcon size={10} strokeWidth={2} />}
+                          {s}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Manual input */}
+              <div style={{ display: 'flex', gap: 8 }}>
+                <input
+                  value={pickerInput}
+                  onChange={(e) => setPickerInput(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); pickerSaveInput(); } }}
+                  placeholder="أو اكتب اسم الوجبة..."
+                  style={{
+                    flex: 1, padding: '11px 14px', borderRadius: 14,
+                    background: 'rgba(67,82,56,0.05)',
+                    border: '1px solid rgba(67,82,56,0.12)',
+                    color: 'var(--text-primary)', fontSize: 14,
+                    fontFamily: 'inherit', direction: 'rtl', outline: 'none',
+                  }}
+                />
+                <button
+                  onClick={pickerSaveInput}
+                  disabled={!pickerInput.trim()}
+                  style={{
+                    padding: '11px 18px', borderRadius: 14,
+                    background: pickerInput.trim() ? 'rgba(163,177,138,0.20)' : 'rgba(67,82,56,0.05)',
+                    border: `1px solid ${pickerInput.trim() ? 'rgba(163,177,138,0.38)' : 'rgba(67,82,56,0.10)'}`,
+                    color: pickerInput.trim() ? 'var(--accent-strong)' : 'var(--text-muted)',
+                    fontSize: 13, fontWeight: 700,
+                    cursor: pickerInput.trim() ? 'pointer' : 'not-allowed',
+                    fontFamily: 'inherit',
+                  }}
+                >
+                  إضافة
+                </button>
+              </div>
+            </div>
+          </>
+        );
+      })()}
 
       {/* ─── Import Recipe Sheet ──────────────────────────────────────────────── */}
       {importOpen && (
