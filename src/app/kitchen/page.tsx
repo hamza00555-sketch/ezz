@@ -708,8 +708,9 @@ export default function KitchenPage() {
               <EmptyState icon="👨‍🍳" title="لا توجد وصفات" description="احفظ وصفاتك المفضلة أو استوردها" />
             ) : (
               myRecipes.map((recipe) => {
-                const recipeImg = recipe.imageUrl || getDishImage(recipe.name);
-                const recipeGrad = dishGradient(recipe.name);
+                const isGrad = recipe.imageUrl?.startsWith('linear-gradient');
+                const recipeImg = !isGrad ? (recipe.imageUrl || getDishImage(recipe.name)) : undefined;
+                const recipeGrad = isGrad ? recipe.imageUrl! : (getDishImage(recipe.name) ? undefined : dishGradient(recipe.name));
                 return (
                 <div key={recipe.id} style={{ padding: 14, borderRadius: 20, background: 'var(--surface-card)', border: '1px solid var(--border-soft)' }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
@@ -718,7 +719,7 @@ export default function KitchenPage() {
                       {recipeImg ? (
                         <img src={recipeImg} alt={recipe.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       ) : (
-                        <div style={{ width: '100%', height: '100%', background: recipeGrad, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div style={{ width: '100%', height: '100%', background: recipeGrad ?? dishGradient(recipe.name), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <ChefHat size={20} color="rgba(255,255,255,0.85)" strokeWidth={1.7} />
                         </div>
                       )}

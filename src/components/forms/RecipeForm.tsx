@@ -29,17 +29,22 @@ export function RecipeForm({ open, onClose }: RecipeFormProps) {
   const [ingredients, setIngredients] = useState<string[]>(['']);
   const [steps, setSteps] = useState<string[]>(['']);
   const [imageUrl, setImageUrl] = useState<string | undefined>();
+  const [imageGenerated, setImageGenerated] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Derived image preview — real photo or gradient
-  const previewImg = imageUrl || (name.trim() ? getDishImage(name.trim()) : undefined);
-  const previewGrad = name.trim() ? dishGradient(name.trim()) : 'linear-gradient(135deg, #F5D9A8 0%, #E8A860 50%, #D4875A 100%)';
+  // imageUrl stores either a real path (/dishes/x.png) or a CSS gradient string
+  const isGradient = imageUrl?.startsWith('linear-gradient');
+  const previewImg = !isGradient ? imageUrl : undefined;
+  const previewGrad = isGradient ? imageUrl! : (name.trim() ? dishGradient(name.trim()) : 'linear-gradient(135deg, #F5D9A8 0%, #E8A860 50%, #D4875A 100%)');
+  const hasGeneratedImage = !!imageUrl;
 
   function generateImage() {
+    if (!name.trim()) return;
     const found = getDishImage(name.trim());
-    if (found) { setImageUrl(found); return; }
-    // No real photo — clear imageUrl so gradient is used (already derived from name)
-    setImageUrl(undefined);
+    // Save real photo path, or save the gradient as the image identity
+    setImageUrl(found ?? dishGradient(name.trim()));
+    setImageGenerated(true);
+    setTimeout(() => setImageGenerated(false), 2000);
   }
 
   function toggleMealTime(value: string) {
@@ -78,7 +83,9 @@ export function RecipeForm({ open, onClose }: RecipeFormProps) {
     e.preventDefault();
     if (!validate()) return;
 
-    const resolvedImg = imageUrl || getDishImage(name.trim()) || undefined;
+    // imageUrl is already set via generateImage (photo path or gradient string)
+    // fall back to auto-lookup if user didn't press the button
+    const resolvedImg = imageUrl ?? getDishImage(name.trim()) ?? dishGradient(name.trim());
 
     const newRecipe: Recipe = {
       id: `rec-${Date.now()}`,
@@ -100,7 +107,7 @@ export function RecipeForm({ open, onClose }: RecipeFormProps) {
     }));
 
     setName(''); setPrepTime(''); setSelectedMealTimes(['lunch']);
-    setIngredients(['']); setSteps(['']); setImageUrl(undefined);
+    setIngredients(['']); setSteps(['']); setImageUrl(undefined); setImageGenerated(false);
     onClose();
   }
 
@@ -110,7 +117,7 @@ export function RecipeForm({ open, onClose }: RecipeFormProps) {
         <FormField label="اسم الوصفة" required error={errors.name}>
           <Input
             value={name}
-            onChange={(e) => { setName(e.target.value); setImageUrl(undefined); }}
+            onChange={(e) => { setName(e.target.value); setImageUrl(undefined); setImageGenerated(false); }}
             placeholder="مثال: كبسة دجاج"
             error={!!errors.name}
             autoFocus
@@ -121,18 +128,27 @@ export function RecipeForm({ open, onClose }: RecipeFormProps) {
         {name.trim() && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             {/* Preview circle */}
-            <div style={{ width: 72, height: 72, borderRadius: 22, overflow: 'hidden', flexShrink: 0, border: '2.5px solid rgba(255,255,255,0.75)', boxShadow: '0 6px 20px rgba(67,82,56,0.14)' }}>
+            <div style={{
+              width: 72, height: 72, borderRadius: 22, overflow: 'hidden', flexShrink: 0,
+              border: hasGeneratedImage ? '2.5px solid rgba(163,177,138,0.60)' : '2.5px solid rgba(67,82,56,0.14)',
+              boxShadow: hasGeneratedImage ? '0 6px 20px rgba(67,82,56,0.18)' : '0 2px 8px rgba(67,82,56,0.08)',
+              transition: 'all 0.3s ease',
+            }}>
               {previewImg ? (
                 <img src={previewImg} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
                 <div style={{ width: '100%', height: '100%', background: previewGrad, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <span style={{ fontSize: 28, opacity: 0.8 }}>🍽️</span>
+                  <span style={{ fontSize: 28, opacity: hasGeneratedImage ? 0.9 : 0.4 }}>🍽️</span>
                 </div>
               )}
             </div>
             <div style={{ flex: 1 }}>
-              <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>
-                {previewImg ? 'وجدنا صورة لهذه الوجبة ✓' : 'سيتم توليد لون مميز لهذه الوجبة'}
+              <p style={{ fontSize: 12, marginBottom: 8, color: imageGenerated ? 'var(--accent-strong)' : hasGeneratedImage ? 'var(--text-secondary)' : 'var(--text-muted)', fontWeight: hasGeneratedImage ? 600 : 400, transition: 'color 0.2s' }}>
+                {imageGenerated
+                  ? (previewImg ? 'تم ربط الصورة ✓' : 'تم توليد اللون ✓')
+                  : hasGeneratedImage
+                    ? (previewImg ? 'صورة حقيقية مرتبطة' : 'لون مميز مولَّد')
+                    : 'اضغط لتوليد صورة للوجبة'}
               </p>
               <button
                 type="button"
@@ -140,15 +156,16 @@ export function RecipeForm({ open, onClose }: RecipeFormProps) {
                 style={{
                   display: 'flex', alignItems: 'center', gap: 6,
                   padding: '7px 14px', borderRadius: 12,
-                  background: 'rgba(163,177,138,0.16)',
-                  border: '1px solid rgba(163,177,138,0.32)',
+                  background: imageGenerated ? 'rgba(163,177,138,0.22)' : 'rgba(163,177,138,0.12)',
+                  border: `1px solid ${imageGenerated ? 'rgba(163,177,138,0.45)' : 'rgba(163,177,138,0.28)'}`,
                   color: 'var(--accent-strong)',
                   fontSize: 12, fontWeight: 700,
                   cursor: 'pointer', fontFamily: 'inherit',
+                  transition: 'all 0.2s ease',
                 }}
               >
                 <Sparkles size={13} strokeWidth={2} />
-                {previewImg ? 'تحديث الصورة' : 'توليد صورة'}
+                {imageGenerated ? 'تم ✓' : hasGeneratedImage ? 'تحديث' : 'توليد صورة'}
               </button>
             </div>
           </div>
