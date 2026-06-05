@@ -252,14 +252,19 @@ export default function KitchenPage() {
               const others   = options.filter((_, i) => i !== idx);
               const isLunch  = meal === 'lunch';
 
-              // Image: real photo if known dish, else dish-specific gradient, else slot gradient
+              // Image: recipe's own imageUrl > library map > gradient fallback
               const slotGradients: Record<MealSlot, string> = {
                 breakfast: 'linear-gradient(135deg, #F5D9A8 0%, #E8A860 50%, #D4875A 100%)',
                 lunch:     'linear-gradient(135deg, #C4907A 0%, #B87560 50%, #A86550 100%)',
                 dinner:    'linear-gradient(135deg, #C98272 0%, #B86F58 50%, #9A5A48 100%)',
               };
-              const dishImg   = selected ? getDishImage(selected) : undefined;
-              const imgGrad   = selected ? dishGradient(selected) : slotGradients[meal];
+              const selectedRecipe = selected ? myRecipes.find((r) => r.name === selected) : null;
+              const recipeImgUrl   = selectedRecipe?.imageUrl && !selectedRecipe.imageUrl.startsWith('linear-gradient')
+                ? selectedRecipe.imageUrl : undefined;
+              const recipeImgGrad  = selectedRecipe?.imageUrl?.startsWith('linear-gradient')
+                ? selectedRecipe.imageUrl : undefined;
+              const dishImg   = selected ? (recipeImgUrl ?? getDishImage(selected)) : undefined;
+              const imgGrad   = selected ? (recipeImgGrad ?? dishGradient(selected)) : slotGradients[meal];
 
               return (
                 <div
@@ -420,7 +425,13 @@ export default function KitchenPage() {
                           </span>
                           <div style={{ flex: 1, display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
                             {options.map((opt) => {
-                              const optImg = getDishImage(opt);
+                              const optRecipe = myRecipes.find((r) => r.name === opt);
+                              const optImg = (optRecipe?.imageUrl && !optRecipe.imageUrl.startsWith('linear-gradient'))
+                                ? optRecipe.imageUrl
+                                : getDishImage(opt);
+                              const optGrad = optRecipe?.imageUrl?.startsWith('linear-gradient')
+                                ? optRecipe.imageUrl
+                                : dishGradient(opt);
                               return (
                                 <div key={opt} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '3px 8px 3px 5px', borderRadius: 20, background: 'rgba(163,177,138,0.12)', border: '1px solid rgba(163,177,138,0.22)' }}>
                                   {/* Mini image circle */}
@@ -428,7 +439,7 @@ export default function KitchenPage() {
                                     {optImg ? (
                                       <img src={optImg} alt={opt} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                     ) : (
-                                      <div style={{ width: '100%', height: '100%', background: dishGradient(opt) }} />
+                                      <div style={{ width: '100%', height: '100%', background: optGrad }} />
                                     )}
                                   </div>
                                   <span style={{ fontSize: 12, color: 'var(--accent-strong)' }}>{opt}</span>
