@@ -350,7 +350,7 @@ const mockMealPlans: MealPlan[] = [
     familyGroupId: FAMILY_GROUP_ID,
     date: new Date().toISOString().split('T')[0],
     breakfast: ['بيض مع خبز', 'لحوح مع العسل', 'شكشوكة'],
-    lunch: ['كبسة دجاج', 'مندي لحم', 'زربيان حضرمي'],
+    lunch: ['كبسة دجاج', 'سوتو أيام', 'زربيان حضرمي'],
     dinner: ['شوربة عدس', 'حمص مع خبز'],
     createdBy: 'member-2',
     updatedAt: new Date().toISOString(),

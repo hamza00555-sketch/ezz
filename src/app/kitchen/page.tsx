@@ -104,6 +104,12 @@ function parseRecipeText(raw: string): ParsedRecipe | null {
   return { name, ingredients, steps, mealTime: [] };
 }
 
+// ─── Dish images ──────────────────────────────────────────────────────────────
+
+const dishImages: Record<string, string> = {
+  'سوتو أيام': '/dishes/soto-ayam.png',
+};
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function KitchenPage() {
@@ -353,13 +359,21 @@ export default function KitchenPage() {
                     border: '3px solid rgba(255,255,255,0.85)',
                     flexShrink: 0,
                   }}>
-                    <div style={{
-                      width: '100%', height: '100%',
-                      background: mealGradients[meal],
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                      <span style={{ fontSize: 36, opacity: 0.85 }}>{mealIcons[meal]}</span>
-                    </div>
+                    {selected && dishImages[selected] ? (
+                      <img
+                        src={dishImages[selected]}
+                        alt={selected}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    ) : (
+                      <div style={{
+                        width: '100%', height: '100%',
+                        background: mealGradients[meal],
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}>
+                        <span style={{ fontSize: 36, opacity: 0.85 }}>{mealIcons[meal]}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               );
