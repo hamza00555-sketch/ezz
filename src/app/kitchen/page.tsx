@@ -8,7 +8,8 @@ import { EmptyState } from '@/components/shared/EmptyState';
 import { RecipeForm } from '@/components/forms/RecipeForm';
 import { useAppStore } from '@/store/appStore';
 import { categoryLabels } from '@/lib/utils';
-import { dishImages, dishGradient, getDishImage } from '@/lib/dishImages';
+import { getDishImage } from '@/lib/dishImages';
+import { RecipeImage } from '@/components/shared/RecipeImage';
 import { Clock, Heart, ChefHat, CheckCircle2, Circle, FileText, X, RefreshCw, Image as ImageIcon, ChevronLeft, Plus } from 'lucide-react';
 import type { ShortagePriority, MealTime } from '@/types';
 
@@ -259,19 +260,7 @@ export default function KitchenPage() {
               const others   = options.filter((_, i) => i !== idx);
               const isLunch  = meal === 'lunch';
 
-              // Image: recipe's own imageUrl > library map > gradient fallback
-              const slotGradients: Record<MealSlot, string> = {
-                breakfast: 'linear-gradient(135deg, #F5D9A8 0%, #E8A860 50%, #D4875A 100%)',
-                lunch:     'linear-gradient(135deg, #C4907A 0%, #B87560 50%, #A86550 100%)',
-                dinner:    'linear-gradient(135deg, #C98272 0%, #B86F58 50%, #9A5A48 100%)',
-              };
               const selectedRecipe = selected ? myRecipes.find((r) => r.name === selected) : null;
-              const recipeImgUrl   = selectedRecipe?.imageUrl && !selectedRecipe.imageUrl.startsWith('linear-gradient')
-                ? selectedRecipe.imageUrl : undefined;
-              const recipeImgGrad  = selectedRecipe?.imageUrl?.startsWith('linear-gradient')
-                ? selectedRecipe.imageUrl : undefined;
-              const dishImg   = selected ? (recipeImgUrl ?? getDishImage(selected)) : undefined;
-              const imgGrad   = selected ? (recipeImgGrad ?? dishGradient(selected)) : slotGradients[meal];
 
               return (
                 <div
@@ -357,25 +346,16 @@ export default function KitchenPage() {
                   </div>
 
                   {/* Image circle — positioned on physical left (RTL end) */}
-                  <div style={{
-                    position: 'absolute',
-                    left: 16, top: '50%',
-                    width: 112, height: 112,
-                    transform: 'translateY(-50%)',
-                    borderRadius: '50%',
-                    overflow: 'hidden',
-                    boxShadow: '0 18px 34px rgba(184,111,88,0.20)',
-                    border: '3px solid rgba(255,255,255,0.85)',
-                    flexShrink: 0,
-                  }}>
-                    {dishImg ? (
-                      <img src={dishImg} alt={selected!} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    ) : (
-                      <div style={{ width: '100%', height: '100%', background: imgGrad, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <span style={{ fontSize: 36, opacity: 0.85 }}>{mealIcons[meal]}</span>
-                      </div>
-                    )}
-                  </div>
+                  <RecipeImage
+                    imageUrl={selectedRecipe?.imageUrl}
+                    name={selected ?? meal}
+                    size={112}
+                    borderRadius={56}
+                    border="3px solid rgba(255,255,255,0.85)"
+                    boxShadow="0 18px 34px rgba(184,111,88,0.20)"
+                    fallbackIcon={<span style={{ fontSize: 36, opacity: 0.85 }}>{mealIcons[meal]}</span>}
+                    style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)' }}
+                  />
                 </div>
               );
             })}
@@ -433,22 +413,9 @@ export default function KitchenPage() {
                           <div style={{ flex: 1, display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
                             {options.map((opt) => {
                               const optRecipe = myRecipes.find((r) => r.name === opt);
-                              const optImg = (optRecipe?.imageUrl && !optRecipe.imageUrl.startsWith('linear-gradient'))
-                                ? optRecipe.imageUrl
-                                : getDishImage(opt);
-                              const optGrad = optRecipe?.imageUrl?.startsWith('linear-gradient')
-                                ? optRecipe.imageUrl
-                                : dishGradient(opt);
                               return (
                                 <div key={opt} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '3px 8px 3px 5px', borderRadius: 20, background: 'rgba(163,177,138,0.12)', border: '1px solid rgba(163,177,138,0.22)' }}>
-                                  {/* Mini image circle */}
-                                  <div style={{ width: 22, height: 22, borderRadius: '50%', overflow: 'hidden', flexShrink: 0 }}>
-                                    {optImg ? (
-                                      <img src={optImg} alt={opt} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                    ) : (
-                                      <div style={{ width: '100%', height: '100%', background: optGrad }} />
-                                    )}
-                                  </div>
+                                  <RecipeImage imageUrl={optRecipe?.imageUrl} name={opt} size={22} borderRadius={11} />
                                   <span style={{ fontSize: 12, color: 'var(--accent-strong)' }}>{opt}</span>
                                   {canEdit && (
                                     <button onClick={() => removeMealOption(dateStr, meal, opt)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, lineHeight: 1, color: 'rgba(163,177,138,0.5)', fontSize: 14 }}>×</button>
@@ -676,9 +643,6 @@ export default function KitchenPage() {
               <EmptyState icon="👨‍🍳" title="لا توجد وصفات" description="اضغط وصفة جديدة لتبدأ" />
             ) : (
               myRecipes.map((recipe) => {
-                const isGrad = recipe.imageUrl?.startsWith('linear-gradient');
-                const recipeImg = !isGrad ? (recipe.imageUrl || getDishImage(recipe.name)) : undefined;
-                const recipeGrad = isGrad ? recipe.imageUrl! : dishGradient(recipe.name);
                 return (
                   <div
                     key={recipe.id}
@@ -692,15 +656,15 @@ export default function KitchenPage() {
                       cursor: 'pointer', transition: 'transform 0.12s ease',
                     }}
                   >
-                    <div style={{ width: 52, height: 52, borderRadius: 16, flexShrink: 0, overflow: 'hidden', border: '2px solid rgba(255,255,255,0.7)', boxShadow: '0 4px 12px rgba(67,82,56,0.12)' }}>
-                      {recipeImg ? (
-                        <img src={recipeImg} alt={recipe.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      ) : (
-                        <div style={{ width: '100%', height: '100%', background: recipeGrad, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <ChefHat size={20} color="rgba(255,255,255,0.85)" strokeWidth={1.7} />
-                        </div>
-                      )}
-                    </div>
+                    <RecipeImage
+                      imageUrl={recipe.imageUrl}
+                      name={recipe.name}
+                      size={52}
+                      borderRadius={16}
+                      border="2px solid rgba(255,255,255,0.7)"
+                      boxShadow="0 4px 12px rgba(67,82,56,0.12)"
+                      fallbackIcon={<ChefHat size={20} color="rgba(255,255,255,0.85)" strokeWidth={1.7} />}
+                    />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 5 }}>{recipe.name}</p>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, alignItems: 'center' }}>
@@ -776,9 +740,6 @@ export default function KitchenPage() {
                   </p>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {mealRecipes.map((r) => {
-                      const rIsGrad = r.imageUrl?.startsWith('linear-gradient');
-                      const rImg = !rIsGrad ? (r.imageUrl || getDishImage(r.name)) : undefined;
-                      const rGrad = rIsGrad ? r.imageUrl! : (rImg ? undefined : dishGradient(r.name));
                       return (
                         <button
                           key={r.id}
@@ -793,16 +754,15 @@ export default function KitchenPage() {
                           }}
                           className="active:scale-[0.98]"
                         >
-                          {/* Image circle */}
-                          <div style={{ width: 44, height: 44, borderRadius: 14, overflow: 'hidden', flexShrink: 0, border: '2px solid rgba(255,255,255,0.7)', boxShadow: '0 2px 8px rgba(67,82,56,0.10)' }}>
-                            {rImg ? (
-                              <img src={rImg} alt={r.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                            ) : (
-                              <div style={{ width: '100%', height: '100%', background: rGrad ?? dishGradient(r.name), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <ChefHat size={16} color="rgba(255,255,255,0.85)" strokeWidth={1.8} />
-                              </div>
-                            )}
-                          </div>
+                          <RecipeImage
+                            imageUrl={r.imageUrl}
+                            name={r.name}
+                            size={44}
+                            borderRadius={14}
+                            border="2px solid rgba(255,255,255,0.7)"
+                            boxShadow="0 2px 8px rgba(67,82,56,0.10)"
+                            fallbackIcon={<ChefHat size={16} color="rgba(255,255,255,0.85)" strokeWidth={1.8} />}
+                          />
                           {/* Info */}
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>{r.name}</p>
@@ -907,9 +867,6 @@ export default function KitchenPage() {
       {/* ─── Recipe Detail Popup ─────────────────────────────────────────────── */}
       {detailRecipe && (() => {
         const r = detailRecipe;
-        const isGrad = r.imageUrl?.startsWith('linear-gradient');
-        const rImg = !isGrad ? (r.imageUrl || getDishImage(r.name)) : undefined;
-        const rGrad = isGrad ? r.imageUrl! : dishGradient(r.name);
         return (
           <>
             <div
@@ -930,13 +887,14 @@ export default function KitchenPage() {
             >
               {/* Image header */}
               <div style={{ width: '100%', height: 200, position: 'relative', borderRadius: '28px 28px 0 0', overflow: 'hidden' }}>
-                {rImg ? (
-                  <img src={rImg} alt={r.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                ) : (
-                  <div style={{ width: '100%', height: '100%', background: rGrad, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <ChefHat size={48} color="rgba(255,255,255,0.70)" strokeWidth={1.4} />
-                  </div>
-                )}
+                <RecipeImage
+                  imageUrl={r.imageUrl}
+                  name={r.name}
+                  size={200}
+                  borderRadius={0}
+                  fallbackIcon={<ChefHat size={48} color="rgba(255,255,255,0.70)" strokeWidth={1.4} />}
+                  style={{ width: '100%', height: '100%' }}
+                />
                 {/* Overlay gradient for readability */}
                 <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(31,33,28,0.55) 0%, transparent 60%)' }} />
                 {/* Close button */}

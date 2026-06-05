@@ -796,7 +796,11 @@ export const useAppStore = create<AppState>()(persist((set, get) => ({
     documents:     state.documents,
     maintenance:   state.maintenance,
     shortages:     state.shortages,
-    recipes:       state.recipes,
+    // Strip raw data URLs from recipes — images live in IndexedDB (idb: refs are fine)
+    recipes: state.recipes.map((r) => ({
+      ...r,
+      imageUrl: r.imageUrl?.startsWith('data:') ? undefined : r.imageUrl,
+    })),
     mealPlans:     state.mealPlans,
     wishItems:     state.wishItems,
     wallets:       state.wallets,
