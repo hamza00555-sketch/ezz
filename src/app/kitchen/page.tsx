@@ -8,7 +8,7 @@ import { EmptyState } from '@/components/shared/EmptyState';
 import { useAppStore } from '@/store/appStore';
 import { categoryLabels } from '@/lib/utils';
 import { dishImages, dishGradient, getDishImage } from '@/lib/dishImages';
-import { Clock, Heart, ChefHat, CheckCircle2, Circle, FileText, X, RefreshCw, Image as ImageIcon, ChevronLeft } from 'lucide-react';
+import { Clock, Heart, ChefHat, CheckCircle2, Circle, FileText, X, RefreshCw, Image as ImageIcon, ChevronLeft, Plus } from 'lucide-react';
 import type { ShortagePriority, MealTime } from '@/types';
 
 type KitchenTab = 'today' | 'week' | 'shortages' | 'recipes';
@@ -131,7 +131,7 @@ export default function KitchenPage() {
   const {
     shortages, recipes, mealPlans, members,
     currentFamilyGroupId, currentUserId,
-    toggleShortageStatus, addMealOption, removeMealOption, addRecipe, addShortage,
+    toggleShortageStatus, addMealOption, removeMealOption, addRecipe, addShortage, setActiveQuickForm,
   } = useAppStore();
 
   const currentMember = members.find((m) => m.id === currentUserId);
@@ -617,25 +617,43 @@ export default function KitchenPage() {
         {activeTab === 'recipes' && (
           <>
             {canEdit && (
-              <button
-                onClick={() => setImportOpen(true)}
-                style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                  width: '100%', padding: '12px 16px', borderRadius: 16,
-                  background: 'rgba(232,121,249,0.08)',
-                  border: '1px solid rgba(232,121,249,0.25)',
-                  cursor: 'pointer', marginBottom: 4, fontFamily: 'inherit',
-                }}
-                className="active:scale-[0.98]"
-              >
-                <FileText size={16} color="#E879F9" />
-                <span style={{ fontSize: 13, fontWeight: 600, color: '#E879F9' }}>
-                  استيراد وصفة بالنص
-                </span>
-              </button>
+              <div style={{ display: 'flex', gap: 8 }}>
+                {/* Primary: add new recipe */}
+                <button
+                  onClick={() => setActiveQuickForm('recipe')}
+                  style={{
+                    flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                    padding: '12px 16px', borderRadius: 16,
+                    background: 'rgba(163,177,138,0.16)',
+                    border: '1px solid rgba(163,177,138,0.32)',
+                    cursor: 'pointer', fontFamily: 'inherit',
+                  }}
+                  className="active:scale-[0.98]"
+                >
+                  <Plus size={16} color="var(--accent-strong)" strokeWidth={2.5} />
+                  <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent-strong)' }}>
+                    وصفة جديدة
+                  </span>
+                </button>
+                {/* Secondary: import from text */}
+                <button
+                  onClick={() => setImportOpen(true)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    padding: '12px 14px', borderRadius: 16,
+                    background: 'rgba(232,121,249,0.07)',
+                    border: '1px solid rgba(232,121,249,0.20)',
+                    cursor: 'pointer', fontFamily: 'inherit',
+                  }}
+                  className="active:scale-[0.98]"
+                >
+                  <FileText size={15} color="#E879F9" />
+                  <span style={{ fontSize: 12, fontWeight: 600, color: '#E879F9' }}>استيراد</span>
+                </button>
+              </div>
             )}
             {myRecipes.length === 0 ? (
-              <EmptyState icon="👨‍🍳" title="لا توجد وصفات" description="احفظ وصفاتك المفضلة أو استوردها" />
+              <EmptyState icon="👨‍🍳" title="لا توجد وصفات" description="اضغط وصفة جديدة لتبدأ" />
             ) : (
               myRecipes.map((recipe) => {
                 const isGrad = recipe.imageUrl?.startsWith('linear-gradient');

@@ -6,7 +6,7 @@ import { BottomSheet } from '@/components/shared/BottomSheet';
 import { FormField, Input, SubmitButton } from '@/components/shared/FormField';
 import { useAppStore } from '@/store/appStore';
 import { getDishImage, dishGradient } from '@/lib/dishImages';
-import type { Recipe } from '@/types';
+import type { MealTime } from '@/types';
 
 interface RecipeFormProps {
   open: boolean;
@@ -21,7 +21,7 @@ const mealTimes = [
 ];
 
 export function RecipeForm({ open, onClose }: RecipeFormProps) {
-  const { currentFamilyGroupId, currentUserId } = useAppStore();
+  const { currentFamilyGroupId, currentUserId, addRecipe } = useAppStore();
 
   const [name, setName] = useState('');
   const [prepTime, setPrepTime] = useState('');
@@ -87,24 +87,17 @@ export function RecipeForm({ open, onClose }: RecipeFormProps) {
     // fall back to auto-lookup if user didn't press the button
     const resolvedImg = imageUrl ?? getDishImage(name.trim()) ?? dishGradient(name.trim());
 
-    const newRecipe: Recipe = {
-      id: `rec-${Date.now()}`,
+    addRecipe({
       familyGroupId: currentFamilyGroupId,
       name: name.trim(),
       ingredients: ingredients.filter((i) => i.trim()),
       steps: steps.filter((s) => s.trim()),
       prepTime: prepTime ? parseInt(prepTime) : undefined,
-      mealTime: selectedMealTimes as Recipe['mealTime'],
+      mealTime: selectedMealTimes as MealTime[],
       imageUrl: resolvedImg,
       favoritedBy: [],
       createdBy: currentUserId,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    useAppStore.setState((state) => ({
-      recipes: [...state.recipes, newRecipe],
-    }));
+    });
 
     setName(''); setPrepTime(''); setSelectedMealTimes(['lunch']);
     setIngredients(['']); setSteps(['']); setImageUrl(undefined); setImageGenerated(false);
