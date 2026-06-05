@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import type {
   FamilyGroup,
   FamilyMember,
@@ -538,7 +539,7 @@ function generateId(): string {
   return Math.random().toString(36).substr(2, 9);
 }
 
-export const useAppStore = create<AppState>((set, get) => ({
+export const useAppStore = create<AppState>()(persist((set, get) => ({
   currentUserId: CURRENT_USER_ID,
   currentFamilyGroupId: FAMILY_GROUP_ID,
   isLoaded: false,
@@ -774,4 +775,22 @@ export const useAppStore = create<AppState>((set, get) => ({
       );
     }
   },
+}), {
+  name: 'ezz-app-store',
+  partialize: (state) => ({
+    familyGroups:  state.familyGroups,
+    members:       state.members,
+    tasks:         state.tasks,
+    requests:      state.requests,
+    homeItems:     state.homeItems,
+    documents:     state.documents,
+    maintenance:   state.maintenance,
+    shortages:     state.shortages,
+    recipes:       state.recipes,
+    mealPlans:     state.mealPlans,
+    wishItems:     state.wishItems,
+    wallets:       state.wallets,
+    expenses:      state.expenses,
+    announcements: state.announcements,
+  }),
 }));
