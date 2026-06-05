@@ -21,7 +21,7 @@ const mealTimes = [
 ];
 
 async function compressImage(file: File): Promise<string> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const img = new Image();
     const objUrl = URL.createObjectURL(file);
     img.onload = () => {
@@ -37,6 +37,7 @@ async function compressImage(file: File): Promise<string> {
       URL.revokeObjectURL(objUrl);
       resolve(canvas.toDataURL('image/jpeg', 0.82));
     };
+    img.onerror = () => { URL.revokeObjectURL(objUrl); reject(new Error('failed to load image')); };
     img.src = objUrl;
   });
 }
@@ -78,6 +79,16 @@ export function RecipeForm({ open, onClose }: RecipeFormProps) {
       const compressed = await compressImage(file);
       setImageUrl(compressed);
       setIsUserPhoto(true);
+    } catch {
+      // compression failed — fall back to reading as data URL directly
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        if (ev.target?.result) {
+          setImageUrl(ev.target.result as string);
+          setIsUserPhoto(true);
+        }
+      };
+      reader.readAsDataURL(file);
     } finally {
       setCompressing(false);
       e.target.value = '';

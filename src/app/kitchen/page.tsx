@@ -121,6 +121,16 @@ export default function KitchenPage() {
   const [pickerInput, setPickerInput] = useState('');
   const [pickerSugg, setPickerSugg]   = useState<string[]>([]);
 
+  // Recipe card expand state
+  const [expandedRecipes, setExpandedRecipes] = useState<Set<string>>(new Set());
+  function toggleRecipe(id: string) {
+    setExpandedRecipes((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  }
+
   // Import recipe sheet
   const [recipeFormOpen, setRecipeFormOpen] = useState(false);
   const [importOpen, setImportOpen]         = useState(false);
@@ -671,64 +681,100 @@ export default function KitchenPage() {
               myRecipes.map((recipe) => {
                 const isGrad = recipe.imageUrl?.startsWith('linear-gradient');
                 const recipeImg = !isGrad ? (recipe.imageUrl || getDishImage(recipe.name)) : undefined;
-                const recipeGrad = isGrad ? recipe.imageUrl! : (getDishImage(recipe.name) ? undefined : dishGradient(recipe.name));
+                const recipeGrad = isGrad ? recipe.imageUrl! : dishGradient(recipe.name);
+                const expanded = expandedRecipes.has(recipe.id);
                 return (
-                <div key={recipe.id} style={{ padding: 14, borderRadius: 20, background: 'var(--surface-card)', border: '1px solid var(--border-soft)' }}>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                    {/* Recipe image circle */}
-                    <div style={{ width: 52, height: 52, borderRadius: 16, flexShrink: 0, overflow: 'hidden', border: '2px solid rgba(255,255,255,0.7)', boxShadow: '0 4px 12px rgba(67,82,56,0.12)' }}>
-                      {recipeImg ? (
-                        <img src={recipeImg} alt={recipe.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      ) : (
-                        <div style={{ width: '100%', height: '100%', background: recipeGrad ?? dishGradient(recipe.name), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <ChefHat size={20} color="rgba(255,255,255,0.85)" strokeWidth={1.7} />
-                        </div>
-                      )}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                        <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{recipe.name}</p>
-                        {recipe.favoritedBy.includes(currentUserId) && (
-                          <Heart size={14} color="#F472B6" fill="#F472B6" />
+                  <div
+                    key={recipe.id}
+                    onClick={() => toggleRecipe(recipe.id)}
+                    style={{
+                      padding: 14, borderRadius: 20,
+                      background: 'var(--surface-card)',
+                      border: `1px solid ${expanded ? 'rgba(163,177,138,0.35)' : 'var(--border-soft)'}`,
+                      cursor: 'pointer', transition: 'border-color 0.2s',
+                    }}
+                  >
+                    {/* Always-visible row */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <div style={{ width: 52, height: 52, borderRadius: 16, flexShrink: 0, overflow: 'hidden', border: '2px solid rgba(255,255,255,0.7)', boxShadow: '0 4px 12px rgba(67,82,56,0.12)' }}>
+                        {recipeImg ? (
+                          <img src={recipeImg} alt={recipe.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : (
+                          <div style={{ width: '100%', height: '100%', background: recipeGrad, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <ChefHat size={20} color="rgba(255,255,255,0.85)" strokeWidth={1.7} />
+                          </div>
                         )}
                       </div>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
-                        {recipe.mealTime.map((t) => (
-                          <span key={t} style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, background: 'rgba(67,82,56,0.07)', color: 'var(--text-muted)' }}>
-                            {t === 'breakfast' ? 'فطور' : t === 'lunch' ? 'غداء' : t === 'dinner' ? 'عشاء' : 'مناسبة'}
-                          </span>
-                        ))}
-                        {recipe.prepTime && (
-                          <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'var(--text-muted)' }}>
-                            <Clock size={10} />{recipe.prepTime} دقيقة
-                          </span>
-                        )}
-                      </div>
-                      {recipe.ingredients.length > 0 && (
-                        <div style={{ marginTop: 10 }}>
-                          <p style={{ fontSize: 11, fontWeight: 600, marginBottom: 4, color: 'var(--text-secondary)' }}>المكونات:</p>
-                          <p style={{ fontSize: 12, lineHeight: 1.6, color: 'var(--text-muted)' }}>
-                            {recipe.ingredients.join(' · ')}
-                          </p>
-                        </div>
-                      )}
-                      {recipe.steps.length > 0 && (
-                        <div style={{ marginTop: 8 }}>
-                          <p style={{ fontSize: 11, fontWeight: 600, marginBottom: 4, color: 'var(--text-secondary)' }}>الخطوات:</p>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                            {recipe.steps.map((step, i) => (
-                              <div key={i} style={{ display: 'flex', gap: 6 }}>
-                                <span style={{ fontSize: 11, color: 'var(--accent-strong)', fontWeight: 700, flexShrink: 0 }}>{i + 1}.</span>
-                                <span style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5 }}>{step}</span>
-                              </div>
-                            ))}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                          <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>{recipe.name}</p>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                            {recipe.favoritedBy.includes(currentUserId) && (
+                              <Heart size={14} color="#F472B6" fill="#F472B6" />
+                            )}
+                            <span style={{ fontSize: 16, color: 'var(--text-muted)', lineHeight: 1, transition: 'transform 0.2s', display: 'inline-block', transform: expanded ? 'rotate(180deg)' : 'none' }}>
+                              ↓
+                            </span>
                           </div>
                         </div>
-                      )}
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 6 }}>
+                          {recipe.mealTime.map((t) => (
+                            <span key={t} style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, background: 'rgba(67,82,56,0.07)', color: 'var(--text-muted)' }}>
+                              {t === 'breakfast' ? 'فطور' : t === 'lunch' ? 'غداء' : t === 'dinner' ? 'عشاء' : 'مناسبة'}
+                            </span>
+                          ))}
+                          {recipe.prepTime && (
+                            <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 10, color: 'var(--text-muted)', padding: '2px 6px', borderRadius: 10, background: 'rgba(176,141,87,0.10)' }}>
+                              <Clock size={9} />{recipe.prepTime} د
+                            </span>
+                          )}
+                          {recipe.ingredients.length > 0 && !expanded && (
+                            <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>
+                              {recipe.ingredients.length} مكون
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </div>
+
+                    {/* Expanded details */}
+                    {expanded && (
+                      <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid var(--border-soft)' }} onClick={(e) => e.stopPropagation()}>
+                        {recipe.ingredients.length > 0 && (
+                          <div style={{ marginBottom: 12 }}>
+                            <p style={{ fontSize: 11, fontWeight: 700, marginBottom: 6, color: 'var(--text-secondary)', letterSpacing: '0.04em' }}>المكونات</p>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                              {recipe.ingredients.map((ing, i) => (
+                                <span key={i} style={{ fontSize: 12, padding: '3px 10px', borderRadius: 20, background: 'rgba(67,82,56,0.06)', color: 'var(--text-secondary)', border: '1px solid var(--border-soft)' }}>
+                                  {ing}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {recipe.steps.length > 0 && (
+                          <div>
+                            <p style={{ fontSize: 11, fontWeight: 700, marginBottom: 6, color: 'var(--text-secondary)', letterSpacing: '0.04em' }}>طريقة التحضير</p>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                              {recipe.steps.map((step, i) => (
+                                <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                                  <span style={{ fontSize: 10, fontWeight: 800, color: 'var(--accent-strong)', flexShrink: 0, width: 18, height: 18, borderRadius: '50%', background: 'rgba(163,177,138,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1 }}>
+                                    {i + 1}
+                                  </span>
+                                  <span style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.55 }}>{step}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {recipe.notes && (
+                          <p style={{ marginTop: 10, fontSize: 12, color: 'var(--text-muted)', fontStyle: 'italic', lineHeight: 1.6 }}>{recipe.notes}</p>
+                        )}
+                      </div>
+                    )}
                   </div>
-                </div>
-              );})
+                );
+              })
             )}
           </>
         )}
