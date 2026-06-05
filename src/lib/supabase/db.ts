@@ -240,7 +240,13 @@ function toRecipe(r: any): Recipe {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function toMealPlan(r: any): MealPlan {
-  const toArr = (v: unknown) => Array.isArray(v) ? v : (v ? [v as string] : []);
+  const toArr = (v: unknown): string[] => {
+    if (Array.isArray(v)) return v as string[];
+    if (typeof v === 'string' && v.startsWith('[')) {
+      try { const p = JSON.parse(v); if (Array.isArray(p)) return p; } catch { /* fall through */ }
+    }
+    return v ? [v as string] : [];
+  };
   return {
     id: r.id,
     familyGroupId: r.family_group_id,
@@ -436,9 +442,9 @@ export async function dbSetMealPlan(plan: MealPlan) {
   return sb.from('meal_plans').upsert({
     family_group_id: plan.familyGroupId,
     date: plan.date,
-    breakfast: plan.breakfast ?? null,
-    lunch: plan.lunch ?? null,
-    dinner: plan.dinner ?? null,
+    breakfast: plan.breakfast?.length ? JSON.stringify(plan.breakfast) : null,
+    lunch:     plan.lunch?.length     ? JSON.stringify(plan.lunch)     : null,
+    dinner:    plan.dinner?.length    ? JSON.stringify(plan.dinner)    : null,
     created_by: plan.createdBy,
     updated_at: new Date().toISOString(),
   }, { onConflict: 'family_group_id,date' });

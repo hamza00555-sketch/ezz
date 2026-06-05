@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, Sparkles } from 'lucide-react';
 import { BottomSheet } from '@/components/shared/BottomSheet';
 import { FormField, Input, SubmitButton } from '@/components/shared/FormField';
 import { useAppStore } from '@/store/appStore';
+import { getDishImage, dishGradient } from '@/lib/dishImages';
 import type { Recipe } from '@/types';
 
 interface RecipeFormProps {
@@ -27,7 +28,19 @@ export function RecipeForm({ open, onClose }: RecipeFormProps) {
   const [selectedMealTimes, setSelectedMealTimes] = useState<string[]>(['lunch']);
   const [ingredients, setIngredients] = useState<string[]>(['']);
   const [steps, setSteps] = useState<string[]>(['']);
+  const [imageUrl, setImageUrl] = useState<string | undefined>();
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Derived image preview — real photo or gradient
+  const previewImg = imageUrl || (name.trim() ? getDishImage(name.trim()) : undefined);
+  const previewGrad = name.trim() ? dishGradient(name.trim()) : 'linear-gradient(135deg, #F5D9A8 0%, #E8A860 50%, #D4875A 100%)';
+
+  function generateImage() {
+    const found = getDishImage(name.trim());
+    if (found) { setImageUrl(found); return; }
+    // No real photo — clear imageUrl so gradient is used (already derived from name)
+    setImageUrl(undefined);
+  }
 
   function toggleMealTime(value: string) {
     setSelectedMealTimes((prev) =>
@@ -65,6 +78,8 @@ export function RecipeForm({ open, onClose }: RecipeFormProps) {
     e.preventDefault();
     if (!validate()) return;
 
+    const resolvedImg = imageUrl || getDishImage(name.trim()) || undefined;
+
     const newRecipe: Recipe = {
       id: `rec-${Date.now()}`,
       familyGroupId: currentFamilyGroupId,
@@ -73,6 +88,7 @@ export function RecipeForm({ open, onClose }: RecipeFormProps) {
       steps: steps.filter((s) => s.trim()),
       prepTime: prepTime ? parseInt(prepTime) : undefined,
       mealTime: selectedMealTimes as Recipe['mealTime'],
+      imageUrl: resolvedImg,
       favoritedBy: [],
       createdBy: currentUserId,
       createdAt: new Date().toISOString(),
@@ -84,7 +100,7 @@ export function RecipeForm({ open, onClose }: RecipeFormProps) {
     }));
 
     setName(''); setPrepTime(''); setSelectedMealTimes(['lunch']);
-    setIngredients(['']); setSteps(['']);
+    setIngredients(['']); setSteps(['']); setImageUrl(undefined);
     onClose();
   }
 
@@ -94,12 +110,49 @@ export function RecipeForm({ open, onClose }: RecipeFormProps) {
         <FormField label="اسم الوصفة" required error={errors.name}>
           <Input
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => { setName(e.target.value); setImageUrl(undefined); }}
             placeholder="مثال: كبسة دجاج"
             error={!!errors.name}
             autoFocus
           />
         </FormField>
+
+        {/* Image preview + generate */}
+        {name.trim() && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            {/* Preview circle */}
+            <div style={{ width: 72, height: 72, borderRadius: 22, overflow: 'hidden', flexShrink: 0, border: '2.5px solid rgba(255,255,255,0.75)', boxShadow: '0 6px 20px rgba(67,82,56,0.14)' }}>
+              {previewImg ? (
+                <img src={previewImg} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <div style={{ width: '100%', height: '100%', background: previewGrad, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ fontSize: 28, opacity: 0.8 }}>🍽️</span>
+                </div>
+              )}
+            </div>
+            <div style={{ flex: 1 }}>
+              <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>
+                {previewImg ? 'وجدنا صورة لهذه الوجبة ✓' : 'سيتم توليد لون مميز لهذه الوجبة'}
+              </p>
+              <button
+                type="button"
+                onClick={generateImage}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  padding: '7px 14px', borderRadius: 12,
+                  background: 'rgba(163,177,138,0.16)',
+                  border: '1px solid rgba(163,177,138,0.32)',
+                  color: 'var(--accent-strong)',
+                  fontSize: 12, fontWeight: 700,
+                  cursor: 'pointer', fontFamily: 'inherit',
+                }}
+              >
+                <Sparkles size={13} strokeWidth={2} />
+                {previewImg ? 'تحديث الصورة' : 'توليد صورة'}
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-3">
           <FormField label="وقت التحضير (دقيقة)">
@@ -121,8 +174,8 @@ export function RecipeForm({ open, onClose }: RecipeFormProps) {
                   onClick={() => toggleMealTime(t.value)}
                   className="px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all"
                   style={{
-                    background: selectedMealTimes.includes(t.value) ? 'var(--bronze)' : 'rgba(255,255,255,0.06)',
-                    color: selectedMealTimes.includes(t.value) ? '#0D0F12' : 'var(--text-secondary)',
+                    background: selectedMealTimes.includes(t.value) ? 'rgba(176,141,87,0.20)' : 'rgba(67,82,56,0.05)',
+                    color: selectedMealTimes.includes(t.value) ? 'var(--bronze)' : 'var(--text-secondary)',
                     border: `1px solid ${selectedMealTimes.includes(t.value) ? 'transparent' : 'var(--border-soft)'}`,
                   }}
                 >

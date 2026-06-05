@@ -7,7 +7,8 @@ import { Tabs } from '@/components/shared/Tabs';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { useAppStore } from '@/store/appStore';
 import { categoryLabels } from '@/lib/utils';
-import { Clock, Heart, ChefHat, CheckCircle2, Circle, FileText, X, RefreshCw } from 'lucide-react';
+import { dishImages, dishGradient, getDishImage } from '@/lib/dishImages';
+import { Clock, Heart, ChefHat, CheckCircle2, Circle, FileText, X, RefreshCw, Image as ImageIcon } from 'lucide-react';
 import type { ShortagePriority, MealTime } from '@/types';
 
 type KitchenTab = 'today' | 'week' | 'shortages' | 'recipes';
@@ -103,12 +104,6 @@ function parseRecipeText(raw: string): ParsedRecipe | null {
   }
   return { name, ingredients, steps, mealTime: [] };
 }
-
-// ─── Dish images ──────────────────────────────────────────────────────────────
-
-const dishImages: Record<string, string> = {
-  'سوتو أيام': '/dishes/soto-ayam.png',
-};
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
@@ -257,12 +252,14 @@ export default function KitchenPage() {
               const others   = options.filter((_, i) => i !== idx);
               const isLunch  = meal === 'lunch';
 
-              // Gradient placeholders per meal slot
-              const mealGradients: Record<MealSlot, string> = {
+              // Image: real photo if known dish, else dish-specific gradient, else slot gradient
+              const slotGradients: Record<MealSlot, string> = {
                 breakfast: 'linear-gradient(135deg, #F5D9A8 0%, #E8A860 50%, #D4875A 100%)',
                 lunch:     'linear-gradient(135deg, #C4907A 0%, #B87560 50%, #A86550 100%)',
                 dinner:    'linear-gradient(135deg, #C98272 0%, #B86F58 50%, #9A5A48 100%)',
               };
+              const dishImg   = selected ? getDishImage(selected) : undefined;
+              const imgGrad   = selected ? dishGradient(selected) : slotGradients[meal];
 
               return (
                 <div
@@ -359,18 +356,10 @@ export default function KitchenPage() {
                     border: '3px solid rgba(255,255,255,0.85)',
                     flexShrink: 0,
                   }}>
-                    {selected && dishImages[selected] ? (
-                      <img
-                        src={dishImages[selected]}
-                        alt={selected}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      />
+                    {dishImg ? (
+                      <img src={dishImg} alt={selected!} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     ) : (
-                      <div style={{
-                        width: '100%', height: '100%',
-                        background: mealGradients[meal],
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      }}>
+                      <div style={{ width: '100%', height: '100%', background: imgGrad, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <span style={{ fontSize: 36, opacity: 0.85 }}>{mealIcons[meal]}</span>
                       </div>
                     )}
@@ -504,22 +493,27 @@ export default function KitchenPage() {
                           {/* AI suggestion chips — only when editing this cell */}
                           {isEditing && suggestions.length > 0 && (
                             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 7, paddingRight: 42 }}>
-                              {suggestions.map((s) => (
-                                <button
-                                  key={s}
-                                  onPointerDown={(e) => e.preventDefault()}
-                                  onClick={() => chipAdd(s)}
-                                  style={{
-                                    fontSize: 11, padding: '4px 12px', borderRadius: 20,
-                                    background: 'rgba(176,141,87,0.12)',
-                                    color: 'var(--bronze)',
-                                    border: '1px solid rgba(176,141,87,0.25)',
-                                    cursor: 'pointer', fontFamily: 'inherit',
-                                  }}
-                                >
-                                  {s}
-                                </button>
-                              ))}
+                              {suggestions.map((s) => {
+                                const hasImg = !!getDishImage(s);
+                                return (
+                                  <button
+                                    key={s}
+                                    onPointerDown={(e) => e.preventDefault()}
+                                    onClick={() => chipAdd(s)}
+                                    style={{
+                                      display: 'flex', alignItems: 'center', gap: 5,
+                                      fontSize: 11, padding: '4px 10px', borderRadius: 20,
+                                      background: hasImg ? 'rgba(201,130,114,0.12)' : 'rgba(176,141,87,0.12)',
+                                      color: hasImg ? 'var(--kitchen-rose)' : 'var(--bronze)',
+                                      border: `1px solid ${hasImg ? 'rgba(201,130,114,0.25)' : 'rgba(176,141,87,0.25)'}`,
+                                      cursor: 'pointer', fontFamily: 'inherit',
+                                    }}
+                                  >
+                                    {hasImg && <ImageIcon size={10} strokeWidth={2} />}
+                                    {s}
+                                  </button>
+                                );
+                              })}
                             </div>
                           )}
                         </div>
@@ -713,11 +707,21 @@ export default function KitchenPage() {
             {myRecipes.length === 0 ? (
               <EmptyState icon="👨‍🍳" title="لا توجد وصفات" description="احفظ وصفاتك المفضلة أو استوردها" />
             ) : (
-              myRecipes.map((recipe) => (
+              myRecipes.map((recipe) => {
+                const recipeImg = recipe.imageUrl || getDishImage(recipe.name);
+                const recipeGrad = dishGradient(recipe.name);
+                return (
                 <div key={recipe.id} style={{ padding: 14, borderRadius: 20, background: 'var(--surface-card)', border: '1px solid var(--border-soft)' }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                    <div style={{ padding: 10, borderRadius: 14, flexShrink: 0, background: 'rgba(176,141,87,0.15)' }}>
-                      <ChefHat size={20} color="var(--bronze)" strokeWidth={1.7} />
+                    {/* Recipe image circle */}
+                    <div style={{ width: 52, height: 52, borderRadius: 16, flexShrink: 0, overflow: 'hidden', border: '2px solid rgba(255,255,255,0.7)', boxShadow: '0 4px 12px rgba(67,82,56,0.12)' }}>
+                      {recipeImg ? (
+                        <img src={recipeImg} alt={recipe.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ) : (
+                        <div style={{ width: '100%', height: '100%', background: recipeGrad, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <ChefHat size={20} color="rgba(255,255,255,0.85)" strokeWidth={1.7} />
+                        </div>
+                      )}
                     </div>
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
@@ -762,7 +766,7 @@ export default function KitchenPage() {
                     </div>
                   </div>
                 </div>
-              ))
+              );})
             )}
           </>
         )}
