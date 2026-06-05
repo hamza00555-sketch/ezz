@@ -5,6 +5,7 @@ import { AppShell } from '@/components/layout/AppShell';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { Tabs } from '@/components/shared/Tabs';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { RecipeForm } from '@/components/forms/RecipeForm';
 import { useAppStore } from '@/store/appStore';
 import { categoryLabels } from '@/lib/utils';
 import { dishImages, dishGradient, getDishImage } from '@/lib/dishImages';
@@ -121,6 +122,7 @@ export default function KitchenPage() {
   const [pickerSugg, setPickerSugg]   = useState<string[]>([]);
 
   // Import recipe sheet
+  const [recipeFormOpen, setRecipeFormOpen] = useState(false);
   const [importOpen, setImportOpen]         = useState(false);
   const [importText, setImportText]         = useState('');
   const [parsed, setParsed]                 = useState<ParsedRecipe | null>(null);
@@ -131,7 +133,7 @@ export default function KitchenPage() {
   const {
     shortages, recipes, mealPlans, members,
     currentFamilyGroupId, currentUserId,
-    toggleShortageStatus, addMealOption, removeMealOption, addRecipe, addShortage, setActiveQuickForm,
+    toggleShortageStatus, addMealOption, removeMealOption, addRecipe, addShortage,
   } = useAppStore();
 
   const currentMember = members.find((m) => m.id === currentUserId);
@@ -620,7 +622,7 @@ export default function KitchenPage() {
               <div style={{ display: 'flex', gap: 8 }}>
                 {/* Primary: add new recipe */}
                 <button
-                  onClick={() => setActiveQuickForm('recipe')}
+                  onClick={() => setRecipeFormOpen(true)}
                   style={{
                     flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                     padding: '12px 16px', borderRadius: 16,
@@ -881,6 +883,9 @@ export default function KitchenPage() {
           </>
         );
       })()}
+
+      {/* ─── Recipe Form ─────────────────────────────────────────────────────── */}
+      <RecipeForm open={recipeFormOpen} onClose={() => setRecipeFormOpen(false)} />
 
       {/* ─── Import Recipe Sheet ──────────────────────────────────────────────── */}
       {importOpen && (
