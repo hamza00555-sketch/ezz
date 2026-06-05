@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import { Plus, X, Sparkles } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Plus, X, Camera, ImageIcon } from 'lucide-react';
 import { BottomSheet } from '@/components/shared/BottomSheet';
 import { FormField, Input, SubmitButton } from '@/components/shared/FormField';
 import { useAppStore } from '@/store/appStore';
-import { getDishImage, dishGradient } from '@/lib/dishImages';
+import { getDishImage, dishGradient, loadDishManifest } from '@/lib/dishImages';
 import type { MealTime } from '@/types';
 
 interface RecipeFormProps {
@@ -20,6 +20,27 @@ const mealTimes = [
   { value: 'occasion', label: 'مناسبة' },
 ];
 
+async function compressImage(file: File): Promise<string> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    const objUrl = URL.createObjectURL(file);
+    img.onload = () => {
+      const MAX = 800;
+      let { width, height } = img;
+      if (width > MAX || height > MAX) {
+        if (width > height) { height = Math.round(height * MAX / width); width = MAX; }
+        else { width = Math.round(width * MAX / height); height = MAX; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d')!.drawImage(img, 0, 0, width, height);
+      URL.revokeObjectURL(objUrl);
+      resolve(canvas.toDataURL('image/jpeg', 0.82));
+    };
+    img.src = objUrl;
+  });
+}
+
 export function RecipeForm({ open, onClose }: RecipeFormProps) {
   const { currentFamilyGroupId, currentUserId, addRecipe } = useAppStore();
 
@@ -29,40 +50,43 @@ export function RecipeForm({ open, onClose }: RecipeFormProps) {
   const [ingredients, setIngredients] = useState<string[]>(['']);
   const [steps, setSteps] = useState<string[]>(['']);
   const [imageUrl, setImageUrl] = useState<string | undefined>();
-  const [generating, setGenerating] = useState(false);
-  const [imageGenerated, setImageGenerated] = useState(false);
+  const [isUserPhoto, setIsUserPhoto] = useState(false);
+  const [compressing, setCompressing] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // imageUrl stores a real path, a Unsplash URL, or a CSS gradient string
-  const isGradient = imageUrl?.startsWith('linear-gradient');
-  const previewImg = !isGradient ? imageUrl : undefined;
-  const previewGrad = isGradient ? imageUrl! : (name.trim() ? dishGradient(name.trim()) : 'linear-gradient(135deg, #F5D9A8 0%, #E8A860 50%, #D4875A 100%)');
-  const hasGeneratedImage = !!imageUrl;
+  const cameraRef = useRef<HTMLInputElement>(null);
+  const galleryRef = useRef<HTMLInputElement>(null);
 
-  async function generateImage() {
-    if (!name.trim() || generating) return;
-    // If we already have a local photo, use it immediately
-    const local = getDishImage(name.trim());
-    if (local) {
-      setImageUrl(local);
-      setImageGenerated(true);
-      setTimeout(() => setImageGenerated(false), 2000);
-      return;
-    }
-    setGenerating(true);
+  const isGradient = !imageUrl || imageUrl.startsWith('linear-gradient');
+  const previewImg = !isGradient ? imageUrl : undefined;
+  const previewGrad = name.trim() ? dishGradient(name.trim()) : 'linear-gradient(135deg, #F5D9A8 0%, #E8A860 50%, #D4875A 100%)';
+  const hasImage = !!imageUrl && !isGradient;
+
+  async function handleNameChange(newName: string) {
+    setName(newName);
+    if (isUserPhoto) return;
+    await loadDishManifest();
+    const lib = getDishImage(newName.trim());
+    setImageUrl(lib);
+  }
+
+  async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setCompressing(true);
     try {
-      const res = await fetch(`/api/dish-image?name=${encodeURIComponent(name.trim())}`);
-      const data = await res.json();
-      setImageUrl(data.imageUrl ?? data.gradient ?? dishGradient(name.trim()));
-      setImageGenerated(true);
-      setTimeout(() => setImageGenerated(false), 2000);
-    } catch {
-      setImageUrl(dishGradient(name.trim()));
-      setImageGenerated(true);
-      setTimeout(() => setImageGenerated(false), 2000);
+      const compressed = await compressImage(file);
+      setImageUrl(compressed);
+      setIsUserPhoto(true);
     } finally {
-      setGenerating(false);
+      setCompressing(false);
+      e.target.value = '';
     }
+  }
+
+  function clearImage() {
+    setImageUrl(getDishImage(name.trim()));
+    setIsUserPhoto(false);
   }
 
   function toggleMealTime(value: string) {
@@ -101,8 +125,6 @@ export function RecipeForm({ open, onClose }: RecipeFormProps) {
     e.preventDefault();
     if (!validate()) return;
 
-    // imageUrl is already set via generateImage (photo path or gradient string)
-    // fall back to auto-lookup if user didn't press the button
     const resolvedImg = imageUrl ?? getDishImage(name.trim()) ?? dishGradient(name.trim());
 
     addRecipe({
@@ -118,36 +140,52 @@ export function RecipeForm({ open, onClose }: RecipeFormProps) {
     });
 
     setName(''); setPrepTime(''); setSelectedMealTimes(['lunch']);
-    setIngredients(['']); setSteps(['']); setImageUrl(undefined); setImageGenerated(false);
+    setIngredients(['']); setSteps(['']); setImageUrl(undefined); setIsUserPhoto(false);
     onClose();
   }
 
   return (
     <BottomSheet open={open} onClose={onClose} title="إضافة وصفة" height="full">
+      {/* Hidden file inputs */}
+      <input
+        ref={cameraRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        style={{ display: 'none' }}
+        onChange={handleFileSelect}
+      />
+      <input
+        ref={galleryRef}
+        type="file"
+        accept="image/*"
+        style={{ display: 'none' }}
+        onChange={handleFileSelect}
+      />
+
       <form onSubmit={handleSubmit} className="p-5 flex flex-col gap-5">
         <FormField label="اسم الوصفة" required error={errors.name}>
           <Input
             value={name}
-            onChange={(e) => { setName(e.target.value); setImageUrl(undefined); setImageGenerated(false); }}
+            onChange={(e) => handleNameChange(e.target.value)}
             placeholder="مثال: كبسة دجاج"
             error={!!errors.name}
             autoFocus
           />
         </FormField>
 
-        {/* Image preview + generate */}
+        {/* Image section */}
         {name.trim() && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            {/* Preview circle */}
+            {/* Preview */}
             <div style={{
               width: 72, height: 72, borderRadius: 22, overflow: 'hidden', flexShrink: 0,
-              border: hasGeneratedImage ? '2.5px solid rgba(163,177,138,0.60)' : '2.5px solid rgba(67,82,56,0.14)',
-              boxShadow: hasGeneratedImage ? '0 6px 20px rgba(67,82,56,0.18)' : '0 2px 8px rgba(67,82,56,0.08)',
-              transition: 'all 0.3s ease',
-              position: 'relative',
+              border: hasImage ? '2.5px solid rgba(163,177,138,0.60)' : '2.5px solid rgba(67,82,56,0.14)',
+              boxShadow: hasImage ? '0 6px 20px rgba(67,82,56,0.18)' : '0 2px 8px rgba(67,82,56,0.08)',
+              transition: 'all 0.3s ease', position: 'relative',
             }}>
-              {generating && (
-                <div style={{ position: 'absolute', inset: 0, zIndex: 2, background: 'rgba(255,253,247,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {compressing && (
+                <div style={{ position: 'absolute', inset: 0, zIndex: 2, background: 'rgba(255,253,247,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <div style={{ width: 22, height: 22, borderRadius: '50%', border: '2.5px solid rgba(163,177,138,0.25)', borderTopColor: 'var(--accent-strong)', animation: 'spin 0.8s linear infinite' }} />
                 </div>
               )}
@@ -155,41 +193,69 @@ export function RecipeForm({ open, onClose }: RecipeFormProps) {
                 <img src={previewImg} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
                 <div style={{ width: '100%', height: '100%', background: previewGrad, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <span style={{ fontSize: 28, opacity: hasGeneratedImage ? 0.9 : 0.35 }}>🍽️</span>
+                  <span style={{ fontSize: 28, opacity: 0.35 }}>🍽️</span>
                 </div>
               )}
             </div>
+
+            {/* Buttons */}
             <div style={{ flex: 1 }}>
-              <p style={{ fontSize: 12, marginBottom: 8, transition: 'color 0.2s',
-                color: imageGenerated ? 'var(--accent-strong)' : generating ? 'var(--text-muted)' : hasGeneratedImage ? 'var(--text-secondary)' : 'var(--text-muted)',
-                fontWeight: hasGeneratedImage ? 600 : 400 }}>
-                {generating
-                  ? 'جاري البحث عن صورة...'
-                  : imageGenerated
-                    ? (previewImg ? 'تم ربط الصورة ✓' : 'تم توليد اللون ✓')
-                    : hasGeneratedImage
-                      ? (previewImg ? 'صورة حقيقية مرتبطة' : 'لون مميز مولَّد')
-                      : 'اضغط لتوليد صورة للوجبة'}
+              <p style={{ fontSize: 12, marginBottom: 8, color: hasImage ? 'var(--accent-strong)' : 'var(--text-muted)', fontWeight: hasImage ? 600 : 400 }}>
+                {compressing ? 'جاري ضغط الصورة...' : hasImage ? (isUserPhoto ? 'صورة مخصصة ✓' : 'صورة من المكتبة ✓') : 'أضف صورة للوجبة'}
               </p>
-              <button
-                type="button"
-                onClick={generateImage}
-                disabled={generating}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 6,
-                  padding: '7px 14px', borderRadius: 12,
-                  background: imageGenerated ? 'rgba(163,177,138,0.22)' : 'rgba(163,177,138,0.12)',
-                  border: `1px solid ${imageGenerated ? 'rgba(163,177,138,0.45)' : 'rgba(163,177,138,0.28)'}`,
-                  color: 'var(--accent-strong)',
-                  fontSize: 12, fontWeight: 700,
-                  cursor: generating ? 'wait' : 'pointer', fontFamily: 'inherit',
-                  opacity: generating ? 0.7 : 1,
-                  transition: 'all 0.2s ease',
-                }}
-              >
-                <Sparkles size={13} strokeWidth={2} />
-                {generating ? '...' : imageGenerated ? 'تم ✓' : hasGeneratedImage ? 'تحديث' : 'توليد صورة'}
-              </button>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={() => cameraRef.current?.click()}
+                  disabled={compressing}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 5,
+                    padding: '7px 12px', borderRadius: 12,
+                    background: 'rgba(163,177,138,0.12)',
+                    border: '1px solid rgba(163,177,138,0.28)',
+                    color: 'var(--accent-strong)', fontSize: 12, fontWeight: 700,
+                    cursor: compressing ? 'wait' : 'pointer', fontFamily: 'inherit',
+                    opacity: compressing ? 0.6 : 1,
+                  }}
+                >
+                  <Camera size={13} strokeWidth={2} />
+                  صوّر الطبق
+                </button>
+                <button
+                  type="button"
+                  onClick={() => galleryRef.current?.click()}
+                  disabled={compressing}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 5,
+                    padding: '7px 12px', borderRadius: 12,
+                    background: 'rgba(163,177,138,0.12)',
+                    border: '1px solid rgba(163,177,138,0.28)',
+                    color: 'var(--accent-strong)', fontSize: 12, fontWeight: 700,
+                    cursor: compressing ? 'wait' : 'pointer', fontFamily: 'inherit',
+                    opacity: compressing ? 0.6 : 1,
+                  }}
+                >
+                  <ImageIcon size={13} strokeWidth={2} />
+                  من المعرض
+                </button>
+                {isUserPhoto && (
+                  <button
+                    type="button"
+                    onClick={clearImage}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 4,
+                      padding: '7px 10px', borderRadius: 12,
+                      background: 'var(--danger-soft)',
+                      border: '1px solid transparent',
+                      color: 'var(--danger)', fontSize: 12, fontWeight: 600,
+                      cursor: 'pointer', fontFamily: 'inherit',
+                    }}
+                  >
+                    <X size={12} strokeWidth={2.5} />
+                    إزالة
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         )}
