@@ -8,6 +8,7 @@ import {
   ChevronLeft, Building2
 } from 'lucide-react';
 import { useAppStore } from '@/store/appStore';
+import { useShallow } from 'zustand/react/shallow';
 
 const menuItems = [
   { href: '/home-section',       icon: Building2, label: 'البيت',                 description: 'الممتلكات والصيانة والوثائق',     color: 'var(--accent-strong)', bg: 'rgba(163,177,138,0.12)' },
@@ -19,7 +20,9 @@ const menuItems = [
 ];
 
 export default function MorePage() {
-  const { members, currentFamilyGroupId, wishItems, announcements, currentUserId } = useAppStore();
+  const { members, currentFamilyGroupId, wishItems, announcements, currentUserId } = useAppStore(
+    useShallow((s) => ({ members: s.members, currentFamilyGroupId: s.currentFamilyGroupId, wishItems: s.wishItems, announcements: s.announcements, currentUserId: s.currentUserId }))
+  );
   const familyMembers = members.filter((m) => m.familyGroupId === currentFamilyGroupId);
   const activeAnnouncements = announcements.filter(
     (a) => a.familyGroupId === currentFamilyGroupId && a.status === 'active' && !a.confirmedBy.includes(currentUserId)

@@ -7,6 +7,7 @@ import { PageHeader } from '@/components/shared/PageHeader';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { MemberAvatar } from '@/components/shared/MemberAvatar';
 import { useAppStore } from '@/store/appStore';
+import { useShallow } from 'zustand/react/shallow';
 import { wishStatusLabels, priorityLabels } from '@/lib/utils';
 
 const typeIcons: Record<string, string> = {
@@ -40,7 +41,9 @@ const priorityStyle: Record<string, { color: string }> = {
 };
 
 export default function WishesPage() {
-  const { wishItems, members, currentFamilyGroupId } = useAppStore();
+  const { wishItems, members, currentFamilyGroupId } = useAppStore(
+    useShallow((s) => ({ wishItems: s.wishItems, members: s.members, currentFamilyGroupId: s.currentFamilyGroupId }))
+  );
   const items = wishItems.filter((w) => w.familyGroupId === currentFamilyGroupId);
 
   const grouped: Record<string, typeof items> = {};

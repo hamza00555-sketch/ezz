@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { BottomSheet } from '@/components/shared/BottomSheet';
 import { FormField, Input, Select, SubmitButton } from '@/components/shared/FormField';
 import { useAppStore } from '@/store/appStore';
+import { useShallow } from 'zustand/react/shallow';
 
 interface ShortageFormProps {
   open: boolean;
@@ -28,7 +29,9 @@ const priorities = [
 ];
 
 export function ShortageForm({ open, onClose }: ShortageFormProps) {
-  const { currentFamilyGroupId, currentUserId, addShortage } = useAppStore();
+  const { currentFamilyGroupId, currentUserId, addShortage } = useAppStore(
+    useShallow((s) => ({ currentFamilyGroupId: s.currentFamilyGroupId, currentUserId: s.currentUserId, addShortage: s.addShortage }))
+  );
 
   const [name, setName] = useState('');
   const [category, setCategory] = useState('other');

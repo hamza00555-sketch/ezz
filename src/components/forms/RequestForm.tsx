@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { BottomSheet } from '@/components/shared/BottomSheet';
 import { FormField, Input, Textarea, Select, SubmitButton } from '@/components/shared/FormField';
 import { useAppStore } from '@/store/appStore';
+import { useShallow } from 'zustand/react/shallow';
 
 interface RequestFormProps {
   open: boolean;
@@ -20,7 +21,9 @@ const requestTypes = [
 ];
 
 export function RequestForm({ open, onClose }: RequestFormProps) {
-  const { members, currentFamilyGroupId, currentUserId, addRequest } = useAppStore();
+  const { members, currentFamilyGroupId, currentUserId, addRequest } = useAppStore(
+    useShallow((s) => ({ members: s.members, currentFamilyGroupId: s.currentFamilyGroupId, currentUserId: s.currentUserId, addRequest: s.addRequest }))
+  );
   const others = members.filter(
     (m) => m.familyGroupId === currentFamilyGroupId && m.id !== currentUserId
   );

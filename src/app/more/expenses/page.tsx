@@ -7,10 +7,13 @@ import { PageHeader } from '@/components/shared/PageHeader';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { MemberAvatar } from '@/components/shared/MemberAvatar';
 import { useAppStore } from '@/store/appStore';
+import { useShallow } from 'zustand/react/shallow';
 import { formatArabicDate, formatCurrency } from '@/lib/utils';
 
 export default function ExpensesPage() {
-  const { wallets, expenses, members, currentFamilyGroupId } = useAppStore();
+  const { wallets, expenses, members, currentFamilyGroupId } = useAppStore(
+    useShallow((s) => ({ wallets: s.wallets, expenses: s.expenses, members: s.members, currentFamilyGroupId: s.currentFamilyGroupId }))
+  );
   const myWallets = wallets.filter((w) => w.familyGroupId === currentFamilyGroupId);
   const myExpenses = expenses
     .filter((e) => e.familyGroupId === currentFamilyGroupId)

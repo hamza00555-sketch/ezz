@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, X, CheckSquare, MessageSquare, Lightbulb, Building2, FileText, ShoppingCart, BookOpen, Megaphone } from 'lucide-react';
 import { useAppStore } from '@/store/appStore';
+import { useShallow } from 'zustand/react/shallow';
 import { TaskForm } from '@/components/forms/TaskForm';
 import { RequestForm } from '@/components/forms/RequestForm';
 import { WishForm } from '@/components/forms/WishForm';
@@ -28,7 +29,9 @@ type FormKey = 'task' | 'request' | 'wish' | 'home_item' | 'document' | 'shortag
 export function QuickAddButton() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [activeForm, setActiveForm] = useState<FormKey>(null);
-  const { activeQuickForm, setActiveQuickForm } = useAppStore();
+  const { activeQuickForm, setActiveQuickForm } = useAppStore(
+    useShallow((s) => ({ activeQuickForm: s.activeQuickForm, setActiveQuickForm: s.setActiveQuickForm }))
+  );
 
   useEffect(() => {
     if (activeQuickForm) {

@@ -6,6 +6,7 @@ import { AppShell } from '@/components/layout/AppShell';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { useAppStore } from '@/store/appStore';
+import { useShallow } from 'zustand/react/shallow';
 import { formatArabicDate, isOverdue } from '@/lib/utils';
 
 interface CalEntry {
@@ -25,7 +26,9 @@ const typeConfig = {
 };
 
 export default function CalendarPage() {
-  const { tasks, maintenance, homeItems, documents, currentFamilyGroupId } = useAppStore();
+  const { tasks, maintenance, homeItems, documents, currentFamilyGroupId } = useAppStore(
+    useShallow((s) => ({ tasks: s.tasks, maintenance: s.maintenance, homeItems: s.homeItems, documents: s.documents, currentFamilyGroupId: s.currentFamilyGroupId }))
+  );
 
   const entries: CalEntry[] = [];
 

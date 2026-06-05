@@ -5,6 +5,7 @@ import { Plus, X, Camera, ImageIcon } from 'lucide-react';
 import { BottomSheet } from '@/components/shared/BottomSheet';
 import { FormField, Input, SubmitButton } from '@/components/shared/FormField';
 import { useAppStore } from '@/store/appStore';
+import { useShallow } from 'zustand/react/shallow';
 import { getDishImage, dishGradient, loadDishManifest } from '@/lib/dishImages';
 import { saveImageToIdb, resolveImage, isIdbRef } from '@/lib/imageStore';
 import type { MealTime, Recipe } from '@/types';
@@ -47,7 +48,9 @@ async function compressImage(file: File): Promise<string> {
 }
 
 export function RecipeForm({ open, onClose, initialRecipe }: RecipeFormProps) {
-  const { currentFamilyGroupId, currentUserId, addRecipe, updateRecipe } = useAppStore();
+  const { currentFamilyGroupId, currentUserId, addRecipe, updateRecipe } = useAppStore(
+    useShallow((s) => ({ currentFamilyGroupId: s.currentFamilyGroupId, currentUserId: s.currentUserId, addRecipe: s.addRecipe, updateRecipe: s.updateRecipe }))
+  );
   const isEditing = !!initialRecipe;
 
   const [name, setName] = useState('');

@@ -6,6 +6,7 @@ import { PageHeader } from '@/components/shared/PageHeader';
 import { Tabs } from '@/components/shared/Tabs';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { useAppStore } from '@/store/appStore';
+import { useShallow } from 'zustand/react/shallow';
 import { formatArabicDate } from '@/lib/utils';
 import { Package, Wrench, MapPin, Calendar, AlertTriangle, ShieldCheck } from 'lucide-react';
 
@@ -39,7 +40,9 @@ const docTypeIcons: Record<string, string> = {
 
 export default function HomeSectionPage() {
   const [activeTab, setActiveTab] = useState<HomeTab>('items');
-  const { homeItems, documents, maintenance, currentFamilyGroupId } = useAppStore();
+  const { homeItems, documents, maintenance, currentFamilyGroupId } = useAppStore(
+    useShallow((s) => ({ homeItems: s.homeItems, documents: s.documents, maintenance: s.maintenance, currentFamilyGroupId: s.currentFamilyGroupId }))
+  );
 
   const items = homeItems.filter((i) => i.familyGroupId === currentFamilyGroupId);
   const docs = documents.filter((d) => d.familyGroupId === currentFamilyGroupId);

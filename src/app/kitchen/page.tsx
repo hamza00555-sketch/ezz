@@ -7,6 +7,7 @@ import { Tabs } from '@/components/shared/Tabs';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { RecipeForm } from '@/components/forms/RecipeForm';
 import { useAppStore } from '@/store/appStore';
+import { useShallow } from 'zustand/react/shallow';
 import { categoryLabels } from '@/lib/utils';
 import { getDishImage } from '@/lib/dishImages';
 import { RecipeImage } from '@/components/shared/RecipeImage';
@@ -141,7 +142,21 @@ export default function KitchenPage() {
     shortages, recipes, mealPlans, members,
     currentFamilyGroupId, currentUserId,
     toggleShortageStatus, addMealOption, removeMealOption, addRecipe, addShortage,
-  } = useAppStore();
+  } = useAppStore(
+    useShallow((s) => ({
+      shortages: s.shortages,
+      recipes: s.recipes,
+      mealPlans: s.mealPlans,
+      members: s.members,
+      currentFamilyGroupId: s.currentFamilyGroupId,
+      currentUserId: s.currentUserId,
+      toggleShortageStatus: s.toggleShortageStatus,
+      addMealOption: s.addMealOption,
+      removeMealOption: s.removeMealOption,
+      addRecipe: s.addRecipe,
+      addShortage: s.addShortage,
+    }))
+  );
 
   const currentMember = members.find((m) => m.id === currentUserId);
   const canEdit = currentMember?.role === 'family_admin' || !!currentMember?.permissions.canManageKitchen;

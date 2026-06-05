@@ -7,6 +7,7 @@ import { AppShell } from '@/components/layout/AppShell';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { MemberAvatar } from '@/components/shared/MemberAvatar';
 import { useAppStore } from '@/store/appStore';
+import { useShallow } from 'zustand/react/shallow';
 import { roleLabels } from '@/lib/utils';
 import { subscribeToPush, unsubscribeFromPush } from '@/lib/push';
 import { savePushSubscription, deletePushSubscription } from '@/actions/push';
@@ -16,7 +17,9 @@ type PushState = 'loading' | 'unsupported' | 'denied' | 'subscribed' | 'unsubscr
 export default function SettingsPage() {
   const [pushState, setPushState] = useState<PushState>('loading');
   const [loggingOut, setLoggingOut] = useState(false);
-  const { members, currentUserId } = useAppStore();
+  const { members, currentUserId } = useAppStore(
+    useShallow((s) => ({ members: s.members, currentUserId: s.currentUserId }))
+  );
   const currentMember = members.find((m) => m.id === currentUserId);
   const isDemo = !process.env.NEXT_PUBLIC_SUPABASE_URL;
 

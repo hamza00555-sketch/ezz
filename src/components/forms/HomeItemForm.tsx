@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { BottomSheet } from '@/components/shared/BottomSheet';
 import { FormField, Input, Select, Textarea, SubmitButton } from '@/components/shared/FormField';
 import { useAppStore } from '@/store/appStore';
+import { useShallow } from 'zustand/react/shallow';
 import type { HomeItem } from '@/types';
 
 interface HomeItemFormProps {
@@ -23,7 +24,9 @@ const categories = [
 const locations = ['المطبخ', 'الصالة', 'غرفة النوم', 'الحمام', 'المرآب', 'الخارج', 'أخرى'];
 
 export function HomeItemForm({ open, onClose }: HomeItemFormProps) {
-  const { currentFamilyGroupId, currentUserId } = useAppStore();
+  const { currentFamilyGroupId, currentUserId } = useAppStore(
+    useShallow((s) => ({ currentFamilyGroupId: s.currentFamilyGroupId, currentUserId: s.currentUserId }))
+  );
 
   const [name, setName] = useState('');
   const [category, setCategory] = useState('appliances');

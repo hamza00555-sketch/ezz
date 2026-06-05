@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { BottomSheet } from '@/components/shared/BottomSheet';
 import { FormField, Input, Textarea, Select, SubmitButton } from '@/components/shared/FormField';
 import { useAppStore } from '@/store/appStore';
+import { useShallow } from 'zustand/react/shallow';
 
 interface TaskFormProps {
   open: boolean;
@@ -29,7 +30,9 @@ const priorities = [
 ];
 
 export function TaskForm({ open, onClose }: TaskFormProps) {
-  const { members, currentFamilyGroupId, currentUserId, addTask } = useAppStore();
+  const { members, currentFamilyGroupId, currentUserId, addTask } = useAppStore(
+    useShallow((s) => ({ members: s.members, currentFamilyGroupId: s.currentFamilyGroupId, currentUserId: s.currentUserId, addTask: s.addTask }))
+  );
   const familyMembers = members.filter((m) => m.familyGroupId === currentFamilyGroupId);
 
   const [title, setTitle] = useState('');

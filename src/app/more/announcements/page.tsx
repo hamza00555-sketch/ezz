@@ -7,11 +7,12 @@ import { PageHeader } from '@/components/shared/PageHeader';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { MemberAvatar } from '@/components/shared/MemberAvatar';
 import { useAppStore } from '@/store/appStore';
+import { useShallow } from 'zustand/react/shallow';
 import { formatRelativeArabic } from '@/lib/utils';
 
 export default function AnnouncementsPage() {
   const { announcements, members, currentFamilyGroupId, currentUserId, confirmAnnouncement } =
-    useAppStore();
+    useAppStore(useShallow((s) => ({ announcements: s.announcements, members: s.members, currentFamilyGroupId: s.currentFamilyGroupId, currentUserId: s.currentUserId, confirmAnnouncement: s.confirmAnnouncement })));
   const items = announcements
     .filter((a) => a.familyGroupId === currentFamilyGroupId)
     .sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0));

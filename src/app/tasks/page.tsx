@@ -7,6 +7,7 @@ import { TaskCard } from '@/components/tasks/TaskCard';
 import { RequestCard } from '@/components/tasks/RequestCard';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { useAppStore } from '@/store/appStore';
+import { useShallow } from 'zustand/react/shallow';
 
 type TaskFilter = 'waiting' | 'urgent' | 'requests' | 'all' | 'done';
 
@@ -25,7 +26,9 @@ export default function TasksPage() {
     tasks, requests,
     currentUserId, currentFamilyGroupId,
     setActiveQuickForm,
-  } = useAppStore();
+  } = useAppStore(
+    useShallow((s) => ({ tasks: s.tasks, requests: s.requests, currentUserId: s.currentUserId, currentFamilyGroupId: s.currentFamilyGroupId, setActiveQuickForm: s.setActiveQuickForm }))
+  );
 
   const familyTasks = tasks.filter(
     (t) => t.familyGroupId === currentFamilyGroupId && t.status !== 'cancelled',

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { BottomSheet } from '@/components/shared/BottomSheet';
 import { FormField, Input, Select, Textarea, SubmitButton } from '@/components/shared/FormField';
 import { useAppStore } from '@/store/appStore';
+import { useShallow } from 'zustand/react/shallow';
 import type { Document } from '@/types';
 
 interface DocumentFormProps {
@@ -21,7 +22,9 @@ const docTypes = [
 ];
 
 export function DocumentForm({ open, onClose }: DocumentFormProps) {
-  const { currentFamilyGroupId, currentUserId, homeItems } = useAppStore();
+  const { currentFamilyGroupId, currentUserId, homeItems } = useAppStore(
+    useShallow((s) => ({ currentFamilyGroupId: s.currentFamilyGroupId, currentUserId: s.currentUserId, homeItems: s.homeItems }))
+  );
   const items = homeItems.filter((i) => i.familyGroupId === currentFamilyGroupId);
 
   const [name, setName] = useState('');

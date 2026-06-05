@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { BottomSheet } from '@/components/shared/BottomSheet';
 import { FormField, Input, Textarea, Select, SubmitButton } from '@/components/shared/FormField';
 import { useAppStore } from '@/store/appStore';
+import { useShallow } from 'zustand/react/shallow';
 
 interface WishFormProps {
   open: boolean;
@@ -25,7 +26,9 @@ const priorities = [
 ];
 
 export function WishForm({ open, onClose }: WishFormProps) {
-  const { currentFamilyGroupId, currentUserId, addWishItem } = useAppStore();
+  const { currentFamilyGroupId, currentUserId, addWishItem } = useAppStore(
+    useShallow((s) => ({ currentFamilyGroupId: s.currentFamilyGroupId, currentUserId: s.currentUserId, addWishItem: s.addWishItem }))
+  );
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');

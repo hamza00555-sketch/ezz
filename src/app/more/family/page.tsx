@@ -7,6 +7,7 @@ import { AppShell } from '@/components/layout/AppShell';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { MemberAvatar } from '@/components/shared/MemberAvatar';
 import { useAppStore } from '@/store/appStore';
+import { useShallow } from 'zustand/react/shallow';
 import { roleLabels } from '@/lib/utils';
 
 const roleStyle: Record<string, { bg: string; color: string }> = {
@@ -15,7 +16,9 @@ const roleStyle: Record<string, { bg: string; color: string }> = {
 };
 
 export default function FamilyPage() {
-  const { members, tasks, familyGroups, currentFamilyGroupId, currentUserId } = useAppStore();
+  const { members, tasks, familyGroups, currentFamilyGroupId, currentUserId } = useAppStore(
+    useShallow((s) => ({ members: s.members, tasks: s.tasks, familyGroups: s.familyGroups, currentFamilyGroupId: s.currentFamilyGroupId, currentUserId: s.currentUserId }))
+  );
   const familyMembers = members.filter((m) => m.familyGroupId === currentFamilyGroupId);
   const familyGroup   = familyGroups.find((g) => g.id === currentFamilyGroupId);
   const currentMember = members.find((m) => m.id === currentUserId);

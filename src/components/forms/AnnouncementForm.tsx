@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { BottomSheet } from '@/components/shared/BottomSheet';
 import { FormField, Input, Textarea, SubmitButton } from '@/components/shared/FormField';
 import { useAppStore } from '@/store/appStore';
+import { useShallow } from 'zustand/react/shallow';
 import { Sparkles } from 'lucide-react';
 
 interface AnnouncementFormProps {
@@ -116,7 +117,9 @@ const typeLabels = {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function AnnouncementForm({ open, onClose }: AnnouncementFormProps) {
-  const { currentFamilyGroupId, currentUserId } = useAppStore();
+  const { currentFamilyGroupId, currentUserId } = useAppStore(
+    useShallow((s) => ({ currentFamilyGroupId: s.currentFamilyGroupId, currentUserId: s.currentUserId }))
+  );
 
   const [naturalText, setNaturalText]     = useState('');
   const [analysis, setAnalysis]           = useState<AnalysisResult | null>(null);
