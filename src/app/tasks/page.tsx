@@ -134,8 +134,8 @@ export default function TasksPage() {
                   display: 'flex', alignItems: 'center', gap: 6,
                   padding: '7px 14px', borderRadius: 20, whiteSpace: 'nowrap',
                   minHeight: 34,
-                  background: isActive ? 'rgba(163,177,138,0.18)' : 'rgba(255,255,255,0.04)',
-                  border: `1px solid ${isActive ? 'rgba(163,177,138,0.35)' : 'rgba(255,255,255,0.08)'}`,
+                  background: isActive ? 'rgba(163,177,138,0.18)' : 'rgba(67,82,56,0.04)',
+                  border: `1px solid ${isActive ? 'rgba(163,177,138,0.35)' : 'rgba(67,82,56,0.10)'}`,
                   color: isActive ? 'var(--accent-strong)' : 'var(--text-muted)',
                   fontSize: 13, fontWeight: isActive ? 700 : 400,
                   cursor: 'pointer', fontFamily: 'inherit',
@@ -149,7 +149,7 @@ export default function TasksPage() {
                     style={{
                       fontSize: 11, fontWeight: 700,
                       padding: '1px 7px', borderRadius: 10,
-                      background: isActive ? 'rgba(163,177,138,0.28)' : 'rgba(255,255,255,0.10)',
+                      background: isActive ? 'rgba(163,177,138,0.28)' : 'rgba(67,82,56,0.08)',
                       color: isActive ? 'var(--accent-strong)' : 'var(--text-secondary)',
                       lineHeight: 1.5,
                     }}

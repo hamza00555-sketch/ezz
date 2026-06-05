@@ -139,7 +139,7 @@ export default function CalendarPage() {
           <span
             style={{
               fontSize: 11, padding: '1px 7px', borderRadius: 10,
-              background: 'rgba(255,255,255,0.06)',
+              background: 'rgba(67,82,56,0.06)',
               color: 'var(--text-muted)', fontWeight: 600,
             }}
           >

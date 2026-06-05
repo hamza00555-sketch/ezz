@@ -18,8 +18,8 @@ export function EmptyState({ icon = '📭', title, description, action }: EmptyS
       <div
         style={{
           width: 72, height: 72, borderRadius: 24,
-          background: 'rgba(255,255,255,0.05)',
-          border: '1px solid rgba(255,255,255,0.08)',
+          background: 'rgba(67,82,56,0.05)',
+          border: '1px solid rgba(67,82,56,0.08)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: 32, marginBottom: 16,
         }}

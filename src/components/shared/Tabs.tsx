@@ -56,7 +56,7 @@ export function Tabs({ tabs, active, onChange }: TabsProps) {
                   style={{
                     fontSize: 10, fontWeight: 700,
                     padding: '1px 6px', borderRadius: 10,
-                    background: isActive ? 'rgba(199,231,123,0.25)' : 'rgba(255,255,255,0.07)',
+                    background: isActive ? 'rgba(163,177,138,0.25)' : 'rgba(67,82,56,0.07)',
                     color: isActive ? 'var(--accent-strong)' : 'var(--text-muted)',
                     minWidth: 18, textAlign: 'center',
                   }}

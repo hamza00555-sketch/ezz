@@ -16,8 +16,8 @@ type MealSlot = 'breakfast' | 'lunch' | 'dinner';
 const shortagePriorityColors: Record<ShortagePriority, { bg: string; text: string }> = {
   urgent: { bg: 'var(--danger-soft)',  text: 'var(--danger)'  },
   high:   { bg: 'var(--warning-soft)', text: 'var(--warning)' },
-  medium: { bg: 'rgba(255,255,255,0.07)', text: 'var(--text-secondary)' },
-  low:    { bg: 'rgba(255,255,255,0.05)', text: 'var(--text-muted)'     },
+  medium: { bg: 'rgba(67,82,56,0.07)', text: 'var(--text-secondary)' },
+  low:    { bg: 'rgba(67,82,56,0.05)', text: 'var(--text-muted)'     },
 };
 const shortagePriorityLabels: Record<ShortagePriority, string> = {
   urgent: 'عاجل', high: 'مهم', medium: 'متوسط', low: 'عادي',
@@ -235,7 +235,7 @@ export default function KitchenPage() {
   }
 
   return (
-    <AppShell>
+    <AppShell extraClass="kitchen-shell">
       <PageHeader title="المطبخ" subtitle="وجبات البيت ونواقص المطبخ" />
       <Tabs tabs={tabs} active={activeTab} onChange={(k) => setActiveTab(k as KitchenTab)} />
 
@@ -244,84 +244,123 @@ export default function KitchenPage() {
         {/* ─── TODAY ────────────────────────────────────────────────────────────── */}
         {activeTab === 'today' && (
           <>
-            {meals.map((meal) => {
+            {meals.map((meal, mealIdx) => {
               const options = todayPlan?.[meal] ?? [];
               const idx = Math.min(mealIndices[meal], options.length - 1);
               const selected = options[idx] ?? null;
               const others   = options.filter((_, i) => i !== idx);
+              const isLunch  = meal === 'lunch';
+
+              // Gradient placeholders per meal slot
+              const mealGradients: Record<MealSlot, string> = {
+                breakfast: 'linear-gradient(135deg, #F5D9A8 0%, #E8A860 50%, #D4875A 100%)',
+                lunch:     'linear-gradient(135deg, #C4907A 0%, #B87560 50%, #A86550 100%)',
+                dinner:    'linear-gradient(135deg, #C98272 0%, #B86F58 50%, #9A5A48 100%)',
+              };
 
               return (
                 <div
                   key={meal}
+                  className="kitchen-card interactive-card"
                   style={{
-                    padding: '20px 20px 18px',
-                    borderRadius: 24,
-                    background: selected ? 'var(--surface-card)' : 'rgba(255,255,255,0.02)',
-                    border: `1px solid ${selected ? 'var(--border-soft)' : 'rgba(255,255,255,0.05)'}`,
+                    position: 'relative',
+                    overflow: 'hidden',
+                    minHeight: 132,
+                    padding: '20px 20px 20px 148px',
+                    borderRadius: 28,
+                    ...(isLunch && {
+                      background: 'linear-gradient(135deg, rgba(244,217,207,0.65) 0%, rgba(255,255,255,0.74) 60%)',
+                      border: '1px solid rgba(201,130,114,0.22)',
+                    }),
                   }}
                 >
-                  {/* Meal header */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: selected ? 14 : 0 }}>
-                    <div style={{
-                      width: 46, height: 46, borderRadius: 16, flexShrink: 0,
-                      background: 'rgba(255,255,255,0.05)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                      <span style={{ fontSize: 24, lineHeight: 1 }}>{mealIcons[meal]}</span>
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 2 }}>
-                        {mealLabels[meal]}
-                      </p>
-                      {!selected && (
-                        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.18)' }}>
-                          لم تُضَف وجبات — افتح تاب الأسبوع لإضافة خيارات
-                        </p>
-                      )}
-                    </div>
-                    {options.length > 1 && (
-                      <button
-                        onClick={() => rerollMeal(meal)}
-                        title="خيار آخر"
-                        style={{
-                          display: 'flex', alignItems: 'center', gap: 5,
-                          padding: '6px 14px', borderRadius: 20,
-                          background: 'rgba(255,255,255,0.06)',
-                          border: '1px solid rgba(255,255,255,0.10)',
-                          cursor: 'pointer', fontFamily: 'inherit',
-                        }}
-                      >
-                        <RefreshCw size={12} color="var(--text-muted)" />
-                        <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)' }}>غيّر</span>
-                      </button>
-                    )}
-                  </div>
+                  {/* Meal label tag */}
+                  <span style={{
+                    display: 'inline-block',
+                    fontSize: 10, fontWeight: 700, letterSpacing: '0.05em',
+                    padding: '3px 10px', borderRadius: 20, marginBottom: 8,
+                    background: 'rgba(201,130,114,0.14)',
+                    color: 'var(--kitchen-rose)',
+                    border: '1px solid rgba(201,130,114,0.18)',
+                  }}>
+                    {mealLabels[meal]}
+                  </span>
 
-                  {/* Selected dish */}
-                  {selected && (
+                  {/* Dish name */}
+                  {selected ? (
                     <>
-                      <p style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.3, marginBottom: others.length > 0 ? 10 : 0 }}>
+                      <p style={{ fontSize: 20, fontWeight: 800, color: 'var(--azz-text-main)', lineHeight: 1.3, marginBottom: 8 }}>
                         {selected}
                       </p>
                       {others.length > 0 && (
-                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
                           {others.map((opt) => (
-                            <span
-                              key={opt}
-                              style={{
-                                fontSize: 11, padding: '3px 10px', borderRadius: 20,
-                                background: 'rgba(255,255,255,0.05)',
-                                color: 'var(--text-muted)',
-                                border: '1px solid rgba(255,255,255,0.07)',
-                              }}
-                            >
+                            <span key={opt} style={{
+                              fontSize: 10, padding: '2px 8px', borderRadius: 20,
+                              background: 'rgba(201,130,114,0.10)',
+                              color: 'var(--kitchen-terracotta)',
+                              border: '1px solid rgba(201,130,114,0.14)',
+                            }}>
                               {opt}
                             </span>
                           ))}
                         </div>
                       )}
                     </>
+                  ) : (
+                    <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 8, lineHeight: 1.5 }}>
+                      لم تُضَف وجبات بعد
+                    </p>
                   )}
+
+                  {/* Actions row */}
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    {options.length > 1 && (
+                      <button
+                        onClick={() => rerollMeal(meal)}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 5,
+                          padding: '5px 12px', borderRadius: 20,
+                          background: 'rgba(255,255,255,0.60)',
+                          border: '1px solid rgba(201,130,114,0.18)',
+                          cursor: 'pointer', fontFamily: 'inherit',
+                        }}
+                      >
+                        <RefreshCw size={11} color="var(--kitchen-rose)" />
+                        <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--kitchen-rose)' }}>غيّر</span>
+                      </button>
+                    )}
+                    {mealIdx === 1 && selected && (
+                      <span style={{
+                        fontSize: 10, padding: '3px 10px', borderRadius: 20, fontWeight: 700,
+                        background: 'rgba(181,139,85,0.14)', color: 'var(--azz-bronze)',
+                        border: '1px solid rgba(181,139,85,0.20)',
+                      }}>
+                        وجبة اليوم الرئيسية
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Image circle — positioned on physical left (RTL end) */}
+                  <div style={{
+                    position: 'absolute',
+                    left: 16, top: '50%',
+                    width: 112, height: 112,
+                    transform: 'translateY(-50%)',
+                    borderRadius: '50%',
+                    overflow: 'hidden',
+                    boxShadow: '0 18px 34px rgba(184,111,88,0.20)',
+                    border: '3px solid rgba(255,255,255,0.85)',
+                    flexShrink: 0,
+                  }}>
+                    <div style={{
+                      width: '100%', height: '100%',
+                      background: mealGradients[meal],
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <span style={{ fontSize: 36, opacity: 0.85 }}>{mealIcons[meal]}</span>
+                    </div>
+                  </div>
                 </div>
               );
             })}
@@ -361,7 +400,7 @@ export default function KitchenPage() {
                       {date.getDate()}/{date.getMonth() + 1}
                     </span>
                     {isToday && (
-                      <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, fontWeight: 700, background: 'var(--bronze)', color: '#0D0F12' }}>
+                      <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, fontWeight: 700, background: 'rgba(181,139,85,0.16)', color: 'var(--bronze)' }}>
                         اليوم
                       </span>
                     )}
@@ -433,7 +472,7 @@ export default function KitchenPage() {
                                     style={{
                                       fontSize: 11, padding: '3px 10px', borderRadius: 20,
                                       background: 'transparent',
-                                      border: '1px dashed rgba(255,255,255,0.18)',
+                                      border: '1px dashed rgba(67,82,56,0.22)',
                                       color: 'var(--text-muted)', cursor: 'pointer',
                                       fontFamily: 'inherit',
                                     }}
@@ -443,7 +482,7 @@ export default function KitchenPage() {
                                 )
                               )}
                               {!canEdit && options.length === 0 && (
-                                <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.18)' }}>—</span>
+                                <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>—</span>
                               )}
                             </div>
                           </div>
@@ -503,8 +542,8 @@ export default function KitchenPage() {
                   disabled={!quickAddVal.trim()}
                   style={{
                     padding: '11px 18px', borderRadius: 14,
-                    background: quickAddVal.trim() ? 'rgba(163,177,138,0.18)' : 'rgba(255,255,255,0.05)',
-                    border: `1px solid ${quickAddVal.trim() ? 'rgba(163,177,138,0.35)' : 'rgba(255,255,255,0.08)'}`,
+                    background: quickAddVal.trim() ? 'rgba(163,177,138,0.18)' : 'rgba(67,82,56,0.05)',
+                    border: `1px solid ${quickAddVal.trim() ? 'rgba(163,177,138,0.35)' : 'rgba(67,82,56,0.10)'}`,
                     color: quickAddVal.trim() ? 'var(--accent-strong)' : 'var(--text-muted)',
                     fontSize: 13, fontWeight: 700,
                     cursor: quickAddVal.trim() ? 'pointer' : 'not-allowed',
@@ -522,7 +561,7 @@ export default function KitchenPage() {
               const providedCount = myShortages.filter((s) => s.status === 'provided').length;
               return (
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 12, padding: '5px 12px', borderRadius: 20, background: 'rgba(255,255,255,0.06)', color: 'var(--text-secondary)', border: '1px solid var(--border-soft)' }}>
+                  <span style={{ fontSize: 12, padding: '5px 12px', borderRadius: 20, background: 'rgba(67,82,56,0.06)', color: 'var(--text-secondary)', border: '1px solid var(--border-soft)' }}>
                     🛒 ناقص {missingCount}
                   </span>
                   {urgentCount > 0 && (
@@ -584,7 +623,7 @@ export default function KitchenPage() {
                       style={{ flexShrink: 0, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                     >
                       {isMissing
-                        ? <Circle size={20} color="rgba(255,255,255,0.22)" />
+                        ? <Circle size={20} color="rgba(67,82,56,0.25)" />
                         : <CheckCircle2 size={20} color="var(--success)" />
                       }
                     </button>
@@ -675,7 +714,7 @@ export default function KitchenPage() {
                       </div>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
                         {recipe.mealTime.map((t) => (
-                          <span key={t} style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, background: 'rgba(255,255,255,0.07)', color: 'var(--text-muted)' }}>
+                          <span key={t} style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, background: 'rgba(67,82,56,0.07)', color: 'var(--text-muted)' }}>
                             {t === 'breakfast' ? 'فطور' : t === 'lunch' ? 'غداء' : t === 'dinner' ? 'عشاء' : 'مناسبة'}
                           </span>
                         ))}
@@ -726,12 +765,12 @@ export default function KitchenPage() {
             className="slide-up"
             style={{
               position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 49,
-              background: 'var(--bg-elevated)',
+              background: 'rgba(255,253,247,0.98)',
               borderRadius: '28px 28px 0 0',
               padding: '20px 20px max(32px, env(safe-area-inset-bottom, 16px))',
               maxHeight: '88dvh', overflowY: 'auto',
-              border: '1px solid rgba(255,255,255,0.10)',
-              boxShadow: '0 -20px 60px rgba(0,0,0,0.5)',
+              border: '1px solid rgba(67,82,56,0.12)',
+              boxShadow: '0 -20px 60px rgba(67,82,56,0.18)',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
@@ -768,7 +807,7 @@ export default function KitchenPage() {
                   style={{
                     marginTop: 12, width: '100%', padding: 14, borderRadius: 16,
                     fontWeight: 700, fontSize: 14,
-                    background: importText.trim() ? 'linear-gradient(135deg, #E879F9, #C026D3)' : 'rgba(255,255,255,0.07)',
+                    background: importText.trim() ? 'linear-gradient(135deg, #E879F9, #C026D3)' : 'rgba(67,82,56,0.06)',
                     color: importText.trim() ? '#fff' : 'var(--text-muted)',
                     border: 'none', cursor: importText.trim() ? 'pointer' : 'not-allowed',
                     fontFamily: 'inherit',
@@ -798,7 +837,7 @@ export default function KitchenPage() {
                     <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 8, fontWeight: 600 }}>المكونات ({parsed.ingredients.length})</p>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                       {parsed.ingredients.map((ing, i) => (
-                        <span key={i} style={{ fontSize: 12, padding: '4px 10px', borderRadius: 20, background: 'rgba(255,255,255,0.07)', color: 'var(--text-secondary)' }}>
+                        <span key={i} style={{ fontSize: 12, padding: '4px 10px', borderRadius: 20, background: 'rgba(67,82,56,0.07)', color: 'var(--text-secondary)' }}>
                           {ing}
                         </span>
                       ))}
@@ -846,7 +885,7 @@ export default function KitchenPage() {
                     onClick={() => setParsed(null)}
                     style={{
                       flex: 1, padding: 12, borderRadius: 14, fontWeight: 600,
-                      background: 'rgba(255,255,255,0.07)', color: 'var(--text-secondary)',
+                      background: 'rgba(67,82,56,0.06)', color: 'var(--text-secondary)',
                       border: '1px solid var(--border-soft)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13,
                     }}
                   >

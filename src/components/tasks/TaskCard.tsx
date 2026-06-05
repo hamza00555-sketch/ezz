@@ -10,19 +10,19 @@ import type { Task } from '@/types';
 const priorityConfig: Record<string, { bar: string; badge: string; badgeText: string }> = {
   urgent: { bar: 'var(--danger)',            badge: 'var(--danger-soft)',           badgeText: 'var(--danger)'   },
   high:   { bar: 'var(--warning)',           badge: 'var(--warning-soft)',          badgeText: 'var(--warning)'  },
-  medium: { bar: 'rgba(255,255,255,0.18)',   badge: 'rgba(255,255,255,0.07)',       badgeText: 'var(--text-secondary)' },
-  low:    { bar: 'rgba(255,255,255,0.08)',   badge: 'rgba(255,255,255,0.04)',       badgeText: 'var(--text-muted)'     },
+  medium: { bar: 'rgba(67,82,56,0.18)',   badge: 'rgba(67,82,56,0.07)',       badgeText: 'var(--text-secondary)' },
+  low:    { bar: 'rgba(67,82,56,0.10)',   badge: 'rgba(67,82,56,0.05)',       badgeText: 'var(--text-muted)'     },
 };
 
 const statusConfig: Record<string, { badge: string; text: string }> = {
-  new:                { badge: 'rgba(255,255,255,0.07)',   text: 'var(--text-muted)'     },
+  new:                { badge: 'rgba(67,82,56,0.07)',   text: 'var(--text-muted)'     },
   pending_acceptance: { badge: 'var(--warning-soft)',      text: 'var(--warning)'        },
   accepted:           { badge: 'var(--info-soft)',         text: 'var(--info)'           },
   in_progress:        { badge: 'var(--warning-soft)',      text: 'var(--warning)'        },
   done:               { badge: 'var(--success-soft)',      text: 'var(--success)'        },
   rejected:           { badge: 'var(--danger-soft)',       text: 'var(--danger)'         },
   postponed:          { badge: 'rgba(167,130,255,0.12)',   text: '#A782FF'               },
-  cancelled:          { badge: 'rgba(255,255,255,0.05)',   text: 'var(--text-muted)'     },
+  cancelled:          { badge: 'rgba(67,82,56,0.05)',   text: 'var(--text-muted)'     },
 };
 
 interface TaskCardProps {
@@ -74,7 +74,7 @@ export function TaskCard({ task, showAssignee = true }: TaskCardProps) {
               marginTop: 2,
               width: 22, height: 22,
               borderRadius: '50%',
-              border: `2px solid ${isDone ? 'var(--success)' : overdue ? 'var(--danger)' : 'rgba(255,255,255,0.20)'}`,
+              border: `2px solid ${isDone ? 'var(--success)' : overdue ? 'var(--danger)' : 'rgba(67,82,56,0.22)'}`,
               background: isDone ? 'var(--success)' : 'transparent',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               flexShrink: 0, cursor: 'pointer',
