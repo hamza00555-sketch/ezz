@@ -2,6 +2,7 @@
 
 import { Check, X, ArrowLeftRight } from 'lucide-react';
 import { useAppStore } from '@/store/appStore';
+import { useShallow } from 'zustand/react/shallow';
 import { MemberAvatar } from '@/components/shared/MemberAvatar';
 import type { Request } from '@/types';
 
@@ -27,7 +28,9 @@ interface RequestCardProps {
 }
 
 export function RequestCard({ request, currentUserId }: RequestCardProps) {
-  const { members, updateRequestStatus } = useAppStore();
+  const { members, updateRequestStatus } = useAppStore(
+    useShallow((s) => ({ members: s.members, updateRequestStatus: s.updateRequestStatus }))
+  );
   const from = members.find((m) => m.id === request.from);
   const to   = members.find((m) => m.id === request.to);
   const isRecipient = request.to === currentUserId;

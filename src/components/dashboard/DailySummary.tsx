@@ -43,7 +43,7 @@ const actions = [
 ];
 
 export function DailySummary() {
-  const { setActiveQuickForm } = useAppStore();
+  const setActiveQuickForm = useAppStore((s) => s.setActiveQuickForm);
 
   return (
     <div style={{ padding: `0 var(--page-px)`, marginBottom: 24 }}>

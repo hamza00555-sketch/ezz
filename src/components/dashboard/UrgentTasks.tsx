@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { ArrowLeft, Clock, AlertCircle } from 'lucide-react';
 import { useAppStore } from '@/store/appStore';
+import { useShallow } from 'zustand/react/shallow';
 import { MemberAvatar } from '@/components/shared/MemberAvatar';
 import { formatArabicDate, isOverdue, categoryLabels } from '@/lib/utils';
 
@@ -14,7 +15,9 @@ const priorityDot: Record<string, string> = {
 };
 
 export function UrgentTasks() {
-  const { tasks, members, currentFamilyGroupId } = useAppStore();
+  const { tasks, members, currentFamilyGroupId } = useAppStore(
+    useShallow((s) => ({ tasks: s.tasks, members: s.members, currentFamilyGroupId: s.currentFamilyGroupId }))
+  );
 
   const urgent = tasks
     .filter(

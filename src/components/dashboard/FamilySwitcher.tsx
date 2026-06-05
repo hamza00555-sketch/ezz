@@ -2,11 +2,20 @@
 
 import { Bell, ChevronDown } from 'lucide-react';
 import { useAppStore } from '@/store/appStore';
+import { useShallow } from 'zustand/react/shallow';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 
 export function FamilySwitcher() {
-  const { familyGroups, currentFamilyGroupId, announcements, currentUserId, members } = useAppStore();
+  const { familyGroups, currentFamilyGroupId, announcements, currentUserId, members } = useAppStore(
+    useShallow((s) => ({
+      familyGroups: s.familyGroups,
+      currentFamilyGroupId: s.currentFamilyGroupId,
+      announcements: s.announcements,
+      currentUserId: s.currentUserId,
+      members: s.members,
+    }))
+  );
   const group = familyGroups.find((g) => g.id === currentFamilyGroupId);
   const me = members.find((m) => m.id === currentUserId);
   const unread = announcements.filter(

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Clock, RotateCcw } from 'lucide-react';
 import { useAppStore } from '@/store/appStore';
+import { useShallow } from 'zustand/react/shallow';
 import { MemberAvatar } from '@/components/shared/MemberAvatar';
 import { formatArabicDate, isOverdue, taskStatusLabels, priorityLabels, categoryLabels, cn } from '@/lib/utils';
 import type { Task } from '@/types';
@@ -31,7 +32,9 @@ interface TaskCardProps {
 }
 
 export function TaskCard({ task, showAssignee = true }: TaskCardProps) {
-  const { members, updateTaskStatus } = useAppStore();
+  const { members, updateTaskStatus } = useAppStore(
+    useShallow((s) => ({ members: s.members, updateTaskStatus: s.updateTaskStatus }))
+  );
   const assignee = members.find((m) => m.id === task.assignedTo);
   const creator  = members.find((m) => m.id === task.createdBy);
   const overdue  = isOverdue(task.dueDate);

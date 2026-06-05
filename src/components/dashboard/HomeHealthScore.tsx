@@ -3,10 +3,18 @@
 import Link from 'next/link';
 import { ArrowLeft, Zap, Clock, MessageSquare } from 'lucide-react';
 import { useAppStore } from '@/store/appStore';
+import { useShallow } from 'zustand/react/shallow';
 import { isOverdue } from '@/lib/utils';
 
 export function HomeHealthScore() {
-  const { tasks, requests, currentUserId, currentFamilyGroupId } = useAppStore();
+  const { tasks, requests, currentUserId, currentFamilyGroupId } = useAppStore(
+    useShallow((s) => ({
+      tasks: s.tasks,
+      requests: s.requests,
+      currentUserId: s.currentUserId,
+      currentFamilyGroupId: s.currentFamilyGroupId,
+    }))
+  );
 
   const allTasks = tasks.filter(
     (t) => t.familyGroupId === currentFamilyGroupId && t.status !== 'cancelled'

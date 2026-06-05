@@ -2,10 +2,19 @@
 
 import Link from 'next/link';
 import { useAppStore } from '@/store/appStore';
+import { useShallow } from 'zustand/react/shallow';
 import { isOverdue } from '@/lib/utils';
 
 export function QuickShortcuts() {
-  const { tasks, shortages, expenses, wallets, currentFamilyGroupId } = useAppStore();
+  const { tasks, shortages, expenses, wallets, currentFamilyGroupId } = useAppStore(
+    useShallow((s) => ({
+      tasks: s.tasks,
+      shortages: s.shortages,
+      expenses: s.expenses,
+      wallets: s.wallets,
+      currentFamilyGroupId: s.currentFamilyGroupId,
+    }))
+  );
 
   const pendingTasks = tasks.filter(
     (t) =>

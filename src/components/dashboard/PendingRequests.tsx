@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { ArrowLeft, Check, X, MessageSquare } from 'lucide-react';
 import { useAppStore } from '@/store/appStore';
+import { useShallow } from 'zustand/react/shallow';
 import { MemberAvatar } from '@/components/shared/MemberAvatar';
 
 const typeLabels: Record<string, string> = {
@@ -15,7 +16,15 @@ const typeLabels: Record<string, string> = {
 };
 
 export function PendingRequests() {
-  const { requests, members, currentUserId, currentFamilyGroupId, updateRequestStatus } = useAppStore();
+  const { requests, members, currentUserId, currentFamilyGroupId, updateRequestStatus } = useAppStore(
+    useShallow((s) => ({
+      requests: s.requests,
+      members: s.members,
+      currentUserId: s.currentUserId,
+      currentFamilyGroupId: s.currentFamilyGroupId,
+      updateRequestStatus: s.updateRequestStatus,
+    }))
+  );
 
   const pending = requests.filter(
     (r) =>

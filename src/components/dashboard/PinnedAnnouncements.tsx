@@ -2,9 +2,18 @@
 
 import { Megaphone, Check } from 'lucide-react';
 import { useAppStore } from '@/store/appStore';
+import { useShallow } from 'zustand/react/shallow';
 
 export function PinnedAnnouncements() {
-  const { announcements, currentFamilyGroupId, currentUserId, members, confirmAnnouncement } = useAppStore();
+  const { announcements, currentFamilyGroupId, currentUserId, members, confirmAnnouncement } = useAppStore(
+    useShallow((s) => ({
+      announcements: s.announcements,
+      currentFamilyGroupId: s.currentFamilyGroupId,
+      currentUserId: s.currentUserId,
+      members: s.members,
+      confirmAnnouncement: s.confirmAnnouncement,
+    }))
+  );
 
   const pinned = announcements.filter(
     (a) => a.familyGroupId === currentFamilyGroupId && a.isPinned && a.status === 'active'

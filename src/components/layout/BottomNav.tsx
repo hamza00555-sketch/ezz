@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Home, ListChecks, ChefHat, LayoutGrid, Plus, X, CheckSquare, MessageSquare, Lightbulb, Building2, FileText, ShoppingCart, BookOpen, Megaphone } from 'lucide-react';
 import { useAppStore } from '@/store/appStore';
 import { TaskForm } from '@/components/forms/TaskForm';
@@ -91,12 +91,16 @@ export function BottomNav() {
   const pathname = usePathname();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [activeForm, setActiveForm] = useState<FormKey>(null);
-  const { activeQuickForm, setActiveQuickForm } = useAppStore();
+  const activeQuickForm = useAppStore((s) => s.activeQuickForm);
+  const setActiveQuickForm = useAppStore((s) => s.setActiveQuickForm);
 
-  if (activeQuickForm && !activeForm) {
-    setActiveForm(activeQuickForm as FormKey);
-    setActiveQuickForm(null);
-  }
+  // Must be in useEffect — calling setState during render causes infinite loop
+  useEffect(() => {
+    if (activeQuickForm) {
+      setActiveForm(activeQuickForm as FormKey);
+      setActiveQuickForm(null);
+    }
+  }, [activeQuickForm, setActiveQuickForm]);
 
   function handleSelect(key: string) {
     setSheetOpen(false);
