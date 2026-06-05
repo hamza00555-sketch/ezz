@@ -121,8 +121,11 @@ export default function KitchenPage() {
   const [pickerInput, setPickerInput] = useState('');
   const [pickerSugg, setPickerSugg]   = useState<string[]>([]);
 
-  // Recipe detail popup
-  const [detailRecipe, setDetailRecipe] = useState<typeof myRecipes[0] | null>(null);
+  // Recipe detail popup (store by ID so it reflects live store updates after edits)
+  const [detailRecipeId, setDetailRecipeId] = useState<string | null>(null);
+
+  // Recipe edit form
+  const [editingRecipe, setEditingRecipe] = useState<import('@/types').Recipe | null>(null);
 
   // Import recipe sheet
   const [recipeFormOpen, setRecipeFormOpen] = useState(false);
@@ -145,6 +148,7 @@ export default function KitchenPage() {
   const myShortages  = shortages.filter((s) => s.familyGroupId === currentFamilyGroupId);
   const missingCount = myShortages.filter((s) => s.status === 'missing').length;
   const myRecipes    = recipes.filter((r) => r.familyGroupId === currentFamilyGroupId);
+  const detailRecipe = detailRecipeId ? myRecipes.find((r) => r.id === detailRecipeId) ?? null : null;
   const todayStr     = new Date().toISOString().split('T')[0];
   const todayPlan    = mealPlans.find((p) => p.familyGroupId === currentFamilyGroupId && p.date === todayStr);
 
@@ -678,7 +682,7 @@ export default function KitchenPage() {
                 return (
                   <div
                     key={recipe.id}
-                    onClick={() => setDetailRecipe(recipe)}
+                    onClick={() => setDetailRecipeId(recipe.id)}
                     className="active:scale-[0.98]"
                     style={{
                       display: 'flex', alignItems: 'center', gap: 12,
@@ -890,8 +894,15 @@ export default function KitchenPage() {
         );
       })()}
 
-      {/* ─── Recipe Form ─────────────────────────────────────────────────────── */}
+      {/* ─── Recipe Form (add) ───────────────────────────────────────────────── */}
       <RecipeForm open={recipeFormOpen} onClose={() => setRecipeFormOpen(false)} />
+
+      {/* ─── Recipe Form (edit) ──────────────────────────────────────────────── */}
+      <RecipeForm
+        open={!!editingRecipe}
+        onClose={() => setEditingRecipe(null)}
+        initialRecipe={editingRecipe ?? undefined}
+      />
 
       {/* ─── Recipe Detail Popup ─────────────────────────────────────────────── */}
       {detailRecipe && (() => {
@@ -903,7 +914,7 @@ export default function KitchenPage() {
           <>
             <div
               style={{ position: 'fixed', inset: 0, zIndex: 48, background: 'rgba(31,33,28,0.45)', backdropFilter: 'blur(5px)', WebkitBackdropFilter: 'blur(5px)' }}
-              onClick={() => setDetailRecipe(null)}
+              onClick={() => setDetailRecipeId(null)}
             />
             <div
               className="slide-up"
@@ -930,7 +941,7 @@ export default function KitchenPage() {
                 <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(31,33,28,0.55) 0%, transparent 60%)' }} />
                 {/* Close button */}
                 <button
-                  onClick={() => setDetailRecipe(null)}
+                  onClick={() => setDetailRecipeId(null)}
                   style={{
                     position: 'absolute', top: 14, left: 14,
                     width: 34, height: 34, borderRadius: '50%',
@@ -1004,6 +1015,25 @@ export default function KitchenPage() {
                   <p style={{ fontSize: 13, color: 'var(--text-muted)', fontStyle: 'italic', lineHeight: 1.7, padding: '10px 14px', borderRadius: 14, background: 'rgba(67,82,56,0.04)', border: '1px solid var(--border-soft)' }}>
                     {r.notes}
                   </p>
+                )}
+
+                {/* Edit button */}
+                {canEdit && (
+                  <button
+                    onClick={() => setEditingRecipe(r)}
+                    style={{
+                      marginTop: 8,
+                      width: '100%', padding: '13px 0', borderRadius: 16,
+                      background: 'rgba(163,177,138,0.14)',
+                      border: '1px solid rgba(163,177,138,0.30)',
+                      color: 'var(--accent-strong)', fontSize: 14, fontWeight: 700,
+                      cursor: 'pointer', fontFamily: 'inherit',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                    }}
+                    className="active:scale-[0.98]"
+                  >
+                    ✏️ تعديل الوصفة
+                  </button>
                 )}
               </div>
             </div>

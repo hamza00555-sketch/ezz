@@ -530,6 +530,7 @@ interface AppState {
 
   // Recipe actions
   addRecipe: (recipe: Omit<Recipe, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  updateRecipe: (id: string, data: Omit<Partial<Recipe>, 'id' | 'familyGroupId' | 'createdBy' | 'createdAt'>) => void;
 
   // Announcement actions
   confirmAnnouncement: (annId: string, memberId: string) => void;
@@ -759,6 +760,15 @@ export const useAppStore = create<AppState>()(persist((set, get) => ({
     if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
       import('@/lib/supabase/db').then(({ dbAddRecipe }) => dbAddRecipe(recipeData));
     }
+  },
+
+  updateRecipe: (id, data) => {
+    const now = new Date().toISOString();
+    set((state) => ({
+      recipes: state.recipes.map((r) =>
+        r.id === id ? { ...r, ...data, id, updatedAt: now } : r
+      ),
+    }));
   },
 
   confirmAnnouncement: (annId, memberId) => {
