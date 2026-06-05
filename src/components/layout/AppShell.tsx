@@ -4,12 +4,12 @@ import { BottomNav } from './BottomNav';
 import { DemoReviewBanner } from './DemoReviewBanner'; // DEMO_REVIEW
 import { useSupabaseInit } from '@/hooks/useSupabaseInit';
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({ children, extraClass }: { children: React.ReactNode; extraClass?: string }) {
   useSupabaseInit();
 
   return (
     <div
-      className="app-bg"
+      className={`app-bg${extraClass ? ` ${extraClass}` : ''}`}
       style={{ minHeight: '100dvh', color: 'var(--text-primary)' }}
     >
       <DemoReviewBanner />{/* DEMO_REVIEW */}

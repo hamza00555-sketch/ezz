@@ -24,14 +24,14 @@ const rightItems = [
 ];
 
 const quickAddItems = [
-  { key: 'task',         icon: CheckSquare,   label: 'مهمة',    color: 'var(--accent)',   bg: 'rgba(163,177,138,0.14)' },
-  { key: 'request',      icon: MessageSquare, label: 'طلب',     color: 'var(--info)',     bg: 'var(--info-soft)'       },
-  { key: 'wish',         icon: Lightbulb,     label: 'فكرة',    color: 'var(--warning)',  bg: 'var(--warning-soft)'    },
-  { key: 'home_item',    icon: Building2,     label: 'ممتلكات', color: 'var(--accent)',   bg: 'rgba(163,177,138,0.10)' },
-  { key: 'document',     icon: FileText,      label: 'وثيقة',   color: 'var(--danger)',   bg: 'var(--danger-soft)'     },
-  { key: 'shortage',     icon: ShoppingCart,  label: 'نقص',     color: 'var(--warning)',  bg: 'var(--warning-soft)'    },
-  { key: 'recipe',       icon: BookOpen,      label: 'وصفة',    color: '#E879F9',         bg: 'rgba(232,121,249,0.10)' },
-  { key: 'announcement', icon: Megaphone,     label: 'إعلان',   color: 'var(--bronze)',   bg: 'rgba(176,141,87,0.12)'  },
+  { key: 'task',         icon: CheckSquare,   label: 'مهمة',    color: 'var(--accent-strong)', bg: 'rgba(168,185,154,0.20)' },
+  { key: 'request',      icon: MessageSquare, label: 'طلب',     color: 'var(--info)',           bg: 'var(--info-soft)'       },
+  { key: 'wish',         icon: Lightbulb,     label: 'فكرة',    color: 'var(--warning)',        bg: 'var(--warning-soft)'    },
+  { key: 'home_item',    icon: Building2,     label: 'ممتلكات', color: 'var(--accent-strong)', bg: 'rgba(168,185,154,0.16)' },
+  { key: 'document',     icon: FileText,      label: 'وثيقة',   color: 'var(--danger)',         bg: 'var(--danger-soft)'     },
+  { key: 'shortage',     icon: ShoppingCart,  label: 'نقص',     color: 'var(--kitchen-rose)',   bg: 'rgba(244,217,207,0.50)' },
+  { key: 'recipe',       icon: BookOpen,      label: 'وصفة',    color: '#8B5CF6',              bg: 'rgba(167,130,255,0.14)' },
+  { key: 'announcement', icon: Megaphone,     label: 'إعلان',   color: 'var(--bronze)',         bg: 'rgba(181,139,85,0.14)'  },
 ];
 
 type FormKey = 'task' | 'request' | 'wish' | 'home_item' | 'document' | 'shortage' | 'recipe' | 'announcement' | null;
@@ -60,7 +60,7 @@ function NavItem({ href, icon: Icon, label, active }: { href: string; icon: Reac
           gap: 3,
           padding: active ? '6px 18px' : '6px 4px',
           borderRadius: 20,
-          background: active ? 'rgba(163, 177, 138, 0.18)' : 'transparent',
+          background: active ? 'rgba(67, 82, 56, 0.12)' : 'transparent',
           transition: 'all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)',
         }}
       >
@@ -93,7 +93,6 @@ export function BottomNav() {
   const [activeForm, setActiveForm] = useState<FormKey>(null);
   const { activeQuickForm, setActiveQuickForm } = useAppStore();
 
-  // sync store-triggered forms (e.g. from dashboard quick-add buttons)
   if (activeQuickForm && !activeForm) {
     setActiveForm(activeQuickForm as FormKey);
     setActiveQuickForm(null);
@@ -109,7 +108,7 @@ export function BottomNav() {
     setActiveForm(null);
   }
 
-  const NAV_BOTTOM = 16; // px from screen bottom
+  const NAV_BOTTOM = 16;
   const NAV_HEIGHT = 72;
 
   return (
@@ -120,15 +119,15 @@ export function BottomNav() {
           className="fade-in"
           style={{
             position: 'fixed', inset: 0, zIndex: 28,
-            background: 'rgba(0,0,0,0.60)',
-            backdropFilter: 'blur(2px)',
-            WebkitBackdropFilter: 'blur(2px)',
+            background: 'rgba(31, 33, 28, 0.40)',
+            backdropFilter: 'blur(4px)',
+            WebkitBackdropFilter: 'blur(4px)',
           }}
           onClick={() => setSheetOpen(false)}
         />
       )}
 
-      {/* Quick-add sheet — anchored to left/right so no centering math needed */}
+      {/* Quick-add sheet */}
       {sheetOpen && (
         <div
           className="slide-up"
@@ -137,13 +136,13 @@ export function BottomNav() {
             bottom: NAV_BOTTOM + NAV_HEIGHT + 12,
             left: 16,
             right: 16,
-            background: 'rgba(21,24,29,0.97)',
-            backdropFilter: 'blur(24px)',
-            WebkitBackdropFilter: 'blur(24px)',
+            background: 'rgba(255, 253, 247, 0.96)',
+            backdropFilter: 'blur(28px)',
+            WebkitBackdropFilter: 'blur(28px)',
             borderRadius: 28,
             padding: '16px 12px 12px',
-            border: '1px solid rgba(255,255,255,0.12)',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+            border: '1px solid rgba(67, 82, 56, 0.14)',
+            boxShadow: '0 20px 60px rgba(67, 82, 56, 0.18)',
             zIndex: 29,
           }}
         >
@@ -171,7 +170,7 @@ export function BottomNav() {
                     padding: '12px 4px',
                     borderRadius: 18,
                     background: item.bg,
-                    border: '1px solid rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(67, 82, 56, 0.08)',
                     cursor: 'pointer',
                     transition: 'transform 0.12s ease',
                   }}
@@ -197,18 +196,17 @@ export function BottomNav() {
           right: 16,
           height: NAV_HEIGHT,
           borderRadius: 28,
-          background: 'rgba(21, 24, 29, 0.90)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
-          border: '1px solid rgba(255, 255, 255, 0.12)',
-          boxShadow: '0 8px 40px rgba(0, 0, 0, 0.50)',
+          background: 'rgba(255, 253, 247, 0.88)',
+          backdropFilter: 'blur(28px)',
+          WebkitBackdropFilter: 'blur(28px)',
+          border: '1px solid rgba(67, 82, 56, 0.12)',
+          boxShadow: '0 8px 40px rgba(67, 82, 56, 0.14)',
           zIndex: 30,
           display: 'flex',
           alignItems: 'center',
           padding: '0 8px',
         }}
       >
-        {/* Left 2 items */}
         {leftItems.map((item) => (
           <NavItem key={item.href} {...item} active={pathname.startsWith(item.href)} />
         ))}
@@ -222,12 +220,14 @@ export function BottomNav() {
             borderRadius: 22,
             flexShrink: 0,
             background: sheetOpen
-              ? 'rgba(255,255,255,0.12)'
-              : 'linear-gradient(135deg, var(--accent), var(--accent-strong))',
-            border: '1.5px solid rgba(255,255,255,0.18)',
+              ? 'rgba(67, 82, 56, 0.10)'
+              : 'var(--accent-strong)',
+            border: sheetOpen
+              ? '1.5px solid rgba(67, 82, 56, 0.18)'
+              : '1.5px solid rgba(67, 82, 56, 0.30)',
             boxShadow: sheetOpen
-              ? '0 4px 20px rgba(0,0,0,0.3)'
-              : '0 6px 32px rgba(163,177,138,0.55), 0 2px 8px rgba(0,0,0,0.3)',
+              ? '0 4px 16px rgba(67,82,56,0.10)'
+              : '0 8px 32px rgba(67, 82, 56, 0.30), inset 0 1px 0 rgba(255,255,255,0.22)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -238,12 +238,11 @@ export function BottomNav() {
           className="active:scale-90"
         >
           {sheetOpen
-            ? <X size={22} color="var(--text-primary)" strokeWidth={2.5} />
-            : <Plus size={27} color="#0D0F12" strokeWidth={2.8} />
+            ? <X size={22} color="var(--accent-strong)" strokeWidth={2.5} />
+            : <Plus size={27} color="#FFFFFF" strokeWidth={2.8} />
           }
         </button>
 
-        {/* Right 2 items */}
         {rightItems.map((item) => (
           <NavItem key={item.href} {...item} active={pathname.startsWith(item.href)} />
         ))}
