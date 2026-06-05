@@ -51,5 +51,6 @@ export function useSupabaseInit() {
     init();
 
     return () => { subscription?.unsubscribe(); };
-  }, [loadFromSupabase]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 }
