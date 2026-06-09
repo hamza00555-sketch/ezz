@@ -32,19 +32,20 @@ export default function SettingsPage() {
   }
 
   useEffect(() => {
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-      setPushState('unsupported');
-      return;
+    async function loadPushState() {
+      if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+        setPushState('unsupported');
+        return;
+      }
+      if (Notification.permission === 'denied') {
+        setPushState('denied');
+        return;
+      }
+      const reg = await navigator.serviceWorker.ready;
+      const sub = await reg.pushManager.getSubscription();
+      setPushState(sub ? 'subscribed' : 'unsubscribed');
     }
-    if (Notification.permission === 'denied') {
-      setPushState('denied');
-      return;
-    }
-    navigator.serviceWorker.ready.then((reg) =>
-      reg.pushManager.getSubscription().then((sub) =>
-        setPushState(sub ? 'subscribed' : 'unsubscribed')
-      )
-    );
+    void loadPushState();
   }, []);
 
   async function handleTogglePush() {

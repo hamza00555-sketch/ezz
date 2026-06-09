@@ -35,8 +35,10 @@ export function QuickAddButton() {
 
   useEffect(() => {
     if (activeQuickForm) {
-      setActiveForm(activeQuickForm as FormKey);
-      setActiveQuickForm(null);
+      queueMicrotask(() => {
+        setActiveForm(activeQuickForm as FormKey);
+        setActiveQuickForm(null);
+      });
     }
   }, [activeQuickForm, setActiveQuickForm]);
 

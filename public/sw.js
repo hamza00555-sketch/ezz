@@ -1,5 +1,4 @@
-const CACHE = 'ezz-v1';
-const OFFLINE_URL = '/offline';
+const CACHE = 'ezz-v2';
 
 const PRECACHE = [
   '/',
@@ -36,16 +35,13 @@ self.addEventListener('fetch', (event) => {
   ) return;
 
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      const networkFetch = fetch(event.request).then((res) => {
+    fetch(event.request).then((res) => {
         if (res.ok && res.type === 'basic') {
           const clone = res.clone();
           caches.open(CACHE).then((cache) => cache.put(event.request, clone));
         }
         return res;
-      });
-      return cached || networkFetch;
-    })
+      }).catch(() => caches.match(event.request))
   );
 });
 

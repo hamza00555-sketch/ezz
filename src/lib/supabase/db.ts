@@ -172,6 +172,7 @@ function toHomeItem(r: any): HomeItem {
     name: r.name,
     category: r.category ?? 'other',
     location: r.location,
+    imageUrl: r.image_url,
     purchaseDate: r.purchase_date,
     price: r.price,
     warrantyExpiry: r.warranty_expiry,
@@ -226,6 +227,7 @@ function toRecipe(r: any): Recipe {
     id: r.id,
     familyGroupId: r.family_group_id,
     name: r.name,
+    imageUrl: r.image_url,
     ingredients: r.ingredients ?? [],
     steps: r.steps ?? [],
     prepTime: r.prep_time,
@@ -400,6 +402,81 @@ export async function dbAddWishItem(item: Omit<WishItem, 'id' | 'createdAt' | 'u
   }).select().single();
 }
 
+export async function dbAddHomeItem(item: Omit<HomeItem, 'id' | 'createdAt' | 'updatedAt'>) {
+  const sb = createClient();
+  return sb.from('home_items').insert({
+    family_group_id: item.familyGroupId,
+    name: item.name,
+    category: item.category,
+    location: item.location,
+    image_url: item.imageUrl,
+    purchase_date: item.purchaseDate,
+    price: item.price,
+    warranty_expiry: item.warrantyExpiry,
+    notes: item.notes,
+    created_by: item.createdBy || null,
+  }).select().single();
+}
+
+export async function dbAddDocument(document: Omit<Document, 'id' | 'createdAt' | 'updatedAt'>) {
+  const sb = createClient();
+  return sb.from('documents').insert({
+    family_group_id: document.familyGroupId,
+    name: document.name,
+    type: document.type,
+    file_url: document.fileUrl,
+    linked_item_id: document.linkedItemId,
+    expiry_date: document.expiryDate,
+    reminder_days: document.reminderDays,
+    visibility: document.visibility,
+    notes: document.notes,
+    created_by: document.createdBy || null,
+  }).select().single();
+}
+
+export async function dbAddRecipe(recipe: Omit<Recipe, 'id' | 'createdAt' | 'updatedAt'>) {
+  const sb = createClient();
+  return sb.from('recipes').insert({
+    family_group_id: recipe.familyGroupId,
+    name: recipe.name,
+    image_url: recipe.imageUrl,
+    ingredients: recipe.ingredients,
+    steps: recipe.steps,
+    prep_time: recipe.prepTime,
+    meal_time: recipe.mealTime,
+    favorited_by: recipe.favoritedBy,
+    notes: recipe.notes,
+    created_by: recipe.createdBy || null,
+  }).select().single();
+}
+
+export async function dbAddAnnouncement(announcement: Omit<Announcement, 'id' | 'createdAt' | 'updatedAt'>) {
+  const sb = createClient();
+  return sb.from('announcements').insert({
+    family_group_id: announcement.familyGroupId,
+    title: announcement.title,
+    message: announcement.message,
+    published_by: announcement.publishedBy || null,
+    audience: announcement.audience,
+    requires_confirmation: announcement.requiresConfirmation,
+    confirmed_by: announcement.confirmedBy,
+    status: announcement.status,
+    is_pinned: announcement.isPinned,
+  }).select().single();
+}
+
+export async function uploadRecipeImage(file: File, familyGroupId: string) {
+  const sb = createClient();
+  const extension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+  const path = `${familyGroupId}/${crypto.randomUUID()}.${extension}`;
+  const { error } = await sb.storage.from('recipe-images').upload(path, file, {
+    cacheControl: '3600',
+    upsert: false,
+  });
+  if (error) throw error;
+  return sb.storage.from('recipe-images').getPublicUrl(path).data.publicUrl;
+}
+
 export async function dbAddExpense(expense: Omit<Expense, 'id' | 'createdAt' | 'updatedAt'>) {
   const sb = createClient();
   const { data, error } = await sb.from('expenses').insert({
@@ -448,21 +525,6 @@ export async function dbSetMealPlan(plan: MealPlan) {
     created_by: plan.createdBy,
     updated_at: new Date().toISOString(),
   }, { onConflict: 'family_group_id,date' });
-}
-
-export async function dbAddRecipe(recipe: Omit<Recipe, 'id' | 'createdAt' | 'updatedAt'>) {
-  const sb = createClient();
-  return sb.from('recipes').insert({
-    family_group_id: recipe.familyGroupId,
-    name: recipe.name,
-    ingredients: recipe.ingredients,
-    steps: recipe.steps,
-    prep_time: recipe.prepTime,
-    meal_time: recipe.mealTime,
-    favorited_by: recipe.favoritedBy,
-    notes: recipe.notes,
-    created_by: recipe.createdBy,
-  }).select().single();
 }
 
 export async function dbJoinFamilyGroup(_userId: string, inviteCode: string) {
