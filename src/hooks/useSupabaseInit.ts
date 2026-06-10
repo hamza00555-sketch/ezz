@@ -56,12 +56,17 @@ export function useSupabaseInit() {
         // every page is fully populated the moment the user enters the app.
         const { data: { session } } = await sb.auth.getSession();
         if (session?.user) {
+          // Pin the user identity immediately so every component that reads
+          // currentUserId / currentFamilyGroupId works even if the full DB
+          // fetch fails (e.g. a transient network error).
+          useAppStore.setState({ currentUserId: session.user.id });
           const { data: profile } = await sb
             .from('profiles')
             .select('family_group_id')
             .eq('id', session.user.id)
             .single();
           if (profile?.family_group_id) {
+            useAppStore.setState({ currentFamilyGroupId: profile.family_group_id });
             await loadFromSupabase(session.user.id, profile.family_group_id);
           }
         }
@@ -77,12 +82,14 @@ export function useSupabaseInit() {
           // avoid a redundant second full data fetch on every mount.
           if (event === 'INITIAL_SESSION') return;
           if (sess?.user) {
+            useAppStore.setState({ currentUserId: sess.user.id });
             const { data: profile } = await sb
               .from('profiles')
               .select('family_group_id')
               .eq('id', sess.user.id)
               .single();
             if (profile?.family_group_id) {
+              useAppStore.setState({ currentFamilyGroupId: profile.family_group_id });
               await loadFromSupabase(sess.user.id, profile.family_group_id);
             }
           }
