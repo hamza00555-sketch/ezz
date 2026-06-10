@@ -9,7 +9,13 @@ export function useSupabaseInit() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL) return;
+    const { setAppReady } = useAppStore.getState();
+
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      // Demo mode — nothing to load, reveal the app immediately
+      setAppReady(true);
+      return;
+    }
 
     let subscription: { unsubscribe: () => void } | null = null;
 
@@ -49,6 +55,10 @@ export function useSupabaseInit() {
         subscription = data.subscription;
       } catch (err) {
         console.error('[useSupabaseInit]', err);
+      } finally {
+        // Reveal the app once the first auth + data load attempt settles,
+        // whether it succeeded, failed, or there was nothing to load.
+        setAppReady(true);
       }
     }
 

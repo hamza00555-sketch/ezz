@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'black-translucent',
+    statusBarStyle: 'default',
     title: 'عز',
   },
   icons: {
@@ -22,14 +22,14 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: '#0D0F12',
+  themeColor: '#F9F6EE',
   viewportFit: 'cover',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ar" dir="rtl" className="h-full">
-      <body className="h-full antialiased">
+    <html lang="ar" dir="rtl" className="h-full" style={{ background: '#F9F6EE' }}>
+      <body className="h-full antialiased" style={{ background: '#F9F6EE' }}>
         {children}
         <ServiceWorkerRegistrar />
       </body>

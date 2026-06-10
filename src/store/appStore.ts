@@ -29,6 +29,7 @@ interface AppState {
   currentUserId: string;
   currentFamilyGroupId: string;
   isLoaded: boolean;
+  appReady: boolean;
 
   familyGroups: FamilyGroup[];
   members: FamilyMember[];
@@ -53,6 +54,7 @@ interface AppState {
   // Supabase sync
   loadFromSupabase: (userId: string, familyGroupId: string) => Promise<void>;
   setCurrentUser: (userId: string, familyGroupId: string) => void;
+  setAppReady: (v: boolean) => void;
 
   // Actions
   setCurrentFamilyGroup: (id: string) => void;
@@ -98,6 +100,7 @@ export const useAppStore = create<AppState>()(persist((set, get) => ({
   currentUserId: CURRENT_USER_ID,
   currentFamilyGroupId: FAMILY_GROUP_ID,
   isLoaded: false,
+  appReady: false,
 
   familyGroups: [],
   members: [],
@@ -120,6 +123,8 @@ export const useAppStore = create<AppState>()(persist((set, get) => ({
 
   setCurrentUser: (userId, familyGroupId) =>
     set({ currentUserId: userId, currentFamilyGroupId: familyGroupId }),
+
+  setAppReady: (v) => set({ appReady: v }),
 
   loadFromSupabase: async (userId, familyGroupId) => {
     const { fetchFamilyData } = await import('@/lib/supabase/db');

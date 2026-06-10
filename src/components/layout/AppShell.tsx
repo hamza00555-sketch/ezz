@@ -2,10 +2,15 @@
 
 import { BottomNav } from './BottomNav';
 import { DemoReviewBanner } from './DemoReviewBanner'; // DEMO_REVIEW
+import { BootSplash } from './BootSplash';
 import { useSupabaseInit } from '@/hooks/useSupabaseInit';
+import { useAppStore } from '@/store/appStore';
 
 export function AppShell({ children, extraClass }: { children: React.ReactNode; extraClass?: string }) {
   useSupabaseInit();
+  const appReady = useAppStore((s) => s.appReady);
+
+  if (!appReady) return <BootSplash />;
 
   return (
     <div

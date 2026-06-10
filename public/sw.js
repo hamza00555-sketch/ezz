@@ -1,4 +1,4 @@
-const CACHE = 'ezz-v2';
+const CACHE = 'ezz-v3';
 
 const PRECACHE = [
   '/',
