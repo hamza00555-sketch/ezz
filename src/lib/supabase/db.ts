@@ -489,12 +489,13 @@ export async function dbAddExpense(expense: Omit<Expense, 'id' | 'createdAt' | '
     notes: expense.notes,
   }).select().single();
 
-  // Update wallet spent
+  // Atomically increment wallet.spent via RPC to avoid race conditions
   if (!error) {
-    const { data: wallet } = await sb.from('wallets').select('spent').eq('id', expense.walletId).single();
-    if (wallet) {
-      await sb.from('wallets').update({ spent: wallet.spent + expense.amount }).eq('id', expense.walletId);
-    }
+    const { error: rpcError } = await sb.rpc('increment_wallet_spent', {
+      p_wallet_id: expense.walletId,
+      p_amount: expense.amount,
+    });
+    if (rpcError) console.error('[dbAddExpense] wallet increment failed', rpcError);
   }
   return { data, error };
 }
