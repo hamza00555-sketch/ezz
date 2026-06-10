@@ -13,6 +13,7 @@ import { HomeItemForm } from '@/components/forms/HomeItemForm';
 import { DocumentForm } from '@/components/forms/DocumentForm';
 import { RecipeForm } from '@/components/forms/RecipeForm';
 import { AnnouncementForm } from '@/components/forms/AnnouncementForm';
+import { ExpenseForm } from '@/components/forms/ExpenseForm';
 
 const leftItems = [
   { href: '/dashboard', icon: Home,       label: 'الرئيسية' },
@@ -34,7 +35,7 @@ const quickAddItems = [
   { key: 'announcement', icon: Megaphone,     label: 'إعلان',   color: 'var(--bronze)',         bg: 'rgba(181,139,85,0.14)'  },
 ];
 
-type FormKey = 'task' | 'request' | 'wish' | 'home_item' | 'document' | 'shortage' | 'recipe' | 'announcement' | null;
+type FormKey = 'task' | 'request' | 'wish' | 'home_item' | 'document' | 'shortage' | 'recipe' | 'announcement' | 'expense' | null;
 
 function NavItem({ href, icon: Icon, label, active }: { href: string; icon: React.ElementType; label: string; active: boolean }) {
   return (
@@ -261,6 +262,7 @@ export function BottomNav() {
       <ShortageForm     open={activeForm === 'shortage'}     onClose={closeAll} />
       <RecipeForm       open={activeForm === 'recipe'}       onClose={closeAll} />
       <AnnouncementForm open={activeForm === 'announcement'} onClose={closeAll} />
+      <ExpenseForm      open={activeForm === 'expense'}      onClose={closeAll} />
     </>
   );
 }

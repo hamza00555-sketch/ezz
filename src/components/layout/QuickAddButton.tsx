@@ -12,6 +12,7 @@ import { HomeItemForm } from '@/components/forms/HomeItemForm';
 import { DocumentForm } from '@/components/forms/DocumentForm';
 import { RecipeForm } from '@/components/forms/RecipeForm';
 import { AnnouncementForm } from '@/components/forms/AnnouncementForm';
+import { ExpenseForm } from '@/components/forms/ExpenseForm';
 
 const quickAddItems = [
   { key: 'task',         icon: CheckSquare,  label: 'مهمة',    color: 'var(--accent)',   bg: 'rgba(163,177,138,0.14)' },
@@ -24,7 +25,7 @@ const quickAddItems = [
   { key: 'announcement', icon: Megaphone,    label: 'إعلان',   color: 'var(--bronze)',   bg: 'rgba(176,141,87,0.12)'  },
 ];
 
-type FormKey = 'task' | 'request' | 'wish' | 'home_item' | 'document' | 'shortage' | 'recipe' | 'announcement' | null;
+type FormKey = 'task' | 'request' | 'wish' | 'home_item' | 'document' | 'shortage' | 'recipe' | 'announcement' | 'expense' | null;
 
 export function QuickAddButton() {
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -171,6 +172,7 @@ export function QuickAddButton() {
       <ShortageForm     open={activeForm === 'shortage'}     onClose={closeAll} />
       <RecipeForm       open={activeForm === 'recipe'}       onClose={closeAll} />
       <AnnouncementForm open={activeForm === 'announcement'} onClose={closeAll} />
+      <ExpenseForm      open={activeForm === 'expense'}      onClose={closeAll} />
     </>
   );
 }
