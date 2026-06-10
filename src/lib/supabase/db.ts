@@ -450,6 +450,25 @@ export async function dbAddRecipe(recipe: Omit<Recipe, 'id' | 'createdAt' | 'upd
   }).select().single();
 }
 
+export async function dbUpdateRecipe(
+  id: string,
+  data: Omit<Partial<Recipe>, 'id' | 'familyGroupId' | 'createdBy' | 'createdAt'>,
+) {
+  const sb = createClient();
+  // Only send columns that are present in `data` to avoid clobbering with undefined.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const patch: Record<string, any> = { updated_at: new Date().toISOString() };
+  if (data.name !== undefined) patch.name = data.name;
+  if (data.imageUrl !== undefined) patch.image_url = data.imageUrl;
+  if (data.ingredients !== undefined) patch.ingredients = data.ingredients;
+  if (data.steps !== undefined) patch.steps = data.steps;
+  if (data.prepTime !== undefined) patch.prep_time = data.prepTime;
+  if (data.mealTime !== undefined) patch.meal_time = data.mealTime;
+  if (data.favoritedBy !== undefined) patch.favorited_by = data.favoritedBy;
+  if (data.notes !== undefined) patch.notes = data.notes;
+  return sb.from('recipes').update(patch).eq('id', id);
+}
+
 export async function dbAddAnnouncement(announcement: Omit<Announcement, 'id' | 'createdAt' | 'updatedAt'>) {
   const sb = createClient();
   return sb.from('announcements').insert({

@@ -605,12 +605,20 @@ export const useAppStore = create<AppState>()(persist((set, get) => ({
     }));
     if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
       import('@/lib/supabase/db').then(({ dbAddTask }) =>
-        dbAddTask(taskData).then(({ data }) => {
+        dbAddTask(taskData).then(({ data, error }) => {
+          if (error) {
+            console.error('[addTask] insert failed, rolling back', error);
+            set((s) => ({ tasks: s.tasks.filter((t) => t.id !== localId) }));
+            return;
+          }
           if (data?.id && data.id !== localId) {
             set((s) => ({ tasks: s.tasks.map((t) => t.id === localId ? { ...t, id: data.id } : t) }));
           }
         })
-      );
+      ).catch((err) => {
+        console.error('[addTask] sync error, rolling back', err);
+        set((s) => ({ tasks: s.tasks.filter((t) => t.id !== localId) }));
+      });
     }
   },
 
@@ -621,7 +629,9 @@ export const useAppStore = create<AppState>()(persist((set, get) => ({
       ),
     }));
     if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
-      import('@/lib/supabase/db').then(({ dbUpdateTaskStatus }) => dbUpdateTaskStatus(taskId, status));
+      import('@/lib/supabase/db')
+        .then(({ dbUpdateTaskStatus }) => dbUpdateTaskStatus(taskId, status))
+        .catch((err) => console.error('[updateTaskStatus] sync failed', err));
     }
   },
 
@@ -632,7 +642,21 @@ export const useAppStore = create<AppState>()(persist((set, get) => ({
       requests: [...state.requests, { ...reqData, id: localId, createdAt: now, updatedAt: now }],
     }));
     if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
-      import('@/lib/supabase/db').then(({ dbAddRequest }) => dbAddRequest(reqData));
+      import('@/lib/supabase/db').then(({ dbAddRequest }) =>
+        dbAddRequest(reqData).then(({ data, error }) => {
+          if (error) {
+            console.error('[addRequest] insert failed, rolling back', error);
+            set((s) => ({ requests: s.requests.filter((r) => r.id !== localId) }));
+            return;
+          }
+          if (data?.id && data.id !== localId) {
+            set((s) => ({ requests: s.requests.map((r) => r.id === localId ? { ...r, id: data.id } : r) }));
+          }
+        })
+      ).catch((err) => {
+        console.error('[addRequest] sync error, rolling back', err);
+        set((s) => ({ requests: s.requests.filter((r) => r.id !== localId) }));
+      });
     }
   },
 
@@ -643,7 +667,9 @@ export const useAppStore = create<AppState>()(persist((set, get) => ({
       ),
     }));
     if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
-      import('@/lib/supabase/db').then(({ dbUpdateRequestStatus }) => dbUpdateRequestStatus(reqId, status));
+      import('@/lib/supabase/db')
+        .then(({ dbUpdateRequestStatus }) => dbUpdateRequestStatus(reqId, status))
+        .catch((err) => console.error('[updateRequestStatus] sync failed', err));
     }
   },
 
@@ -654,7 +680,21 @@ export const useAppStore = create<AppState>()(persist((set, get) => ({
       shortages: [...state.shortages, { ...itemData, id: localId, createdAt: now, updatedAt: now }],
     }));
     if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
-      import('@/lib/supabase/db').then(({ dbAddShortage }) => dbAddShortage(itemData));
+      import('@/lib/supabase/db').then(({ dbAddShortage }) =>
+        dbAddShortage(itemData).then(({ data, error }) => {
+          if (error) {
+            console.error('[addShortage] insert failed, rolling back', error);
+            set((s) => ({ shortages: s.shortages.filter((sh) => sh.id !== localId) }));
+            return;
+          }
+          if (data?.id && data.id !== localId) {
+            set((s) => ({ shortages: s.shortages.map((sh) => sh.id === localId ? { ...sh, id: data.id } : sh) }));
+          }
+        })
+      ).catch((err) => {
+        console.error('[addShortage] sync error, rolling back', err);
+        set((s) => ({ shortages: s.shortages.filter((sh) => sh.id !== localId) }));
+      });
     }
   },
 
@@ -667,7 +707,9 @@ export const useAppStore = create<AppState>()(persist((set, get) => ({
       ),
     }));
     if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
-      import('@/lib/supabase/db').then(({ dbToggleShortageStatus }) => dbToggleShortageStatus(id, newStatus));
+      import('@/lib/supabase/db')
+        .then(({ dbToggleShortageStatus }) => dbToggleShortageStatus(id, newStatus))
+        .catch((err) => console.error('[toggleShortageStatus] sync failed', err));
     }
   },
 
@@ -678,7 +720,21 @@ export const useAppStore = create<AppState>()(persist((set, get) => ({
       wishItems: [...state.wishItems, { ...itemData, id: localId, createdAt: now, updatedAt: now }],
     }));
     if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
-      import('@/lib/supabase/db').then(({ dbAddWishItem }) => dbAddWishItem(itemData));
+      import('@/lib/supabase/db').then(({ dbAddWishItem }) =>
+        dbAddWishItem(itemData).then(({ data, error }) => {
+          if (error) {
+            console.error('[addWishItem] insert failed, rolling back', error);
+            set((s) => ({ wishItems: s.wishItems.filter((w) => w.id !== localId) }));
+            return;
+          }
+          if (data?.id && data.id !== localId) {
+            set((s) => ({ wishItems: s.wishItems.map((w) => w.id === localId ? { ...w, id: data.id } : w) }));
+          }
+        })
+      ).catch((err) => {
+        console.error('[addWishItem] sync error, rolling back', err);
+        set((s) => ({ wishItems: s.wishItems.filter((w) => w.id !== localId) }));
+      });
     }
   },
 
@@ -694,7 +750,35 @@ export const useAppStore = create<AppState>()(persist((set, get) => ({
       ),
     }));
     if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
-      import('@/lib/supabase/db').then(({ dbAddExpense }) => dbAddExpense(expData));
+      import('@/lib/supabase/db').then(({ dbAddExpense }) =>
+        dbAddExpense(expData).then(({ data, error }) => {
+          if (error) {
+            console.error('[addExpense] insert failed, rolling back', error);
+            set((s) => ({
+              expenses: s.expenses.filter((e) => e.id !== localId),
+              wallets: s.wallets.map((w) =>
+                w.id === expData.walletId
+                  ? { ...w, spent: w.spent - expData.amount }
+                  : w
+              ),
+            }));
+            return;
+          }
+          if (data?.id && data.id !== localId) {
+            set((s) => ({ expenses: s.expenses.map((e) => e.id === localId ? { ...e, id: data.id } : e) }));
+          }
+        })
+      ).catch((err) => {
+        console.error('[addExpense] sync error, rolling back', err);
+        set((s) => ({
+          expenses: s.expenses.filter((e) => e.id !== localId),
+          wallets: s.wallets.map((w) =>
+            w.id === expData.walletId
+              ? { ...w, spent: w.spent - expData.amount }
+              : w
+          ),
+        }));
+      });
     }
   },
 
@@ -726,8 +810,8 @@ export const useAppStore = create<AppState>()(persist((set, get) => ({
     if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
       import('@/lib/supabase/db').then(({ dbSetMealPlan }) => {
         const plan = get().mealPlans.find((p) => p.familyGroupId === currentFamilyGroupId && p.date === date);
-        if (plan) dbSetMealPlan(plan);
-      });
+        if (plan) return dbSetMealPlan(plan);
+      }).catch((err) => console.error('[addMealOption] sync failed', err));
     }
   },
 
@@ -746,8 +830,8 @@ export const useAppStore = create<AppState>()(persist((set, get) => ({
     if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
       import('@/lib/supabase/db').then(({ dbSetMealPlan }) => {
         const plan = get().mealPlans.find((p) => p.familyGroupId === currentFamilyGroupId && p.date === date);
-        if (plan) dbSetMealPlan(plan);
-      });
+        if (plan) return dbSetMealPlan(plan);
+      }).catch((err) => console.error('[removeMealOption] sync failed', err));
     }
   },
 
@@ -758,17 +842,44 @@ export const useAppStore = create<AppState>()(persist((set, get) => ({
       recipes: [...state.recipes, { ...recipeData, id: localId, createdAt: now, updatedAt: now }],
     }));
     if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
-      import('@/lib/supabase/db').then(({ dbAddRecipe }) => dbAddRecipe(recipeData));
+      import('@/lib/supabase/db').then(({ dbAddRecipe }) =>
+        dbAddRecipe(recipeData).then(({ data, error }) => {
+          if (error) {
+            console.error('[addRecipe] insert failed, rolling back', error);
+            set((s) => ({ recipes: s.recipes.filter((r) => r.id !== localId) }));
+            return;
+          }
+          if (data?.id && data.id !== localId) {
+            set((s) => ({ recipes: s.recipes.map((r) => r.id === localId ? { ...r, id: data.id } : r) }));
+          }
+        })
+      ).catch((err) => {
+        console.error('[addRecipe] sync error, rolling back', err);
+        set((s) => ({ recipes: s.recipes.filter((r) => r.id !== localId) }));
+      });
     }
   },
 
   updateRecipe: (id, data) => {
     const now = new Date().toISOString();
+    const previous = get().recipes.find((r) => r.id === id);
     set((state) => ({
       recipes: state.recipes.map((r) =>
         r.id === id ? { ...r, ...data, id, updatedAt: now } : r
       ),
     }));
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      import('@/lib/supabase/db').then(({ dbUpdateRecipe }) =>
+        dbUpdateRecipe(id, data).then(({ error }) => {
+          if (error) {
+            console.error('[updateRecipe] update failed, rolling back', error);
+            if (previous) {
+              set((s) => ({ recipes: s.recipes.map((r) => r.id === id ? previous : r) }));
+            }
+          }
+        })
+      ).catch((err) => console.error('[updateRecipe] sync error', err));
+    }
   },
 
   confirmAnnouncement: (annId, memberId) => {
@@ -782,7 +893,16 @@ export const useAppStore = create<AppState>()(persist((set, get) => ({
     if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
       import('@/lib/supabase/db').then(({ dbConfirmAnnouncement }) =>
         dbConfirmAnnouncement(annId, memberId)
-      );
+      ).catch((err) => {
+        console.error('[confirmAnnouncement] sync failed, rolling back', err);
+        set((s) => ({
+          announcements: s.announcements.map((a) =>
+            a.id === annId
+              ? { ...a, confirmedBy: a.confirmedBy.filter((m) => m !== memberId) }
+              : a
+          ),
+        }));
+      });
     }
   },
 }), {
