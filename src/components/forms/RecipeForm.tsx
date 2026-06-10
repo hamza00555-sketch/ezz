@@ -7,8 +7,31 @@ import { FormField, Input, SubmitButton } from '@/components/shared/FormField';
 import { useAppStore } from '@/store/appStore';
 import { useShallow } from 'zustand/react/shallow';
 import { getDishImage, dishGradient, loadDishManifest } from '@/lib/dishImages';
-import { saveImageToIdb, resolveImage, isIdbRef } from '@/lib/imageStore';
+import { uploadRecipeImage, deleteRecipeImage } from '@/lib/supabase/db';
 import type { MealTime, Recipe } from '@/types';
+
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5MB
+
+/** Convert a compressed data URL back to a File for upload. */
+function dataUrlToFile(dataUrl: string, baseName: string): File {
+  const [meta, b64] = dataUrl.split(',');
+  const mime = meta.match(/data:([^;]+)/)?.[1] || 'image/jpeg';
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  const ext = mime.split('/')[1] || 'jpg';
+  return new File([bytes], `${baseName}.${ext}`, { type: mime });
+}
+
+/** An uploaded/remote image we should preserve (Supabase Storage public URL or absolute http URL). */
+function isRemoteImage(url: string | undefined): url is string {
+  return !!url && (url.startsWith('http://') || url.startsWith('https://'));
+}
+
+/** A gradient string or a bundled dish-library path (not a user-supplied photo). */
+function isLibraryOrGradient(url: string | undefined): boolean {
+  return !!url && (url.startsWith('linear-gradient') || url.startsWith('/'));
+}
 
 interface RecipeFormProps {
   open: boolean;
@@ -58,11 +81,16 @@ export function RecipeForm({ open, onClose, initialRecipe }: RecipeFormProps) {
   const [selectedMealTimes, setSelectedMealTimes] = useState<string[]>(['lunch']);
   const [ingredients, setIngredients] = useState<string[]>(['']);
   const [steps, setSteps] = useState<string[]>(['']);
-  // imageRef: what gets stored in recipe.imageUrl (idb: ref, /path, gradient, or undefined)
+  // imageRef: already-persisted value that goes in recipe.imageUrl
+  // (remote https URL, library /path, gradient, or undefined)
   const [imageRef, setImageRef] = useState<string | undefined>();
-  // previewUrl: actual data URL for display in this form session
+  // pendingDataUrl: a freshly-picked, compressed image not yet uploaded to Storage.
+  // When set, it takes priority and is uploaded on submit.
+  const [pendingDataUrl, setPendingDataUrl] = useState<string | undefined>();
+  // previewUrl: actual URL/data URL for display in this form session
   const [previewUrl, setPreviewUrl] = useState<string | undefined>();
   const [compressing, setCompressing] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const cameraRef = useRef<HTMLInputElement>(null);
@@ -78,17 +106,14 @@ export function RecipeForm({ open, onClose, initialRecipe }: RecipeFormProps) {
       setIngredients(initialRecipe.ingredients.length ? [...initialRecipe.ingredients] : ['']);
       setSteps(initialRecipe.steps.length ? [...initialRecipe.steps] : ['']);
       setImageRef(initialRecipe.imageUrl);
-      // Load preview for IDB refs
-      if (isIdbRef(initialRecipe.imageUrl)) {
-        resolveImage(initialRecipe.imageUrl!).then(setPreviewUrl);
-      } else {
-        setPreviewUrl(initialRecipe.imageUrl);
-      }
+      setPreviewUrl(initialRecipe.imageUrl);
     } else {
       setName(''); setPrepTime(''); setSelectedMealTimes(['lunch']);
       setIngredients(['']); setSteps(['']);
       setImageRef(undefined); setPreviewUrl(undefined);
     }
+    setPendingDataUrl(undefined);
+    setSubmitting(false);
     setErrors({});
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -99,7 +124,9 @@ export function RecipeForm({ open, onClose, initialRecipe }: RecipeFormProps) {
 
   async function handleNameChange(newName: string) {
     setName(newName);
-    if (imageRef && !imageRef.startsWith('linear-gradient')) return; // keep user photo
+    // Keep an explicit user photo (pending upload or already-uploaded remote URL)
+    if (pendingDataUrl) return;
+    if (imageRef && !imageRef.startsWith('linear-gradient') && !isLibraryOrGradient(imageRef)) return;
     await loadDishManifest();
     const lib = getDishImage(newName.trim());
     setImageRef(lib);
@@ -109,6 +136,19 @@ export function RecipeForm({ open, onClose, initialRecipe }: RecipeFormProps) {
   async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    e.target.value = '';
+
+    // Validate type and size before compressing
+    if (!file.type.startsWith('image/')) {
+      setErrors((prev) => ({ ...prev, image: 'الملف يجب أن يكون صورة' }));
+      return;
+    }
+    if (file.size > MAX_IMAGE_BYTES) {
+      setErrors((prev) => ({ ...prev, image: 'حجم الصورة يجب ألا يتجاوز 5 ميجابايت' }));
+      return;
+    }
+    setErrors((prev) => { const n = { ...prev }; delete n.image; return n; });
+
     setCompressing(true);
     try {
       let dataUrl: string;
@@ -122,23 +162,23 @@ export function RecipeForm({ open, onClose, initialRecipe }: RecipeFormProps) {
           r.readAsDataURL(file);
         });
       }
-      // Save to IndexedDB — store only the idb: ref in the recipe
-      const ref = await saveImageToIdb(dataUrl);
-      setImageRef(ref);
-      setPreviewUrl(dataUrl); // show instantly without re-loading from IDB
+      // Hold the compressed image locally; upload to Storage happens on submit.
+      setPendingDataUrl(dataUrl);
+      setPreviewUrl(dataUrl);
     } finally {
       setCompressing(false);
-      e.target.value = '';
     }
   }
 
   function clearImage() {
     const lib = getDishImage(name.trim());
+    setPendingDataUrl(undefined);
     setImageRef(lib);
     setPreviewUrl(lib);
   }
 
-  const isUserPhoto = !!imageRef && isIdbRef(imageRef);
+  // A user photo is either a freshly picked image (pending) or an already-uploaded remote URL.
+  const isUserPhoto = !!pendingDataUrl || (!!imageRef && isRemoteImage(imageRef));
 
   function toggleMealTime(value: string) {
     setSelectedMealTimes((prev) =>
@@ -172,25 +212,59 @@ export function RecipeForm({ open, onClose, initialRecipe }: RecipeFormProps) {
     return Object.keys(e).length === 0;
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!validate()) return;
+    if (!validate() || submitting) return;
 
-    const resolvedRef = imageRef ?? getDishImage(name.trim()) ?? dishGradient(name.trim());
+    setSubmitting(true);
+    setErrors((prev) => { const n = { ...prev }; delete n.submit; return n; });
+
+    let resolvedImageUrl: string | undefined;
+    let uploadedUrl: string | undefined; // track for orphan cleanup on DB failure
+
+    try {
+      if (pendingDataUrl) {
+        // Upload the freshly-picked, compressed image to Supabase Storage on submit.
+        const file = dataUrlToFile(pendingDataUrl, name.trim() || 'recipe');
+        uploadedUrl = await uploadRecipeImage(file, currentFamilyGroupId);
+        resolvedImageUrl = uploadedUrl;
+      } else {
+        // No new photo: keep existing remote/library URL, else fall back to library/gradient.
+        resolvedImageUrl = imageRef ?? getDishImage(name.trim()) ?? dishGradient(name.trim());
+      }
+    } catch (err) {
+      console.error('[RecipeForm] image upload failed', err);
+      setErrors((prev) => ({ ...prev, submit: 'فشل رفع الصورة، حاول مرة أخرى' }));
+      setSubmitting(false);
+      return; // keep form open for retry
+    }
+
     const data = {
       name: name.trim(),
       ingredients: ingredients.filter((i) => i.trim()),
       steps: steps.filter((s) => s.trim()),
       prepTime: prepTime ? parseInt(prepTime) : undefined,
       mealTime: selectedMealTimes as MealTime[],
-      imageUrl: resolvedRef,
+      imageUrl: resolvedImageUrl,
+    };
+
+    // If the DB write fails, delete the orphaned uploaded image and surface an error.
+    const handleDbError = () => {
+      if (uploadedUrl) deleteRecipeImage(uploadedUrl).catch(() => {});
+      setErrors((prev) => ({ ...prev, submit: 'فشل حفظ الوصفة، حاول مرة أخرى' }));
+      setSubmitting(false);
     };
 
     if (isEditing) {
-      updateRecipe(initialRecipe.id, data);
+      updateRecipe(initialRecipe.id, data, handleDbError);
     } else {
-      addRecipe({ ...data, familyGroupId: currentFamilyGroupId, favoritedBy: [], createdBy: currentUserId });
+      addRecipe(
+        { ...data, familyGroupId: currentFamilyGroupId, favoritedBy: [], createdBy: currentUserId },
+        handleDbError,
+      );
     }
+
+    // Optimistic close: the store applies the change immediately and rolls back on failure.
     onClose();
   }
 
@@ -237,8 +311,11 @@ export function RecipeForm({ open, onClose, initialRecipe }: RecipeFormProps) {
             {/* Buttons */}
             <div style={{ flex: 1 }}>
               <p style={{ fontSize: 12, marginBottom: 8, color: hasImage ? 'var(--accent-strong)' : 'var(--text-muted)', fontWeight: hasImage ? 600 : 400 }}>
-                {compressing ? 'جاري حفظ الصورة...' : hasImage ? (isUserPhoto ? 'صورة مخصصة ✓' : 'صورة من المكتبة ✓') : 'أضف صورة للوجبة'}
+                {compressing ? 'جاري معالجة الصورة...' : hasImage ? (isUserPhoto ? 'صورة مخصصة ✓' : 'صورة من المكتبة ✓') : 'أضف صورة للوجبة'}
               </p>
+              {errors.image && (
+                <p style={{ fontSize: 11, marginBottom: 6, color: 'var(--danger)' }}>{errors.image}</p>
+              )}
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 <button type="button" onClick={() => cameraRef.current?.click()} disabled={compressing}
                   style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 12px', borderRadius: 12, background: 'rgba(163,177,138,0.12)', border: '1px solid rgba(163,177,138,0.28)', color: 'var(--accent-strong)', fontSize: 12, fontWeight: 700, cursor: compressing ? 'wait' : 'pointer', fontFamily: 'inherit', opacity: compressing ? 0.6 : 1 }}>
@@ -319,7 +396,14 @@ export function RecipeForm({ open, onClose, initialRecipe }: RecipeFormProps) {
           </div>
         </FormField>
 
-        <SubmitButton label={isEditing ? 'حفظ التعديلات' : 'حفظ الوصفة'} />
+        {errors.submit && (
+          <p className="text-sm text-center" style={{ color: 'var(--danger)' }}>{errors.submit}</p>
+        )}
+        <SubmitButton
+          label={isEditing ? 'حفظ التعديلات' : 'حفظ الوصفة'}
+          loading={submitting}
+          disabled={compressing}
+        />
       </form>
     </BottomSheet>
   );

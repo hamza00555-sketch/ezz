@@ -83,8 +83,8 @@ interface AppState {
   removeMealOption: (date: string, meal: 'breakfast' | 'lunch' | 'dinner', option: string) => void;
 
   // Recipe actions
-  addRecipe: (recipe: Omit<Recipe, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  updateRecipe: (id: string, data: Omit<Partial<Recipe>, 'id' | 'familyGroupId' | 'createdBy' | 'createdAt'>) => void;
+  addRecipe: (recipe: Omit<Recipe, 'id' | 'createdAt' | 'updatedAt'>, onError?: () => void) => void;
+  updateRecipe: (id: string, data: Omit<Partial<Recipe>, 'id' | 'familyGroupId' | 'createdBy' | 'createdAt'>, onError?: () => void) => void;
 
   // Announcement actions
   confirmAnnouncement: (annId: string, memberId: string) => void;
@@ -389,7 +389,7 @@ export const useAppStore = create<AppState>()(persist((set, get) => ({
     }
   },
 
-  addRecipe: (recipeData) => {
+  addRecipe: (recipeData, onError) => {
     const localId = `rec-${generateId()}`;
     const now = new Date().toISOString();
     set((state) => ({
@@ -401,6 +401,7 @@ export const useAppStore = create<AppState>()(persist((set, get) => ({
           if (error) {
             console.error('[addRecipe] insert failed, rolling back', error);
             set((s) => ({ recipes: s.recipes.filter((r) => r.id !== localId) }));
+            onError?.();
             return;
           }
           if (data?.id && data.id !== localId) {
@@ -410,11 +411,12 @@ export const useAppStore = create<AppState>()(persist((set, get) => ({
       ).catch((err) => {
         console.error('[addRecipe] sync error, rolling back', err);
         set((s) => ({ recipes: s.recipes.filter((r) => r.id !== localId) }));
+        onError?.();
       });
     }
   },
 
-  updateRecipe: (id, data) => {
+  updateRecipe: (id, data, onError) => {
     const now = new Date().toISOString();
     const previous = get().recipes.find((r) => r.id === id);
     set((state) => ({
@@ -430,9 +432,10 @@ export const useAppStore = create<AppState>()(persist((set, get) => ({
             if (previous) {
               set((s) => ({ recipes: s.recipes.map((r) => r.id === id ? previous : r) }));
             }
+            onError?.();
           }
         })
-      ).catch((err) => console.error('[updateRecipe] sync error', err));
+      ).catch((err) => { console.error('[updateRecipe] sync error', err); onError?.(); });
     }
   },
 

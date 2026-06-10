@@ -486,14 +486,33 @@ export async function dbAddAnnouncement(announcement: Omit<Announcement, 'id' | 
 
 export async function uploadRecipeImage(file: File, familyGroupId: string) {
   const sb = createClient();
-  const extension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+  // Derive extension from MIME type (canvas-compressed blobs have no filename ext)
+  const mimeExt: Record<string, string> = {
+    'image/webp': 'webp', 'image/jpeg': 'jpg', 'image/jpg': 'jpg',
+    'image/png': 'png', 'image/gif': 'gif', 'image/avif': 'avif',
+  };
+  const extension =
+    mimeExt[file.type] || file.name.split('.').pop()?.toLowerCase() || 'jpg';
   const path = `${familyGroupId}/${crypto.randomUUID()}.${extension}`;
   const { error } = await sb.storage.from('recipe-images').upload(path, file, {
     cacheControl: '3600',
+    contentType: file.type || undefined,
     upsert: false,
   });
   if (error) throw error;
   return sb.storage.from('recipe-images').getPublicUrl(path).data.publicUrl;
+}
+
+/** Best-effort delete of a recipe image given its public URL (cleanup on failed save). */
+export async function deleteRecipeImage(publicUrl: string): Promise<void> {
+  if (!publicUrl) return;
+  const marker = '/recipe-images/';
+  const idx = publicUrl.indexOf(marker);
+  if (idx === -1) return; // not a Storage URL — nothing to clean up
+  const path = publicUrl.slice(idx + marker.length).split('?')[0];
+  if (!path) return;
+  const sb = createClient();
+  await sb.storage.from('recipe-images').remove([path]);
 }
 
 export async function dbAddExpense(expense: Omit<Expense, 'id' | 'createdAt' | 'updatedAt'>) {

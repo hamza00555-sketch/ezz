@@ -1,11 +1,10 @@
 'use client';
 
 import { useState, useEffect, type ReactNode } from 'react';
-import { resolveImage, isIdbRef } from '@/lib/imageStore';
 import { dishGradient, getDishImage } from '@/lib/dishImages';
 
 interface RecipeImageProps {
-  /** Stored imageUrl: idb: ref, /path, linear-gradient, or undefined */
+  /** Stored imageUrl: remote https URL, /library-path, linear-gradient, or undefined */
   imageUrl?: string;
   /** Used for gradient fallback and library lookup when imageUrl is unset */
   name: string;
@@ -17,10 +16,10 @@ interface RecipeImageProps {
   style?: React.CSSProperties;
 }
 
-function getInitialUrl(imageUrl: string | undefined, name: string): string | undefined {
-  if (!imageUrl) return getDishImage(name); // library lookup as fallback
-  if (isIdbRef(imageUrl)) return undefined; // async — will load in effect
-  return imageUrl; // gradient string or regular path
+function resolveUrl(imageUrl: string | undefined, name: string): string | undefined {
+  // Legacy idb: refs are no longer supported (images now live in Supabase Storage).
+  if (!imageUrl || imageUrl.startsWith('idb:')) return getDishImage(name);
+  return imageUrl;
 }
 
 export function RecipeImage({
@@ -34,23 +33,11 @@ export function RecipeImage({
   style,
 }: RecipeImageProps) {
   const [displayUrl, setDisplayUrl] = useState<string | undefined>(
-    () => getInitialUrl(imageUrl, name)
+    () => resolveUrl(imageUrl, name)
   );
 
   useEffect(() => {
-    if (!imageUrl) {
-      setDisplayUrl(getDishImage(name));
-      return;
-    }
-    if (!isIdbRef(imageUrl)) {
-      setDisplayUrl(imageUrl);
-      return;
-    }
-    let alive = true;
-    resolveImage(imageUrl).then((url) => {
-      if (alive) setDisplayUrl(url ?? getDishImage(name));
-    });
-    return () => { alive = false; };
+    setDisplayUrl(resolveUrl(imageUrl, name));
   }, [imageUrl, name]);
 
   const isGradient = displayUrl?.startsWith('linear-gradient');
