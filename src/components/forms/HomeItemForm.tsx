@@ -48,8 +48,9 @@ export function HomeItemForm({ open, onClose }: HomeItemFormProps) {
     e.preventDefault();
     if (!validate()) return;
 
-    const newItem: HomeItem = {
-      id: `item-${Date.now()}`,
+    const localId = `item-${Date.now()}`;
+    const now = new Date().toISOString();
+    const itemData: Omit<HomeItem, 'id' | 'createdAt' | 'updatedAt'> = {
       familyGroupId: currentFamilyGroupId,
       name: name.trim(),
       category,
@@ -59,13 +60,33 @@ export function HomeItemForm({ open, onClose }: HomeItemFormProps) {
       warrantyExpiry: warrantyExpiry ? new Date(warrantyExpiry).toISOString() : undefined,
       notes: notes.trim() || undefined,
       createdBy: currentUserId,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
     };
 
+    // Optimistic local insert
     useAppStore.setState((state) => ({
-      homeItems: [...state.homeItems, newItem],
+      homeItems: [...state.homeItems, { ...itemData, id: localId, createdAt: now, updatedAt: now }],
     }));
+
+    // Sync to Supabase + replace local id with the real DB id (or roll back on failure)
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      import('@/lib/supabase/db').then(({ dbAddHomeItem }) =>
+        dbAddHomeItem(itemData).then(({ data, error }) => {
+          if (error) {
+            console.error('[HomeItemForm] insert failed, rolling back', error);
+            useAppStore.setState((s) => ({ homeItems: s.homeItems.filter((i) => i.id !== localId) }));
+            return;
+          }
+          if (data?.id && data.id !== localId) {
+            useAppStore.setState((s) => ({
+              homeItems: s.homeItems.map((i) => (i.id === localId ? { ...i, id: data.id } : i)),
+            }));
+          }
+        })
+      ).catch((err) => {
+        console.error('[HomeItemForm] sync error, rolling back', err);
+        useAppStore.setState((s) => ({ homeItems: s.homeItems.filter((i) => i.id !== localId) }));
+      });
+    }
 
     setName(''); setCategory('appliances'); setLocation('');
     setPurchaseDate(''); setPrice(''); setWarrantyExpiry(''); setNotes('');

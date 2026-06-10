@@ -46,8 +46,9 @@ export function DocumentForm({ open, onClose }: DocumentFormProps) {
     e.preventDefault();
     if (!validate()) return;
 
-    const newDoc: Document = {
-      id: `doc-${Date.now()}`,
+    const localId = `doc-${Date.now()}`;
+    const now = new Date().toISOString();
+    const docData: Omit<Document, 'id' | 'createdAt' | 'updatedAt'> = {
       familyGroupId: currentFamilyGroupId,
       name: name.trim(),
       type: type as Document['type'],
@@ -57,13 +58,33 @@ export function DocumentForm({ open, onClose }: DocumentFormProps) {
       visibility: 'all',
       notes: notes.trim() || undefined,
       createdBy: currentUserId,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
     };
 
+    // Optimistic local insert
     useAppStore.setState((state) => ({
-      documents: [...state.documents, newDoc],
+      documents: [...state.documents, { ...docData, id: localId, createdAt: now, updatedAt: now }],
     }));
+
+    // Sync to Supabase + replace local id with the real DB id (or roll back on failure)
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      import('@/lib/supabase/db').then(({ dbAddDocument }) =>
+        dbAddDocument(docData).then(({ data, error }) => {
+          if (error) {
+            console.error('[DocumentForm] insert failed, rolling back', error);
+            useAppStore.setState((s) => ({ documents: s.documents.filter((d) => d.id !== localId) }));
+            return;
+          }
+          if (data?.id && data.id !== localId) {
+            useAppStore.setState((s) => ({
+              documents: s.documents.map((d) => (d.id === localId ? { ...d, id: data.id } : d)),
+            }));
+          }
+        })
+      ).catch((err) => {
+        console.error('[DocumentForm] sync error, rolling back', err);
+        useAppStore.setState((s) => ({ documents: s.documents.filter((d) => d.id !== localId) }));
+      });
+    }
 
     setName(''); setType('other'); setLinkedItemId('');
     setExpiryDate(''); setReminderDays('30'); setNotes('');

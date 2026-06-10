@@ -150,25 +150,50 @@ export function AnnouncementForm({ open, onClose }: AnnouncementFormProps) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!validate()) return;
+
+    const localId = `ann-${Date.now()}`;
+    const now = new Date().toISOString();
+    const annData = {
+      familyGroupId: currentFamilyGroupId,
+      title: title.trim(),
+      message: message.trim(),
+      publishedBy: currentUserId,
+      audience: 'all' as const,
+      requiresConfirmation,
+      confirmedBy: [] as string[],
+      status: 'active' as const,
+      isPinned,
+    };
+
+    // Optimistic local insert
     useAppStore.setState((state) => ({
       announcements: [
         ...state.announcements,
-        {
-          id: `ann-${Date.now()}`,
-          familyGroupId: currentFamilyGroupId,
-          title: title.trim(),
-          message: message.trim(),
-          publishedBy: currentUserId,
-          audience: 'all' as const,
-          requiresConfirmation,
-          confirmedBy: [] as string[],
-          status: 'active' as const,
-          isPinned,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
+        { ...annData, id: localId, createdAt: now, updatedAt: now },
       ],
     }));
+
+    // Sync to Supabase + replace local id with the real DB id (or roll back on failure)
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      import('@/lib/supabase/db').then(({ dbAddAnnouncement }) =>
+        dbAddAnnouncement(annData).then(({ data, error }) => {
+          if (error) {
+            console.error('[AnnouncementForm] insert failed, rolling back', error);
+            useAppStore.setState((s) => ({ announcements: s.announcements.filter((a) => a.id !== localId) }));
+            return;
+          }
+          if (data?.id && data.id !== localId) {
+            useAppStore.setState((s) => ({
+              announcements: s.announcements.map((a) => (a.id === localId ? { ...a, id: data.id } : a)),
+            }));
+          }
+        })
+      ).catch((err) => {
+        console.error('[AnnouncementForm] sync error, rolling back', err);
+        useAppStore.setState((s) => ({ announcements: s.announcements.filter((a) => a.id !== localId) }));
+      });
+    }
+
     setTitle(''); setMessage(''); setNaturalText('');
     setIsPinned(false); setRequiresConfirmation(false);
     setAnalysis(null);
