@@ -280,37 +280,62 @@ export interface FamilyData {
   announcements: Announcement[];
 }
 
+// Cap on unbounded collections to keep mobile payloads small.
+const FETCH_LIMIT = 100;
+
 export async function fetchFamilyData(familyGroupId: string): Promise<FamilyData | null> {
   const sb = createClient();
 
-  const [
-    membersRes, tasksRes, requestsRes, homeItemsRes, docsRes,
-    maintRes, shortagesRes, recipesRes, mealPlansRes, wishRes,
-    walletsRes, expensesRes, announcementsRes, groupRes,
-  ] = await Promise.all([
-    sb.from('profiles').select('*').eq('family_group_id', familyGroupId),
-    sb.from('tasks').select('*').eq('family_group_id', familyGroupId).is('deleted_at', null),
-    sb.from('requests').select('*').eq('family_group_id', familyGroupId),
-    sb.from('home_items').select('*').eq('family_group_id', familyGroupId),
-    sb.from('documents').select('*').eq('family_group_id', familyGroupId),
-    sb.from('maintenance_records').select('*').eq('family_group_id', familyGroupId),
-    sb.from('kitchen_shortages').select('*').eq('family_group_id', familyGroupId),
-    sb.from('recipes').select('*').eq('family_group_id', familyGroupId),
-    sb.from('meal_plans').select('*').eq('family_group_id', familyGroupId),
-    sb.from('wish_items').select('*').eq('family_group_id', familyGroupId),
-    sb.from('wallets').select('*').eq('family_group_id', familyGroupId),
-    sb.from('expenses').select('*').eq('family_group_id', familyGroupId),
-    sb.from('announcements').select('*').eq('family_group_id', familyGroupId),
+  // The family group + members are always needed and are small. Fetch them first
+  // so a brand-new family (no content rows yet) can short-circuit the 12 other queries.
+  const [groupRes, membersRes] = await Promise.all([
     sb.from('family_groups').select('*').eq('id', familyGroupId).single(),
+    sb.from('profiles').select('*').eq('family_group_id', familyGroupId),
   ]);
 
   if (groupRes.error || !groupRes.data) return null;
 
   const members = (membersRes.data ?? []).map(toMember);
   const memberIds = members.map((m) => m.id);
+  const familyGroup = toFamilyGroup(groupRes.data, memberIds);
+
+  const emptyData: FamilyData = {
+    familyGroup, members,
+    tasks: [], requests: [], homeItems: [], documents: [], maintenance: [],
+    shortages: [], recipes: [], mealPlans: [], wishItems: [], wallets: [],
+    expenses: [], announcements: [],
+  };
+
+  // New family fast-path: a freshly created group has the single creator and no
+  // content yet. Skip the 12 content queries entirely.
+  const createdRecently =
+    !!groupRes.data.created_at &&
+    Date.now() - new Date(groupRes.data.created_at).getTime() < 5 * 60 * 1000;
+  if (members.length <= 1 && createdRecently) {
+    return emptyData;
+  }
+
+  const [
+    tasksRes, requestsRes, homeItemsRes, docsRes,
+    maintRes, shortagesRes, recipesRes, mealPlansRes, wishRes,
+    walletsRes, expensesRes, announcementsRes,
+  ] = await Promise.all([
+    sb.from('tasks').select('*').eq('family_group_id', familyGroupId).is('deleted_at', null).order('created_at', { ascending: false }).limit(FETCH_LIMIT),
+    sb.from('requests').select('*').eq('family_group_id', familyGroupId).order('created_at', { ascending: false }).limit(FETCH_LIMIT),
+    sb.from('home_items').select('*').eq('family_group_id', familyGroupId).order('created_at', { ascending: false }).limit(FETCH_LIMIT),
+    sb.from('documents').select('*').eq('family_group_id', familyGroupId).order('created_at', { ascending: false }).limit(FETCH_LIMIT),
+    sb.from('maintenance_records').select('*').eq('family_group_id', familyGroupId).order('date', { ascending: false }).limit(FETCH_LIMIT),
+    sb.from('kitchen_shortages').select('*').eq('family_group_id', familyGroupId).order('created_at', { ascending: false }).limit(FETCH_LIMIT),
+    sb.from('recipes').select('*').eq('family_group_id', familyGroupId).order('created_at', { ascending: false }).limit(FETCH_LIMIT),
+    sb.from('meal_plans').select('*').eq('family_group_id', familyGroupId).order('date', { ascending: false }).limit(FETCH_LIMIT),
+    sb.from('wish_items').select('*').eq('family_group_id', familyGroupId).order('created_at', { ascending: false }).limit(FETCH_LIMIT),
+    sb.from('wallets').select('*').eq('family_group_id', familyGroupId).limit(FETCH_LIMIT),
+    sb.from('expenses').select('*').eq('family_group_id', familyGroupId).order('date', { ascending: false }).limit(FETCH_LIMIT),
+    sb.from('announcements').select('*').eq('family_group_id', familyGroupId).order('created_at', { ascending: false }).limit(FETCH_LIMIT),
+  ]);
 
   return {
-    familyGroup: toFamilyGroup(groupRes.data, memberIds),
+    familyGroup,
     members,
     tasks: (tasksRes.data ?? []).map(toTask),
     requests: (requestsRes.data ?? []).map(toRequest),
