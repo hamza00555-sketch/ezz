@@ -30,6 +30,7 @@ interface AppState {
   currentFamilyGroupId: string;
   isLoaded: boolean;
   appReady: boolean;
+  lastLoadedAt: number;
 
   familyGroups: FamilyGroup[];
   members: FamilyMember[];
@@ -55,6 +56,7 @@ interface AppState {
   loadFromSupabase: (userId: string, familyGroupId: string) => Promise<void>;
   setCurrentUser: (userId: string, familyGroupId: string) => void;
   setAppReady: (v: boolean) => void;
+  clearUserData: () => void;
 
   // Actions
   setCurrentFamilyGroup: (id: string) => void;
@@ -101,6 +103,7 @@ export const useAppStore = create<AppState>()(persist((set, get) => ({
   currentFamilyGroupId: FAMILY_GROUP_ID,
   isLoaded: false,
   appReady: false,
+  lastLoadedAt: 0,
 
   familyGroups: [],
   members: [],
@@ -126,6 +129,28 @@ export const useAppStore = create<AppState>()(persist((set, get) => ({
 
   setAppReady: (v) => set({ appReady: v }),
 
+  clearUserData: () => set({
+    currentUserId: '',
+    currentFamilyGroupId: '',
+    familyGroups: [],
+    members: [],
+    tasks: [],
+    requests: [],
+    homeItems: [],
+    documents: [],
+    maintenance: [],
+    shortages: [],
+    recipes: [],
+    mealPlans: [],
+    wishItems: [],
+    wallets: [],
+    expenses: [],
+    announcements: [],
+    isLoaded: false,
+    appReady: false,
+    lastLoadedAt: 0,
+  }),
+
   loadFromSupabase: async (userId, familyGroupId) => {
     const { fetchFamilyData } = await import('@/lib/supabase/db');
     const data = await fetchFamilyData(familyGroupId);
@@ -148,6 +173,7 @@ export const useAppStore = create<AppState>()(persist((set, get) => ({
       expenses: data.expenses,
       announcements: data.announcements,
       isLoaded: true,
+      lastLoadedAt: Date.now(),
     });
   },
 
@@ -470,6 +496,8 @@ export const useAppStore = create<AppState>()(persist((set, get) => ({
 }), {
   name: 'ezz-app-store-v2',
   partialize: (state) => ({
+    currentUserId:        state.currentUserId,
+    currentFamilyGroupId: state.currentFamilyGroupId,
     familyGroups:  state.familyGroups,
     members:       state.members,
     tasks:         state.tasks,
