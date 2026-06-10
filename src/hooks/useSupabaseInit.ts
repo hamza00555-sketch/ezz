@@ -4,9 +4,15 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/store/appStore';
 
-// Minimum milliseconds between full data refreshes to avoid hammering Supabase
-// on every client-side navigation (AppShell remounts on each page).
+// Minimum milliseconds between full data refreshes. During a single session,
+// client-side navigations (AppShell remounts per page) reuse the in-memory store
+// instead of refetching. lastLoadedAt is NOT persisted, so a cold reload always
+// refetches fresh data.
 const REFRESH_THROTTLE_MS = 30_000;
+
+// All primary routes. We prefetch their JS bundles during the splash so the
+// first visit to each tab is instant instead of fetching a chunk on entry.
+const APP_ROUTES = ['/dashboard', '/tasks', '/kitchen', '/home-section', '/more'];
 
 export function useSupabaseInit() {
   const loadFromSupabase = useAppStore((s) => s.loadFromSupabase);
@@ -16,27 +22,28 @@ export function useSupabaseInit() {
     const store = useAppStore.getState();
     const { setAppReady, clearUserData } = store;
 
+    // Warm every route bundle while the splash is up so tab switches are instant.
+    APP_ROUTES.forEach((r) => { try { router.prefetch(r); } catch { /* noop */ } });
+
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
       setAppReady(true);
       return;
     }
 
-    // Stale-while-revalidate: if we have valid cached credentials + data from a
-    // previous session, reveal the app immediately so the user never waits on
-    // an empty screen. The background refresh below will silently update data.
-    //
-    // If currentFamilyGroupId isn't persisted yet (first load after this update),
-    // try to derive it from the persisted familyGroups array as a fallback.
+    // Recover the family id from persisted groups if it wasn't persisted directly.
     if (!store.currentFamilyGroupId && store.familyGroups.length > 0) {
       useAppStore.setState({ currentFamilyGroupId: store.familyGroups[0].id });
     }
-    const hasCachedData = useAppStore.getState().currentFamilyGroupId !== '' && store.members.length > 0;
-    if (hasCachedData) {
-      setAppReady(true);
-    }
 
-    // True if enough time has passed to warrant a fresh data fetch.
     const isStale = Date.now() - store.lastLoadedAt > REFRESH_THROTTLE_MS;
+
+    // Same-session navigation: data is already fresh in memory, so reveal at once.
+    // This path never shows the splash because appReady is already true from the
+    // first load (the store is a singleton across client-side navigations).
+    if (!isStale) {
+      setAppReady(true);
+      return;
+    }
 
     let subscription: { unsubscribe: () => void } | null = null;
 
@@ -45,31 +52,28 @@ export function useSupabaseInit() {
         const { createClient } = await import('@/lib/supabase/client');
         const sb = createClient();
 
-        // Initial fetch: skip when data is fresh to avoid 12+ queries on every
-        // client-side navigation (AppShell remounts on each page change).
-        if (isStale) {
-          const { data: { session } } = await sb.auth.getSession();
-          if (session?.user) {
-            const { data: profile } = await sb
-              .from('profiles')
-              .select('family_group_id')
-              .eq('id', session.user.id)
-              .single();
-            if (profile?.family_group_id) {
-              await loadFromSupabase(session.user.id, profile.family_group_id);
-            }
+        // Cold start: hold the splash until the full dataset is in the store, so
+        // every page is fully populated the moment the user enters the app.
+        const { data: { session } } = await sb.auth.getSession();
+        if (session?.user) {
+          const { data: profile } = await sb
+            .from('profiles')
+            .select('family_group_id')
+            .eq('id', session.user.id)
+            .single();
+          if (profile?.family_group_id) {
+            await loadFromSupabase(session.user.id, profile.family_group_id);
           }
         }
 
-        // Always subscribe for auth changes — sign-out must be caught regardless
-        // of the throttle so the user gets redirected to /login immediately.
+        // Keep an auth subscription so sign-out / sign-in are caught instantly.
         const { data } = sb.auth.onAuthStateChange(async (event, sess) => {
           if (event === 'SIGNED_OUT') {
             clearUserData();
             router.push('/login');
             return;
           }
-          // INITIAL_SESSION is already handled by getSession() above — skip to
+          // INITIAL_SESSION is already handled by getSession() above — skip it to
           // avoid a redundant second full data fetch on every mount.
           if (event === 'INITIAL_SESSION') return;
           if (sess?.user) {
@@ -87,6 +91,8 @@ export function useSupabaseInit() {
       } catch (err) {
         console.error('[useSupabaseInit]', err);
       } finally {
+        // Reveal the app only after data is loaded (or the attempt failed) — the
+        // splash stays up for the whole cold-start load so entry is smooth.
         setAppReady(true);
       }
     }
