@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -98,10 +98,53 @@
   --shadow-nav:  0 8px 40px rgba(67, 82, 56, 0.14);
 }
 
+/* ─── ezz Brand Tokens (v2 — Navy/Clay Rose identity) ────────────────────── */
+:root {
+  --color-bg:           #F7F2EC;
+  --color-surface:      #FFFDF8;
+  --color-elevated:     #FFFDF8;
+  --color-text:         #0F1B33;
+  --color-text-muted:   #667085;
+  --color-text-inverse: #FFFDF8;
+  --color-accent:       #C97A66;
+  --color-accent-soft:  #F6C9B2;
+  --color-border:       #E8DDD3;
+  --color-success:      #72BFA3;
+  --color-navy:         #0F1B33;
+  --color-peach:        #F6C9B2;
+  --ezz-font: 'Cairo', 'IBM Plex Sans Arabic', sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg:           #07111F;
+    --color-surface:      #101D31;
+    --color-elevated:     #14213A;
+    --color-text:         #FFF7EF;
+    --color-text-muted:   #B8C0CC;
+    --color-text-inverse: #0F1B33;
+    --color-accent:       #D18A76;
+    --color-accent-soft:  rgba(201, 122, 102, 0.20);
+    --color-border:       rgba(255, 247, 239, 0.10);
+  }
+}
+
+.dark {
+  --color-bg:           #07111F;
+  --color-surface:      #101D31;
+  --color-elevated:     #14213A;
+  --color-text:         #FFF7EF;
+  --color-text-muted:   #B8C0CC;
+  --color-text-inverse: #0F1B33;
+  --color-accent:       #D18A76;
+  --color-accent-soft:  rgba(201, 122, 102, 0.20);
+  --color-border:       rgba(255, 247, 239, 0.10);
+}
+
 @theme inline {
   --color-background: var(--bg-app);
   --color-foreground: var(--text-primary);
-  --font-sans: 'IBM Plex Sans Arabic', sans-serif;
+  --font-sans: 'Cairo', 'IBM Plex Sans Arabic', sans-serif;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -112,7 +155,7 @@
 
 html {
   direction: rtl;
-  font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif;
+  font-family: 'Cairo', 'IBM Plex Sans Arabic', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -133,10 +176,10 @@ body {
    ═══════════════════════════════════════════════════════════════════════════ */
 .app-bg {
   background:
-    radial-gradient(circle at top center,  rgba(168, 185, 154, 0.42), transparent 36%),
-    radial-gradient(circle at bottom right, rgba(181, 139, 85,  0.16), transparent 32%),
-    linear-gradient(180deg, #F9F6EE 0%, #F6F2E8 46%, #ECE6DA 100%);
-  color: var(--azz-text-main);
+    radial-gradient(circle at top center,   rgba(246, 201, 178, 0.18), transparent 38%),
+    radial-gradient(circle at bottom right, rgba(15,  27,  51,  0.04), transparent 32%),
+    linear-gradient(180deg, #F7F2EC 0%, #F4EFE8 50%, #EFE8DF 100%);
+  color: var(--color-text);
   min-height: 100dvh;
 }
 
