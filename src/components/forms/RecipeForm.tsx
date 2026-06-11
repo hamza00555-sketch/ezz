@@ -290,13 +290,13 @@ export function RecipeForm({ open, onClose, initialRecipe }: RecipeFormProps) {
             {/* Preview circle */}
             <div style={{
               width: 72, height: 72, borderRadius: 22, overflow: 'hidden', flexShrink: 0,
-              border: hasImage ? '2.5px solid rgba(163,177,138,0.60)' : '2.5px solid rgba(67,82,56,0.14)',
-              boxShadow: hasImage ? '0 6px 20px rgba(67,82,56,0.18)' : '0 2px 8px rgba(67,82,56,0.08)',
+              border: hasImage ? '2.5px solid rgba(201,122,102,0.60)' : '2.5px solid rgba(15,27,51,0.14)',
+              boxShadow: hasImage ? '0 6px 20px rgba(15,27,51,0.18)' : '0 2px 8px rgba(15,27,51,0.08)',
               position: 'relative', transition: 'all 0.3s ease',
             }}>
               {compressing && (
                 <div style={{ position: 'absolute', inset: 0, zIndex: 2, background: 'rgba(255,253,247,0.82)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <div style={{ width: 22, height: 22, borderRadius: '50%', border: '2.5px solid rgba(163,177,138,0.25)', borderTopColor: 'var(--accent-strong)', animation: 'spin 0.8s linear infinite' }} />
+                  <div style={{ width: 22, height: 22, borderRadius: '50%', border: '2.5px solid rgba(201,122,102,0.25)', borderTopColor: 'var(--accent-strong)', animation: 'spin 0.8s linear infinite' }} />
                 </div>
               )}
               {showImg ? (
@@ -318,11 +318,11 @@ export function RecipeForm({ open, onClose, initialRecipe }: RecipeFormProps) {
               )}
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 <button type="button" onClick={() => cameraRef.current?.click()} disabled={compressing}
-                  style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 12px', borderRadius: 12, background: 'rgba(163,177,138,0.12)', border: '1px solid rgba(163,177,138,0.28)', color: 'var(--accent-strong)', fontSize: 12, fontWeight: 700, cursor: compressing ? 'wait' : 'pointer', fontFamily: 'inherit', opacity: compressing ? 0.6 : 1 }}>
+                  style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 12px', borderRadius: 12, background: 'rgba(201,122,102,0.12)', border: '1px solid rgba(201,122,102,0.28)', color: 'var(--accent-strong)', fontSize: 12, fontWeight: 700, cursor: compressing ? 'wait' : 'pointer', fontFamily: 'inherit', opacity: compressing ? 0.6 : 1 }}>
                   <Camera size={13} strokeWidth={2} />صوّر الطبق
                 </button>
                 <button type="button" onClick={() => galleryRef.current?.click()} disabled={compressing}
-                  style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 12px', borderRadius: 12, background: 'rgba(163,177,138,0.12)', border: '1px solid rgba(163,177,138,0.28)', color: 'var(--accent-strong)', fontSize: 12, fontWeight: 700, cursor: compressing ? 'wait' : 'pointer', fontFamily: 'inherit', opacity: compressing ? 0.6 : 1 }}>
+                  style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 12px', borderRadius: 12, background: 'rgba(201,122,102,0.12)', border: '1px solid rgba(201,122,102,0.28)', color: 'var(--accent-strong)', fontSize: 12, fontWeight: 700, cursor: compressing ? 'wait' : 'pointer', fontFamily: 'inherit', opacity: compressing ? 0.6 : 1 }}>
                   <ImageIcon size={13} strokeWidth={2} />من المعرض
                 </button>
                 {isUserPhoto && (
@@ -346,7 +346,7 @@ export function RecipeForm({ open, onClose, initialRecipe }: RecipeFormProps) {
                 <button key={t.value} type="button" onClick={() => toggleMealTime(t.value)}
                   className="px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all"
                   style={{
-                    background: selectedMealTimes.includes(t.value) ? 'rgba(176,141,87,0.20)' : 'rgba(67,82,56,0.05)',
+                    background: selectedMealTimes.includes(t.value) ? 'rgba(201,122,102,0.20)' : 'rgba(15,27,51,0.05)',
                     color: selectedMealTimes.includes(t.value) ? 'var(--bronze)' : 'var(--text-secondary)',
                     border: `1px solid ${selectedMealTimes.includes(t.value) ? 'transparent' : 'var(--border-soft)'}`,
                   }}>
@@ -379,7 +379,7 @@ export function RecipeForm({ open, onClose, initialRecipe }: RecipeFormProps) {
           <div className="flex flex-col gap-2">
             {steps.map((step, i) => (
               <div key={i} className="flex gap-2 items-start">
-                <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-3" style={{ background: 'rgba(176,141,87,0.18)', color: 'var(--bronze)' }}>
+                <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-3" style={{ background: 'rgba(201,122,102,0.18)', color: 'var(--bronze)' }}>
                   {i + 1}
                 </span>
                 <Input value={step} onChange={(e) => updateStep(i, e.target.value)} placeholder={`الخطوة ${i + 1}`} className="flex-1" />

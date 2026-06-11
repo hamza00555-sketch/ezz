@@ -19,9 +19,9 @@ interface CalEntry {
 }
 
 const typeConfig = {
-  task:        { icon: CheckSquare, color: 'var(--accent-strong)', bg: 'rgba(163,177,138,0.14)', label: 'مهمة'  },
-  maintenance: { icon: Wrench,      color: 'var(--bronze)',        bg: 'rgba(176,141,87,0.15)',  label: 'صيانة' },
-  warranty:    { icon: ShieldAlert, color: '#C5A3FF',              bg: 'rgba(197,163,255,0.12)', label: 'ضمان'  },
+  task:        { icon: CheckSquare, color: 'var(--accent-strong)', bg: 'rgba(201,122,102,0.10)', label: 'مهمة'  },
+  maintenance: { icon: Wrench,      color: 'var(--bronze)',        bg: 'rgba(201,122,102,0.10)', label: 'صيانة' },
+  warranty:    { icon: ShieldAlert, color: 'var(--info)',          bg: 'var(--info-soft)',        label: 'ضمان'  },
   document:    { icon: FileWarning, color: 'var(--danger)',        bg: 'var(--danger-soft)',      label: 'وثيقة' },
 };
 
@@ -142,7 +142,7 @@ export default function CalendarPage() {
           <span
             style={{
               fontSize: 11, padding: '1px 7px', borderRadius: 10,
-              background: 'rgba(67,82,56,0.06)',
+              background: 'rgba(15,27,51,0.06)',
               color: 'var(--text-muted)', fontWeight: 600,
             }}
           >

@@ -56,7 +56,7 @@ export function BottomSheet({ open, onClose, title, children, height = 'auto' }:
           <button
             onClick={onClose}
             className="p-2 rounded-full"
-            style={{ background: 'rgba(255,255,255,0.07)' }}
+            style={{ background: 'rgba(15,27,51,0.06)' }}
           >
             <X size={18} color="var(--text-secondary)" />
           </button>

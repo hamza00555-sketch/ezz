@@ -209,8 +209,8 @@ export function AnnouncementForm({ open, onClose }: AnnouncementFormProps) {
           style={{
             padding: '14px',
             borderRadius: 18,
-            background: 'rgba(176,141,87,0.08)',
-            border: '1px solid rgba(176,141,87,0.22)',
+            background: 'rgba(201,122,102,0.08)',
+            border: '1px solid rgba(201,122,102,0.22)',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
@@ -228,8 +228,8 @@ export function AnnouncementForm({ open, onClose }: AnnouncementFormProps) {
             rows={3}
             style={{
               width: '100%',
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(176,141,87,0.18)',
+              background: 'rgba(15,27,51,0.04)',
+              border: '1px solid rgba(201,122,102,0.18)',
               borderRadius: 12, padding: '10px 12px',
               color: 'var(--text-primary)', fontSize: 13,
               fontFamily: 'inherit', direction: 'rtl',
@@ -245,24 +245,24 @@ export function AnnouncementForm({ open, onClose }: AnnouncementFormProps) {
               <span
                 style={{
                   fontSize: 11, padding: '3px 10px', borderRadius: 20,
-                  background: 'rgba(176,141,87,0.18)', color: 'var(--bronze)',
-                  border: '1px solid rgba(176,141,87,0.25)',
+                  background: 'rgba(201,122,102,0.18)', color: 'var(--bronze)',
+                  border: '1px solid rgba(201,122,102,0.25)',
                 }}
               >
                 {typeLabels[analysis.detectedType]}
               </span>
               {analysis.detectedDay && (
-                <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: 'rgba(255,255,255,0.07)', color: 'var(--text-secondary)' }}>
+                <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: 'rgba(15,27,51,0.06)', color: 'var(--text-secondary)' }}>
                   📅 {analysis.detectedDay}
                 </span>
               )}
               {analysis.detectedTime && (
-                <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: 'rgba(255,255,255,0.07)', color: 'var(--text-secondary)' }}>
+                <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: 'rgba(15,27,51,0.06)', color: 'var(--text-secondary)' }}>
                   🕐 {analysis.detectedTime}
                 </span>
               )}
               {analysis.detectedLocation && (
-                <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: 'rgba(255,255,255,0.07)', color: 'var(--text-secondary)' }}>
+                <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: 'rgba(15,27,51,0.06)', color: 'var(--text-secondary)' }}>
                   📍 {analysis.detectedLocation}
                 </span>
               )}
@@ -277,9 +277,9 @@ export function AnnouncementForm({ open, onClose }: AnnouncementFormProps) {
               display: 'flex', alignItems: 'center', gap: 6,
               marginTop: analysis ? 0 : 8,
               padding: '7px 14px', borderRadius: 10,
-              background: naturalText.trim() ? 'rgba(176,141,87,0.18)' : 'rgba(255,255,255,0.05)',
+              background: naturalText.trim() ? 'rgba(201,122,102,0.18)' : 'rgba(15,27,51,0.04)',
               color: naturalText.trim() ? 'var(--bronze)' : 'var(--text-muted)',
-              border: `1px solid ${naturalText.trim() ? 'rgba(176,141,87,0.30)' : 'rgba(255,255,255,0.08)'}`,
+              border: `1px solid ${naturalText.trim() ? 'rgba(201,122,102,0.30)' : 'rgba(15,27,51,0.06)'}`,
               cursor: naturalText.trim() ? 'pointer' : 'not-allowed',
               fontFamily: 'inherit', fontSize: 12, fontWeight: 700,
             }}
@@ -314,7 +314,7 @@ export function AnnouncementForm({ open, onClose }: AnnouncementFormProps) {
         <div className="flex flex-col gap-2">
           <label
             className="flex items-center gap-3 p-3.5 rounded-xl cursor-pointer"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border-soft)' }}
+            style={{ background: 'rgba(15,27,51,0.03)', border: '1px solid var(--border-soft)' }}
           >
             <input
               type="checkbox"
@@ -330,7 +330,7 @@ export function AnnouncementForm({ open, onClose }: AnnouncementFormProps) {
 
           <label
             className="flex items-center gap-3 p-3.5 rounded-xl cursor-pointer"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border-soft)' }}
+            style={{ background: 'rgba(15,27,51,0.03)', border: '1px solid var(--border-soft)' }}
           >
             <input
               type="checkbox"

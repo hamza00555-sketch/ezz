@@ -39,8 +39,8 @@ export default function ExpensesPage() {
         <div
           style={{
             padding: 20, borderRadius: 24,
-            background: 'linear-gradient(135deg, rgba(176,141,87,0.30) 0%, rgba(176,141,87,0.14) 60%, rgba(28,32,39,0.80) 100%)',
-            border: '1px solid rgba(176,141,87,0.30)',
+            background: 'linear-gradient(135deg, rgba(201,122,102,0.30) 0%, rgba(201,122,102,0.14) 60%, rgba(28,32,39,0.80) 100%)',
+            border: '1px solid rgba(201,122,102,0.30)',
           }}
         >
           <p style={{ fontSize: 13, color: 'rgba(245,242,234,0.70)', marginBottom: 4 }}>إجمالي الشهر</p>
@@ -50,7 +50,7 @@ export default function ExpensesPage() {
           <p style={{ fontSize: 13, color: 'rgba(245,242,234,0.60)', marginTop: 4 }}>
             من {formatCurrency(totalBudget)}
           </p>
-          <div style={{ marginTop: 16, height: 6, borderRadius: 6, background: 'rgba(255,255,255,0.15)' }}>
+          <div style={{ marginTop: 16, height: 6, borderRadius: 6, background: 'rgba(15,27,51,0.10)' }}>
             <div
               style={{
                 height: 6, borderRadius: 6, transition: 'width 0.4s ease',
@@ -90,7 +90,7 @@ export default function ExpensesPage() {
                         {isOver ? 'تجاوز' : 'متبقي'} {formatCurrency(Math.abs(remaining))}
                       </p>
                     </div>
-                    <div style={{ height: 5, borderRadius: 5, marginBottom: 8, background: 'rgba(255,255,255,0.08)' }}>
+                    <div style={{ height: 5, borderRadius: 5, marginBottom: 8, background: 'rgba(15,27,51,0.06)' }}>
                       <div
                         style={{
                           height: 5, borderRadius: 5, transition: 'width 0.4s ease',
@@ -136,7 +136,7 @@ export default function ExpensesPage() {
                       </p>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
                         {wallet && (
-                          <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, background: 'rgba(255,255,255,0.07)', color: 'var(--text-muted)' }}>
+                          <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, background: 'rgba(15,27,51,0.06)', color: 'var(--text-muted)' }}>
                             {wallet.name}
                           </span>
                         )}

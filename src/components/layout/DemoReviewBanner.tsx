@@ -32,10 +32,10 @@ export function DemoReviewBanner() {
         alignItems: 'flex-end',
         justifyContent: 'space-between',
         padding: '0 16px calc(6px)',
-        background: 'rgba(176,141,87,0.92)',
+        background: 'rgba(201,122,102,0.92)',
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
-        borderBottom: '1px solid rgba(176,141,87,0.4)',
+        borderBottom: '1px solid rgba(201,122,102,0.4)',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>

@@ -105,7 +105,7 @@ export function ShortageForm({ open, onClose }: ShortageFormProps) {
                 onClick={() => setPriority(p.value)}
                 className="py-2 rounded-xl text-xs font-medium transition-all"
                 style={{
-                  background: priority === p.value ? 'var(--bronze)' : 'rgba(255,255,255,0.06)',
+                  background: priority === p.value ? 'var(--bronze)' : 'rgba(15,27,51,0.05)',
                   color: priority === p.value ? '#0D0F12' : 'var(--text-secondary)',
                   border: `1px solid ${priority === p.value ? 'transparent' : 'var(--border-soft)'}`,
                 }}

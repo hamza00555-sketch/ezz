@@ -38,7 +38,7 @@ export function Input({ error, className, style, ...props }: InputProps) {
         className
       )}
       style={{
-        background: error ? 'rgba(249,112,102,0.08)' : 'rgba(255,255,255,0.05)',
+        background: error ? 'rgba(215,92,92,0.08)' : 'var(--color-bg, #F7F2EC)',
         border: `1px solid ${error ? 'var(--danger)' : 'var(--border-soft)'}`,
         color: 'var(--text-primary)',
         ...style,
@@ -61,7 +61,7 @@ export function Textarea({ error, className, style, ...props }: TextareaProps) {
         className
       )}
       style={{
-        background: error ? 'rgba(249,112,102,0.08)' : 'rgba(255,255,255,0.05)',
+        background: error ? 'rgba(215,92,92,0.08)' : 'var(--color-bg, #F7F2EC)',
         border: `1px solid ${error ? 'var(--danger)' : 'var(--border-soft)'}`,
         color: 'var(--text-primary)',
         ...style,
@@ -86,7 +86,7 @@ export function Select({ error, placeholder, className, style, children, ...prop
         className
       )}
       style={{
-        background: error ? 'rgba(249,112,102,0.08)' : 'rgba(255,255,255,0.05)',
+        background: error ? 'rgba(215,92,92,0.08)' : 'var(--color-bg, #F7F2EC)',
         border: `1px solid ${error ? 'var(--danger)' : 'var(--border-soft)'}`,
         color: 'var(--text-primary)',
         ...style,
@@ -112,9 +112,9 @@ export function SubmitButton({ label, loading, disabled }: SubmitButtonProps) {
       disabled={disabled || loading}
       className="w-full py-3.5 rounded-2xl text-base font-bold transition-all active:scale-[0.98] disabled:opacity-50"
       style={{
-        background: 'linear-gradient(135deg, rgba(176,141,87,0.90), rgba(176,141,87,0.70))',
-        color: '#0D0F12',
-        border: '1px solid rgba(176,141,87,0.40)',
+        background: '#0F1B33',
+        color: '#FFFDF8',
+        border: '1px solid rgba(15,27,51,0.20)',
       }}
     >
       {loading ? 'جاري الحفظ...' : label}

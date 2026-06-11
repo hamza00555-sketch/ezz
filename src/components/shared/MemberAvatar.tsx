@@ -1,12 +1,12 @@
 'use client';
 
 const avatarPalette = [
-  { bg: 'rgba(199,231,123,0.18)', text: '#C7E77B' },
-  { bg: 'rgba(125,211,252,0.15)', text: '#7DD3FC' },
-  { bg: 'rgba(134,239,172,0.15)', text: '#86EFAC' },
-  { bg: 'rgba(249,168,212,0.15)', text: '#F9A8D4' },
-  { bg: 'rgba(167,130,255,0.15)', text: '#A782FF' },
-  { bg: 'rgba(253,186,116,0.15)', text: '#FDBA74' },
+  { bg: 'rgba(201,122,102,0.14)', text: '#C97A66' },
+  { bg: 'rgba(15,27,51,0.10)',    text: '#0F1B33'  },
+  { bg: 'rgba(114,191,163,0.15)', text: '#4A9E85'  },
+  { bg: 'rgba(246,201,178,0.30)', text: '#B8604E'  },
+  { bg: 'rgba(209,138,118,0.14)', text: '#D18A76'  },
+  { bg: 'rgba(44,62,92,0.10)',    text: '#2C3E5C'  },
 ];
 
 function getColor(name: string) {

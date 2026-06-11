@@ -92,7 +92,7 @@ export default function SettingsPage() {
               <p style={{ fontSize: 12, marginTop: 2, color: 'var(--text-muted)' }}>{roleLabels[currentMember.role]}</p>
             </div>
             {isDemo && (
-              <span style={{ fontSize: 10, padding: '3px 10px', borderRadius: 10, background: 'rgba(176,141,87,0.15)', color: 'var(--bronze)', fontWeight: 600 }}>
+              <span style={{ fontSize: 10, padding: '3px 10px', borderRadius: 10, background: 'rgba(201,122,102,0.15)', color: 'var(--bronze)', fontWeight: 600 }}>
                 تجريبي
               </span>
             )}
@@ -129,7 +129,7 @@ export default function SettingsPage() {
                   display: 'flex', alignItems: 'center', gap: 6,
                   padding: '8px 16px', borderRadius: 12,
                   fontSize: 13, fontWeight: 600, cursor: 'pointer', border: 'none',
-                  background: pushState === 'subscribed' ? 'var(--danger-soft)' : 'rgba(199,231,123,0.15)',
+                  background: pushState === 'subscribed' ? 'var(--danger-soft)' : 'rgba(201,122,102,0.15)',
                   color: pushState === 'subscribed' ? 'var(--danger)' : 'var(--accent-strong)',
                 }}
               >

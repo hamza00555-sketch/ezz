@@ -54,7 +54,7 @@ export function HomeHealthScore() {
         style={{
           position: 'absolute', top: -40, right: -40,
           width: 180, height: 180, borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(163,177,138,0.15), transparent 70%)',
+          background: 'radial-gradient(circle, rgba(201,122,102,0.10), transparent 70%)',
           pointerEvents: 'none',
         }}
       />
@@ -69,7 +69,7 @@ export function HomeHealthScore() {
         {/* Ring */}
         <div style={{ position: 'relative', width: 84, height: 84, flexShrink: 0 }}>
           <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
-            <circle cx="50" cy="50" r={radius} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="8" />
+            <circle cx="50" cy="50" r={radius} fill="none" stroke="rgba(15,27,51,0.10)" strokeWidth="8" />
             <circle
               cx="50" cy="50" r={radius}
               fill="none"
@@ -123,8 +123,8 @@ export function HomeHealthScore() {
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             padding: '12px 14px',
             borderRadius: 16,
-            background: 'rgba(163,177,138,0.14)',
-            border: '1px solid rgba(163,177,138,0.25)',
+            background: 'rgba(201,122,102,0.10)',
+            border: '1px solid rgba(201,122,102,0.20)',
             textDecoration: 'none',
             transition: 'background 0.15s ease',
           }}
@@ -142,8 +142,8 @@ export function HomeHealthScore() {
         <div
           style={{
             padding: '12px 14px', borderRadius: 16,
-            background: 'rgba(134,239,172,0.10)',
-            border: '1px solid rgba(134,239,172,0.20)',
+            background: 'var(--success-soft)',
+            border: '1px solid rgba(114,191,163,0.25)',
             textAlign: 'center',
           }}
         >

@@ -63,41 +63,58 @@ export default function OnboardingPage() {
     }
   }
 
+  const inputStyle = {
+    border: '1px solid var(--border-soft)',
+    color: 'var(--text-primary, #0F1B33)',
+    background: 'var(--color-bg, #F7F2EC)',
+  };
+
+  const errorStyle = {
+    background: 'var(--danger-soft)',
+    color: 'var(--danger)',
+  };
+
   if (step === 'choice') {
     return (
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <span className="text-6xl">🏡</span>
-          <h1 className="text-2xl font-black mt-4 mb-2" style={{ color: '#1C1917' }}>مرحباً بك في عز</h1>
-          <p className="text-sm" style={{ color: '#78716C' }}>هل تريد إنشاء بيت جديد أو الانضمام لبيت موجود؟</p>
+          <h1 className="text-2xl font-black mt-4 mb-2" style={{ color: 'var(--text-primary, #0F1B33)' }}>مرحباً بك في عز</h1>
+          <p className="text-sm" style={{ color: 'var(--text-muted, #6B7A8D)' }}>هل تريد إنشاء بيت جديد أو الانضمام لبيت موجود؟</p>
         </div>
 
         <div className="flex flex-col gap-3">
           <button
             onClick={() => setStep('create')}
             className="flex items-center gap-4 p-5 rounded-2xl text-right transition-all active:scale-[0.98]"
-            style={{ background: 'linear-gradient(135deg, #FFF7ED, #FFFBEB)', border: '1.5px solid #FED7AA' }}
+            style={{
+              background: 'rgba(201,122,102,0.08)',
+              border: '1.5px solid rgba(201,122,102,0.25)',
+            }}
           >
-            <div className="p-3 rounded-2xl" style={{ background: '#C8922A' }}>
-              <Home size={24} color="#FFFFFF" />
+            <div className="p-3 rounded-2xl" style={{ background: '#C97A66' }}>
+              <Home size={24} color="#FFFDF8" />
             </div>
             <div>
-              <p className="font-bold text-base" style={{ color: '#1C1917' }}>إنشاء بيت جديد</p>
-              <p className="text-xs mt-0.5" style={{ color: '#78716C' }}>ابدأ من الصفر وادعِ عائلتك</p>
+              <p className="font-bold text-base" style={{ color: 'var(--text-primary, #0F1B33)' }}>إنشاء بيت جديد</p>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted, #6B7A8D)' }}>ابدأ من الصفر وادعِ عائلتك</p>
             </div>
           </button>
 
           <button
             onClick={() => setStep('join')}
             className="flex items-center gap-4 p-5 rounded-2xl text-right transition-all active:scale-[0.98]"
-            style={{ background: '#FFFFFF', border: '1.5px solid var(--border)' }}
+            style={{
+              background: 'var(--surface-card, #FFFDF8)',
+              border: '1.5px solid var(--border-soft)',
+            }}
           >
-            <div className="p-3 rounded-2xl" style={{ background: '#F5F3FF' }}>
-              <Users size={24} color="#7C3AED" />
+            <div className="p-3 rounded-2xl" style={{ background: 'rgba(15, 27, 51, 0.08)' }}>
+              <Users size={24} color="#0F1B33" />
             </div>
             <div>
-              <p className="font-bold text-base" style={{ color: '#1C1917' }}>الانضمام لبيت</p>
-              <p className="text-xs mt-0.5" style={{ color: '#78716C' }}>ادخل كود الدعوة من أحد أفراد العائلة</p>
+              <p className="font-bold text-base" style={{ color: 'var(--text-primary, #0F1B33)' }}>الانضمام لبيت</p>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted, #6B7A8D)' }}>ادخل كود الدعوة من أحد أفراد العائلة</p>
             </div>
           </button>
         </div>
@@ -108,17 +125,17 @@ export default function OnboardingPage() {
   if (step === 'create') {
     return (
       <div className="w-full max-w-sm">
-        <button onClick={() => setStep('choice')} className="flex items-center gap-1 mb-6" style={{ color: '#78716C' }}>
+        <button onClick={() => setStep('choice')} className="flex items-center gap-1 mb-6" style={{ color: 'var(--text-muted, #6B7A8D)' }}>
           <ArrowLeft size={16} /> رجوع
         </button>
 
         <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold" style={{ color: '#1C1917' }}>إنشاء بيتك</h2>
-          <p className="text-sm mt-1" style={{ color: '#78716C' }}>اختر اسماً وأيقونة لبيتك</p>
+          <h2 className="text-2xl font-bold" style={{ color: 'var(--text-primary, #0F1B33)' }}>إنشاء بيتك</h2>
+          <p className="text-sm mt-1" style={{ color: 'var(--text-muted, #6B7A8D)' }}>اختر اسماً وأيقونة لبيتك</p>
         </div>
 
         {error && (
-          <div className="mb-4 p-3 rounded-xl text-sm text-center" style={{ background: '#FEF2F2', color: '#DC2626' }}>
+          <div className="mb-4 p-3 rounded-xl text-sm text-center" style={errorStyle}>
             {error}
           </div>
         )}
@@ -126,7 +143,7 @@ export default function OnboardingPage() {
         <div className="flex flex-col gap-4">
           {/* Emoji picker */}
           <div>
-            <p className="text-sm font-medium mb-2" style={{ color: '#44403C' }}>الأيقونة</p>
+            <p className="text-sm font-medium mb-2" style={{ color: 'var(--text-secondary, #2C3E5C)' }}>الأيقونة</p>
             <div className="grid grid-cols-8 gap-2">
               {homeEmojis.map((e) => (
                 <button
@@ -134,8 +151,8 @@ export default function OnboardingPage() {
                   onClick={() => setEmoji(e)}
                   className="p-2 rounded-xl text-2xl transition-all"
                   style={{
-                    background: emoji === e ? '#FFF7ED' : '#F5F5F4',
-                    border: emoji === e ? '2px solid #C8922A' : '2px solid transparent',
+                    background: emoji === e ? 'rgba(201,122,102,0.12)' : 'rgba(15,27,51,0.04)',
+                    border: emoji === e ? '2px solid #C97A66' : '2px solid transparent',
                   }}
                 >
                   {e}
@@ -146,13 +163,15 @@ export default function OnboardingPage() {
 
           {/* Home name */}
           <div>
-            <p className="text-sm font-medium mb-1.5" style={{ color: '#44403C' }}>اسم البيت</p>
+            <p className="text-sm font-medium mb-1.5" style={{ color: 'var(--text-secondary, #2C3E5C)' }}>اسم البيت</p>
             <input
               value={homeName}
               onChange={(e) => setHomeName(e.target.value)}
               placeholder="مثال: بيت آل الأحمدي"
-              className="w-full px-4 py-3.5 rounded-xl text-sm border outline-none focus:border-[#C8922A] transition-colors"
-              style={{ border: '1px solid var(--border)', color: '#1C1917' }}
+              className="w-full px-4 py-3.5 rounded-xl text-sm border outline-none transition-colors"
+              style={inputStyle}
+              onFocus={(e) => e.currentTarget.style.borderColor = '#C97A66'}
+              onBlur={(e) => e.currentTarget.style.borderColor = 'var(--border-soft)'}
               autoFocus
             />
           </div>
@@ -161,18 +180,18 @@ export default function OnboardingPage() {
           {homeName && (
             <div
               className="p-4 rounded-2xl flex items-center gap-3"
-              style={{ background: '#FFF7ED', border: '1px solid #FED7AA' }}
+              style={{ background: 'rgba(201,122,102,0.08)', border: '1px solid rgba(201,122,102,0.20)' }}
             >
               <span className="text-3xl">{emoji}</span>
-              <p className="font-bold text-lg" style={{ color: '#1C1917' }}>{homeName}</p>
+              <p className="font-bold text-lg" style={{ color: 'var(--text-primary, #0F1B33)' }}>{homeName}</p>
             </div>
           )}
 
           <button
             onClick={createHome}
             disabled={loading}
-            className="w-full py-3.5 rounded-2xl text-base font-bold text-white transition-all active:scale-[0.98] disabled:opacity-60"
-            style={{ background: 'linear-gradient(135deg, #C8922A, #A37520)' }}
+            className="w-full py-3.5 rounded-2xl text-base font-bold transition-all active:scale-[0.98] disabled:opacity-60"
+            style={{ background: '#0F1B33', color: '#FFFDF8', boxShadow: '0 4px 16px rgba(15,27,51,0.25)' }}
           >
             {loading ? 'جاري الإنشاء...' : 'إنشاء البيت 🏡'}
           </button>
@@ -183,17 +202,17 @@ export default function OnboardingPage() {
 
   return (
     <div className="w-full max-w-sm">
-      <button onClick={() => setStep('choice')} className="flex items-center gap-1 mb-6" style={{ color: '#78716C' }}>
+      <button onClick={() => setStep('choice')} className="flex items-center gap-1 mb-6" style={{ color: 'var(--text-muted, #6B7A8D)' }}>
         <ArrowLeft size={16} /> رجوع
       </button>
 
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold" style={{ color: '#1C1917' }}>انضم لبيت</h2>
-        <p className="text-sm mt-1" style={{ color: '#78716C' }}>ادخل كود الدعوة المكون من 8 أحرف</p>
+        <h2 className="text-2xl font-bold" style={{ color: 'var(--text-primary, #0F1B33)' }}>انضم لبيت</h2>
+        <p className="text-sm mt-1" style={{ color: 'var(--text-muted, #6B7A8D)' }}>ادخل كود الدعوة المكون من 8 أحرف</p>
       </div>
 
       {error && (
-        <div className="mb-4 p-3 rounded-xl text-sm text-center" style={{ background: '#FEF2F2', color: '#DC2626' }}>
+        <div className="mb-4 p-3 rounded-xl text-sm text-center" style={errorStyle}>
           {error}
         </div>
       )}
@@ -205,16 +224,18 @@ export default function OnboardingPage() {
           placeholder="ABCD1234"
           maxLength={8}
           dir="ltr"
-          className="w-full px-4 py-4 rounded-xl text-2xl font-black text-center border outline-none focus:border-[#C8922A] tracking-widest transition-colors"
-          style={{ border: '1px solid var(--border)', color: '#1C1917', letterSpacing: '0.3em' }}
+          className="w-full px-4 py-4 rounded-xl text-2xl font-black text-center border outline-none transition-colors tracking-widest"
+          style={{ ...inputStyle, letterSpacing: '0.3em' }}
+          onFocus={(e) => e.currentTarget.style.borderColor = '#C97A66'}
+          onBlur={(e) => e.currentTarget.style.borderColor = 'var(--border-soft)'}
           autoFocus
         />
 
         <button
           onClick={joinHome}
           disabled={loading || inviteCode.length !== 8}
-          className="w-full py-3.5 rounded-2xl text-base font-bold text-white transition-all active:scale-[0.98] disabled:opacity-60"
-          style={{ background: 'linear-gradient(135deg, #C8922A, #A37520)' }}
+          className="w-full py-3.5 rounded-2xl text-base font-bold transition-all active:scale-[0.98] disabled:opacity-60"
+          style={{ background: '#0F1B33', color: '#FFFDF8', boxShadow: '0 4px 16px rgba(15,27,51,0.25)' }}
         >
           {loading ? 'جاري التحقق...' : 'انضم الآن'}
         </button>

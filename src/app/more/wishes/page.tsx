@@ -25,12 +25,12 @@ const typeLabels: Record<string, string> = {
 };
 
 const wishStatusStyle: Record<string, { bg: string; color: string }> = {
-  idea:      { bg: 'rgba(199,231,123,0.12)', color: 'var(--accent-strong)' },
+  idea:      { bg: 'rgba(201,122,102,0.10)', color: 'var(--accent-strong)' },
   studying:  { bg: 'var(--info-soft)',        color: 'var(--info)'          },
   approved:  { bg: 'var(--success-soft)',     color: 'var(--success)'       },
-  done:      { bg: 'rgba(255,255,255,0.07)',  color: 'var(--text-muted)'    },
-  postponed: { bg: 'rgba(167,130,255,0.12)', color: '#A782FF'               },
-  cancelled: { bg: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)'    },
+  done:      { bg: 'rgba(15,27,51,0.06)',     color: 'var(--text-muted)'    },
+  postponed: { bg: 'rgba(201,122,102,0.10)', color: 'var(--accent)'         },
+  cancelled: { bg: 'rgba(15,27,51,0.05)',    color: 'var(--text-muted)'     },
 };
 
 const priorityStyle: Record<string, { color: string }> = {

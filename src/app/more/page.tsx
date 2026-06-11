@@ -11,12 +11,12 @@ import { useAppStore } from '@/store/appStore';
 import { useShallow } from 'zustand/react/shallow';
 
 const menuItems = [
-  { href: '/home-section',       icon: Building2, label: 'البيت',                 description: 'الممتلكات والصيانة والوثائق',     color: 'var(--accent-strong)', bg: 'rgba(163,177,138,0.12)' },
-  { href: '/more/family',        icon: Users,     label: 'العائلة والأفراد',      description: 'إدارة أفراد العائلة والصلاحيات',  color: '#A782FF', bg: 'rgba(167,130,255,0.12)' },
+  { href: '/home-section',       icon: Building2, label: 'البيت',                 description: 'الممتلكات والصيانة والوثائق',     color: 'var(--accent-strong)', bg: 'rgba(201,122,102,0.10)' },
+  { href: '/more/family',        icon: Users,     label: 'العائلة والأفراد',      description: 'إدارة أفراد العائلة والصلاحيات',  color: 'var(--accent-strong)', bg: 'rgba(15,27,51,0.08)' },
   { href: '/more/calendar',      icon: Calendar,  label: 'التقويم',               description: 'مواعيد وصيانة وضمانات',           color: 'var(--info)',    bg: 'var(--info-soft)'    },
   { href: '/more/expenses',      icon: Wallet,    label: 'المصاريف',              description: 'محافظ وميزانيات يدوية',           color: 'var(--success)', bg: 'var(--success-soft)' },
   { href: '/more/wishes',        icon: Lightbulb, label: 'الأفكار والـ Wish List', description: 'احتياجات وأفكار مستقبلية',        color: 'var(--warning)', bg: 'var(--warning-soft)' },
-  { href: '/more/announcements', icon: Megaphone, label: 'الإعلانات العائلية',    description: 'رسائل مثبتة ومهمة',              color: 'var(--bronze)',  bg: 'rgba(176,141,87,0.12)' },
+  { href: '/more/announcements', icon: Megaphone, label: 'الإعلانات العائلية',    description: 'رسائل مثبتة ومهمة',              color: 'var(--bronze)',  bg: 'rgba(201,122,102,0.10)' },
 ];
 
 export default function MorePage() {
@@ -95,12 +95,12 @@ export default function MorePage() {
           style={{
             display: 'flex', alignItems: 'center', gap: 14,
             padding: 16, borderRadius: 20, marginTop: 6,
-            background: 'rgba(255,255,255,0.04)',
+            background: 'var(--surface-card)',
             border: '1px solid var(--border-soft)',
             textDecoration: 'none',
           }}
         >
-          <div style={{ padding: 12, borderRadius: 16, flexShrink: 0, background: 'rgba(255,255,255,0.07)' }}>
+          <div style={{ padding: 12, borderRadius: 16, flexShrink: 0, background: 'rgba(15,27,51,0.06)' }}>
             <Settings size={22} color="var(--text-secondary)" strokeWidth={1.8} />
           </div>
           <div style={{ flex: 1 }}>

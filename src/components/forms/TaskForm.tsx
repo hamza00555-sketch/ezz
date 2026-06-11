@@ -156,7 +156,7 @@ export function TaskForm({ open, onClose }: TaskFormProps) {
         </div>
 
         <label className="flex items-center gap-3 p-3 rounded-xl cursor-pointer"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border-soft)' }}>
+          style={{ background: 'rgba(15,27,51,0.03)', border: '1px solid var(--border-soft)' }}>
           <input
             type="checkbox"
             checked={isRecurring}

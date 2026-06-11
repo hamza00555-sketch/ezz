@@ -15,14 +15,14 @@ import { AnnouncementForm } from '@/components/forms/AnnouncementForm';
 import { ExpenseForm } from '@/components/forms/ExpenseForm';
 
 const quickAddItems = [
-  { key: 'task',         icon: CheckSquare,  label: 'مهمة',    color: 'var(--accent)',   bg: 'rgba(163,177,138,0.14)' },
-  { key: 'request',      icon: MessageSquare,label: 'طلب',     color: 'var(--info)',     bg: 'var(--info-soft)'       },
-  { key: 'wish',         icon: Lightbulb,    label: 'فكرة',    color: 'var(--warning)',  bg: 'var(--warning-soft)'    },
-  { key: 'home_item',    icon: Building2,    label: 'ممتلكات', color: 'var(--accent)',   bg: 'rgba(163,177,138,0.10)' },
-  { key: 'document',     icon: FileText,     label: 'وثيقة',   color: 'var(--danger)',   bg: 'var(--danger-soft)'     },
-  { key: 'shortage',     icon: ShoppingCart, label: 'نقص',     color: 'var(--warning)',  bg: 'var(--warning-soft)'    },
-  { key: 'recipe',       icon: BookOpen,     label: 'وصفة',    color: '#E879F9',         bg: 'rgba(232,121,249,0.10)' },
-  { key: 'announcement', icon: Megaphone,    label: 'إعلان',   color: 'var(--bronze)',   bg: 'rgba(176,141,87,0.12)'  },
+  { key: 'task',         icon: CheckSquare,  label: 'مهمة',    color: 'var(--accent-strong)', bg: 'rgba(201,122,102,0.12)' },
+  { key: 'request',      icon: MessageSquare,label: 'طلب',     color: 'var(--info)',           bg: 'var(--info-soft)'       },
+  { key: 'wish',         icon: Lightbulb,    label: 'فكرة',    color: 'var(--warning)',        bg: 'var(--warning-soft)'    },
+  { key: 'home_item',    icon: Building2,    label: 'ممتلكات', color: 'var(--accent-strong)', bg: 'rgba(201,122,102,0.10)' },
+  { key: 'document',     icon: FileText,     label: 'وثيقة',   color: 'var(--danger)',         bg: 'var(--danger-soft)'     },
+  { key: 'shortage',     icon: ShoppingCart, label: 'نقص',     color: 'var(--kitchen-rose)',   bg: 'rgba(244,217,207,0.50)' },
+  { key: 'recipe',       icon: BookOpen,     label: 'وصفة',    color: 'var(--accent)',         bg: 'rgba(201,122,102,0.12)' },
+  { key: 'announcement', icon: Megaphone,    label: 'إعلان',   color: 'var(--bronze)',         bg: 'rgba(201,122,102,0.12)' },
 ];
 
 type FormKey = 'task' | 'request' | 'wish' | 'home_item' | 'document' | 'shortage' | 'recipe' | 'announcement' | 'expense' | null;
@@ -67,12 +67,14 @@ export function QuickAddButton() {
           height: 52,
           borderRadius: 18,
           background: sheetOpen
-            ? 'rgba(255,255,255,0.12)'
-            : 'linear-gradient(135deg, var(--accent), var(--accent-strong))',
-          border: '1px solid rgba(255,255,255,0.15)',
+            ? 'rgba(201, 122, 102, 0.10)'
+            : 'var(--accent-strong)',
+          border: sheetOpen
+            ? '1.5px solid rgba(201, 122, 102, 0.20)'
+            : '1.5px solid rgba(15, 27, 51, 0.20)',
           boxShadow: sheetOpen
-            ? '0 4px 20px rgba(0,0,0,0.3)'
-            : '0 4px 24px rgba(163,177,138,0.4)',
+            ? '0 4px 20px rgba(201,122,102,0.10)'
+            : '0 4px 24px rgba(15, 27, 51, 0.30)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -83,8 +85,8 @@ export function QuickAddButton() {
         className="active:scale-90 transition-all"
       >
         {sheetOpen
-          ? <X size={22} color="var(--text-primary)" strokeWidth={2.5} />
-          : <Plus size={26} color="#0D0F12" strokeWidth={2.8} />
+          ? <X size={22} color="var(--accent)" strokeWidth={2.5} />
+          : <Plus size={26} color="#FFFDF8" strokeWidth={2.8} />
         }
       </button>
 
@@ -94,7 +96,7 @@ export function QuickAddButton() {
           className="fade-in"
           style={{
             position: 'fixed', inset: 0, zIndex: 20,
-            background: 'rgba(0,0,0,0.6)',
+            background: 'rgba(15, 27, 51, 0.45)',
             backdropFilter: 'blur(2px)',
             WebkitBackdropFilter: 'blur(2px)',
           }}
@@ -113,13 +115,13 @@ export function QuickAddButton() {
             transform: 'translateX(-50%)',
             width: 'calc(100vw - 32px)',
             maxWidth: 400,
-            background: 'rgba(21,24,29,0.95)',
+            background: 'rgba(247, 242, 236, 0.97)',
             backdropFilter: 'blur(24px)',
             WebkitBackdropFilter: 'blur(24px)',
             borderRadius: 28,
             padding: '16px 12px 12px',
-            border: '1px solid rgba(255,255,255,0.12)',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+            border: '1px solid rgba(201, 122, 102, 0.14)',
+            boxShadow: '0 20px 60px rgba(15, 27, 51, 0.12)',
             zIndex: 30,
           }}
         >
@@ -147,7 +149,7 @@ export function QuickAddButton() {
                     padding: '12px 4px',
                     borderRadius: 18,
                     background: item.bg,
-                    border: '1px solid rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(15, 27, 51, 0.06)',
                     cursor: 'pointer',
                     transition: 'transform 0.12s ease',
                   }}

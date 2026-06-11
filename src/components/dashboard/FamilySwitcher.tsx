@@ -42,8 +42,8 @@ export function FamilySwitcher() {
             display: 'flex', alignItems: 'center', gap: 8,
             padding: '8px 12px',
             borderRadius: 20,
-            background: 'rgba(255,255,255,0.07)',
-            border: '1px solid rgba(255,255,255,0.10)',
+            background: 'rgba(15,27,51,0.06)',
+            border: '1px solid rgba(15,27,51,0.08)',
             cursor: 'pointer',
             transition: 'background 0.15s ease',
           }}
@@ -61,8 +61,8 @@ export function FamilySwitcher() {
           style={{
             width: 40, height: 40,
             borderRadius: 16,
-            background: 'rgba(255,255,255,0.07)',
-            border: '1px solid rgba(255,255,255,0.10)',
+            background: 'rgba(15,27,51,0.06)',
+            border: '1px solid rgba(15,27,51,0.08)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: 'pointer',
             position: 'relative',

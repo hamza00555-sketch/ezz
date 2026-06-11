@@ -20,8 +20,8 @@ type MealSlot = 'breakfast' | 'lunch' | 'dinner';
 const shortagePriorityColors: Record<ShortagePriority, { bg: string; text: string }> = {
   urgent: { bg: 'var(--danger-soft)',  text: 'var(--danger)'  },
   high:   { bg: 'var(--warning-soft)', text: 'var(--warning)' },
-  medium: { bg: 'rgba(67,82,56,0.07)', text: 'var(--text-secondary)' },
-  low:    { bg: 'rgba(67,82,56,0.05)', text: 'var(--text-muted)'     },
+  medium: { bg: 'rgba(15,27,51,0.07)', text: 'var(--text-secondary)' },
+  low:    { bg: 'rgba(15,27,51,0.05)', text: 'var(--text-muted)'     },
 };
 const shortagePriorityLabels: Record<ShortagePriority, string> = {
   urgent: 'عاجل', high: 'مهم', medium: 'متوسط', low: 'عادي',
@@ -340,7 +340,7 @@ export default function KitchenPage() {
                         style={{
                           display: 'flex', alignItems: 'center', gap: 5,
                           padding: '5px 12px', borderRadius: 20,
-                          background: 'rgba(255,255,255,0.60)',
+                          background: 'rgba(247,242,236,0.70)',
                           border: '1px solid rgba(201,130,114,0.18)',
                           cursor: 'pointer', fontFamily: 'inherit',
                         }}
@@ -352,8 +352,8 @@ export default function KitchenPage() {
                     {mealIdx === 1 && selected && (
                       <span style={{
                         fontSize: 10, padding: '3px 10px', borderRadius: 20, fontWeight: 700,
-                        background: 'rgba(181,139,85,0.14)', color: 'var(--azz-bronze)',
-                        border: '1px solid rgba(181,139,85,0.20)',
+                        background: 'rgba(201,122,102,0.12)', color: 'var(--bronze)',
+                        border: '1px solid rgba(201,122,102,0.20)',
                       }}>
                         وجبة اليوم الرئيسية
                       </span>
@@ -397,8 +397,8 @@ export default function KitchenPage() {
                   key={dateStr}
                   style={{
                     padding: '14px 16px', borderRadius: 22,
-                    background: isToday ? 'rgba(176,141,87,0.08)' : 'var(--surface-card)',
-                    border: `1px solid ${isToday ? 'rgba(176,141,87,0.35)' : 'var(--border-soft)'}`,
+                    background: isToday ? 'rgba(201,122,102,0.08)' : 'var(--surface-card)',
+                    border: `1px solid ${isToday ? 'rgba(201,122,102,0.25)' : 'var(--border-soft)'}`,
                   }}
                 >
                   {/* Day header */}
@@ -410,7 +410,7 @@ export default function KitchenPage() {
                       {date.getDate()}/{date.getMonth() + 1}
                     </span>
                     {isToday && (
-                      <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, fontWeight: 700, background: 'rgba(181,139,85,0.16)', color: 'var(--bronze)' }}>
+                      <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, fontWeight: 700, background: 'rgba(201,122,102,0.12)', color: 'var(--bronze)' }}>
                         اليوم
                       </span>
                     )}
@@ -429,11 +429,11 @@ export default function KitchenPage() {
                             {options.map((opt) => {
                               const optRecipe = myRecipes.find((r) => r.name === opt);
                               return (
-                                <div key={opt} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '3px 8px 3px 5px', borderRadius: 20, background: 'rgba(163,177,138,0.12)', border: '1px solid rgba(163,177,138,0.22)' }}>
+                                <div key={opt} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '3px 8px 3px 5px', borderRadius: 20, background: 'rgba(201,122,102,0.10)', border: '1px solid rgba(201,122,102,0.20)' }}>
                                   <RecipeImage imageUrl={optRecipe?.imageUrl} name={opt} size={22} borderRadius={11} />
                                   <span style={{ fontSize: 12, color: 'var(--accent-strong)' }}>{opt}</span>
                                   {canEdit && (
-                                    <button onClick={() => removeMealOption(dateStr, meal, opt)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, lineHeight: 1, color: 'rgba(163,177,138,0.5)', fontSize: 14 }}>×</button>
+                                    <button onClick={() => removeMealOption(dateStr, meal, opt)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, lineHeight: 1, color: 'rgba(201,122,102,0.5)', fontSize: 14 }}>×</button>
                                   )}
                                 </div>
                               );
@@ -441,7 +441,7 @@ export default function KitchenPage() {
                             {canEdit && (
                               <button
                                 onClick={() => openPicker(dateStr, meal, options)}
-                                style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: 'transparent', border: '1px dashed rgba(67,82,56,0.22)', color: 'var(--text-muted)', cursor: 'pointer', fontFamily: 'inherit' }}
+                                style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: 'transparent', border: '1px dashed rgba(15,27,51,0.18)', color: 'var(--text-muted)', cursor: 'pointer', fontFamily: 'inherit' }}
                               >
                                 + أضف
                               </button>
@@ -482,8 +482,8 @@ export default function KitchenPage() {
                   disabled={!quickAddVal.trim()}
                   style={{
                     padding: '11px 18px', borderRadius: 14,
-                    background: quickAddVal.trim() ? 'rgba(163,177,138,0.18)' : 'rgba(67,82,56,0.05)',
-                    border: `1px solid ${quickAddVal.trim() ? 'rgba(163,177,138,0.35)' : 'rgba(67,82,56,0.10)'}`,
+                    background: quickAddVal.trim() ? 'rgba(201,122,102,0.12)' : 'rgba(15,27,51,0.05)',
+                    border: `1px solid ${quickAddVal.trim() ? 'rgba(201,122,102,0.22)' : 'rgba(15,27,51,0.10)'}`,
                     color: quickAddVal.trim() ? 'var(--accent-strong)' : 'var(--text-muted)',
                     fontSize: 13, fontWeight: 700,
                     cursor: quickAddVal.trim() ? 'pointer' : 'not-allowed',
@@ -501,7 +501,7 @@ export default function KitchenPage() {
               const providedCount = myShortages.filter((s) => s.status === 'provided').length;
               return (
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 12, padding: '5px 12px', borderRadius: 20, background: 'rgba(67,82,56,0.06)', color: 'var(--text-secondary)', border: '1px solid var(--border-soft)' }}>
+                  <span style={{ fontSize: 12, padding: '5px 12px', borderRadius: 20, background: 'rgba(15,27,51,0.06)', color: 'var(--text-secondary)', border: '1px solid var(--border-soft)' }}>
                     🛒 ناقص {missingCount}
                   </span>
                   {urgentCount > 0 && (
@@ -563,7 +563,7 @@ export default function KitchenPage() {
                       style={{ flexShrink: 0, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                     >
                       {isMissing
-                        ? <Circle size={20} color="rgba(67,82,56,0.25)" />
+                        ? <Circle size={20} color="rgba(15,27,51,0.22)" />
                         : <CheckCircle2 size={20} color="var(--success)" />
                       }
                     </button>
@@ -626,8 +626,8 @@ export default function KitchenPage() {
                   style={{
                     flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                     padding: '12px 16px', borderRadius: 16,
-                    background: 'rgba(163,177,138,0.16)',
-                    border: '1px solid rgba(163,177,138,0.32)',
+                    background: 'rgba(201,122,102,0.10)',
+                    border: '1px solid rgba(201,122,102,0.22)',
                     cursor: 'pointer', fontFamily: 'inherit',
                   }}
                   className="active:scale-[0.98]"
@@ -643,14 +643,14 @@ export default function KitchenPage() {
                   style={{
                     display: 'flex', alignItems: 'center', gap: 6,
                     padding: '12px 14px', borderRadius: 16,
-                    background: 'rgba(232,121,249,0.07)',
-                    border: '1px solid rgba(232,121,249,0.20)',
+                    background: 'rgba(201,122,102,0.08)',
+                    border: '1px solid rgba(201,122,102,0.18)',
                     cursor: 'pointer', fontFamily: 'inherit',
                   }}
                   className="active:scale-[0.98]"
                 >
-                  <FileText size={15} color="#E879F9" />
-                  <span style={{ fontSize: 12, fontWeight: 600, color: '#E879F9' }}>استيراد</span>
+                  <FileText size={15} color="var(--accent)" />
+                  <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--accent)' }}>استيراد</span>
                 </button>
               </div>
             )}
@@ -677,14 +677,14 @@ export default function KitchenPage() {
                       size={52}
                       borderRadius={16}
                       border="2px solid rgba(255,255,255,0.7)"
-                      boxShadow="0 4px 12px rgba(67,82,56,0.12)"
+                      boxShadow="0 4px 12px rgba(15,27,51,0.10)"
                       fallbackIcon={<ChefHat size={20} color="rgba(255,255,255,0.85)" strokeWidth={1.7} />}
                     />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 5 }}>{recipe.name}</p>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, alignItems: 'center' }}>
                         {recipe.mealTime.map((t) => (
-                          <span key={t} style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, background: 'rgba(67,82,56,0.07)', color: 'var(--text-muted)' }}>
+                          <span key={t} style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, background: 'rgba(15,27,51,0.07)', color: 'var(--text-muted)' }}>
                             {t === 'breakfast' ? 'فطور' : t === 'lunch' ? 'غداء' : t === 'dinner' ? 'عشاء' : 'مناسبة'}
                           </span>
                         ))}
@@ -721,20 +721,20 @@ export default function KitchenPage() {
         return (
           <>
             <div
-              style={{ position: 'fixed', inset: 0, zIndex: 48, background: 'rgba(31,33,28,0.35)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' }}
+              style={{ position: 'fixed', inset: 0, zIndex: 48, background: 'rgba(15,27,51,0.35)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' }}
               onClick={closePicker}
             />
             <div
               className="slide-up"
               style={{
                 position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 49,
-                background: 'rgba(255,253,247,0.98)',
+                background: 'rgba(247,242,236,0.98)',
                 backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)',
                 borderRadius: '28px 28px 0 0',
                 padding: '20px 16px max(28px, env(safe-area-inset-bottom, 16px))',
                 maxHeight: '72dvh', overflowY: 'auto',
-                border: '1px solid rgba(67,82,56,0.10)',
-                boxShadow: '0 -16px 48px rgba(67,82,56,0.14)',
+                border: '1px solid rgba(15,27,51,0.08)',
+                boxShadow: '0 -16px 48px rgba(15,27,51,0.10)',
               }}
             >
               {/* Header */}
@@ -775,7 +775,7 @@ export default function KitchenPage() {
                             size={44}
                             borderRadius={14}
                             border="2px solid rgba(255,255,255,0.7)"
-                            boxShadow="0 2px 8px rgba(67,82,56,0.10)"
+                            boxShadow="0 2px 8px rgba(15,27,51,0.08)"
                             fallbackIcon={<ChefHat size={16} color="rgba(255,255,255,0.85)" strokeWidth={1.8} />}
                           />
                           {/* Info */}
@@ -818,9 +818,9 @@ export default function KitchenPage() {
                           style={{
                             display: 'flex', alignItems: 'center', gap: 5,
                             fontSize: 12, padding: '6px 12px', borderRadius: 20,
-                            background: hasImg ? 'rgba(201,130,114,0.10)' : 'rgba(176,141,87,0.10)',
+                            background: hasImg ? 'rgba(201,130,114,0.10)' : 'rgba(201,122,102,0.10)',
                             color: hasImg ? 'var(--kitchen-rose)' : 'var(--bronze)',
-                            border: `1px solid ${hasImg ? 'rgba(201,130,114,0.22)' : 'rgba(176,141,87,0.22)'}`,
+                            border: `1px solid ${hasImg ? 'rgba(201,130,114,0.22)' : 'rgba(201,122,102,0.20)'}`,
                             cursor: 'pointer', fontFamily: 'inherit',
                           }}
                         >
@@ -842,8 +842,8 @@ export default function KitchenPage() {
                   placeholder="أو اكتب اسم الوجبة..."
                   style={{
                     flex: 1, padding: '11px 14px', borderRadius: 14,
-                    background: 'rgba(67,82,56,0.05)',
-                    border: '1px solid rgba(67,82,56,0.12)',
+                    background: 'rgba(15,27,51,0.05)',
+                    border: '1px solid rgba(15,27,51,0.10)',
                     color: 'var(--text-primary)', fontSize: 14,
                     fontFamily: 'inherit', direction: 'rtl', outline: 'none',
                   }}
@@ -853,8 +853,8 @@ export default function KitchenPage() {
                   disabled={!pickerInput.trim()}
                   style={{
                     padding: '11px 18px', borderRadius: 14,
-                    background: pickerInput.trim() ? 'rgba(163,177,138,0.20)' : 'rgba(67,82,56,0.05)',
-                    border: `1px solid ${pickerInput.trim() ? 'rgba(163,177,138,0.38)' : 'rgba(67,82,56,0.10)'}`,
+                    background: pickerInput.trim() ? 'rgba(201,122,102,0.12)' : 'rgba(15,27,51,0.05)',
+                    border: `1px solid ${pickerInput.trim() ? 'rgba(201,122,102,0.22)' : 'rgba(15,27,51,0.08)'}`,
                     color: pickerInput.trim() ? 'var(--accent-strong)' : 'var(--text-muted)',
                     fontSize: 13, fontWeight: 700,
                     cursor: pickerInput.trim() ? 'pointer' : 'not-allowed',
@@ -885,19 +885,19 @@ export default function KitchenPage() {
         return (
           <>
             <div
-              style={{ position: 'fixed', inset: 0, zIndex: 48, background: 'rgba(31,33,28,0.45)', backdropFilter: 'blur(5px)', WebkitBackdropFilter: 'blur(5px)' }}
+              style={{ position: 'fixed', inset: 0, zIndex: 48, background: 'rgba(15,27,51,0.40)', backdropFilter: 'blur(5px)', WebkitBackdropFilter: 'blur(5px)' }}
               onClick={() => setDetailRecipeId(null)}
             />
             <div
               className="slide-up"
               style={{
                 position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 49,
-                background: 'rgba(255,253,247,0.98)',
+                background: 'rgba(247,242,236,0.98)',
                 backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)',
                 borderRadius: '28px 28px 0 0',
                 maxHeight: '88dvh', overflowY: 'auto',
-                border: '1px solid rgba(67,82,56,0.10)',
-                boxShadow: '0 -16px 48px rgba(67,82,56,0.16)',
+                border: '1px solid rgba(15,27,51,0.08)',
+                boxShadow: '0 -16px 48px rgba(15,27,51,0.10)',
               }}
             >
               {/* Image header */}
@@ -911,7 +911,7 @@ export default function KitchenPage() {
                   style={{ width: '100%', height: '100%' }}
                 />
                 {/* Overlay gradient for readability */}
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(31,33,28,0.55) 0%, transparent 60%)' }} />
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(15,27,51,0.45) 0%, transparent 60%)' }} />
                 {/* Close button */}
                 <button
                   onClick={() => setDetailRecipeId(null)}
@@ -952,7 +952,7 @@ export default function KitchenPage() {
                     </p>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
                       {r.ingredients.map((ing, i) => (
-                        <span key={i} style={{ fontSize: 13, padding: '5px 12px', borderRadius: 20, background: 'rgba(67,82,56,0.07)', color: 'var(--text-secondary)', border: '1px solid var(--border-soft)' }}>
+                        <span key={i} style={{ fontSize: 13, padding: '5px 12px', borderRadius: 20, background: 'rgba(15,27,51,0.07)', color: 'var(--text-secondary)', border: '1px solid var(--border-soft)' }}>
                           {ing}
                         </span>
                       ))}
@@ -971,7 +971,7 @@ export default function KitchenPage() {
                           <span style={{
                             fontSize: 11, fontWeight: 800, color: 'var(--accent-strong)',
                             flexShrink: 0, width: 24, height: 24, borderRadius: '50%',
-                            background: 'rgba(163,177,138,0.20)',
+                            background: 'rgba(201,122,102,0.14)',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                             marginTop: 1,
                           }}>
@@ -985,7 +985,7 @@ export default function KitchenPage() {
                 )}
 
                 {r.notes && (
-                  <p style={{ fontSize: 13, color: 'var(--text-muted)', fontStyle: 'italic', lineHeight: 1.7, padding: '10px 14px', borderRadius: 14, background: 'rgba(67,82,56,0.04)', border: '1px solid var(--border-soft)' }}>
+                  <p style={{ fontSize: 13, color: 'var(--text-muted)', fontStyle: 'italic', lineHeight: 1.7, padding: '10px 14px', borderRadius: 14, background: 'rgba(15,27,51,0.04)', border: '1px solid var(--border-soft)' }}>
                     {r.notes}
                   </p>
                 )}
@@ -997,8 +997,8 @@ export default function KitchenPage() {
                     style={{
                       marginTop: 8,
                       width: '100%', padding: '13px 0', borderRadius: 16,
-                      background: 'rgba(163,177,138,0.14)',
-                      border: '1px solid rgba(163,177,138,0.30)',
+                      background: 'rgba(201,122,102,0.10)',
+                      border: '1px solid rgba(201,122,102,0.22)',
                       color: 'var(--accent-strong)', fontSize: 14, fontWeight: 700,
                       cursor: 'pointer', fontFamily: 'inherit',
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
@@ -1018,19 +1018,19 @@ export default function KitchenPage() {
       {importOpen && (
         <>
           <div
-            style={{ position: 'fixed', inset: 0, zIndex: 48, background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(3px)', WebkitBackdropFilter: 'blur(3px)' }}
+            style={{ position: 'fixed', inset: 0, zIndex: 48, background: 'rgba(15,27,51,0.50)', backdropFilter: 'blur(3px)', WebkitBackdropFilter: 'blur(3px)' }}
             onClick={closeImport}
           />
           <div
             className="slide-up"
             style={{
               position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 49,
-              background: 'rgba(255,253,247,0.98)',
+              background: 'rgba(247,242,236,0.98)',
               borderRadius: '28px 28px 0 0',
               padding: '20px 20px max(32px, env(safe-area-inset-bottom, 16px))',
               maxHeight: '88dvh', overflowY: 'auto',
-              border: '1px solid rgba(67,82,56,0.12)',
-              boxShadow: '0 -20px 60px rgba(67,82,56,0.18)',
+              border: '1px solid rgba(15,27,51,0.10)',
+              boxShadow: '0 -20px 60px rgba(15,27,51,0.10)',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
@@ -1067,7 +1067,7 @@ export default function KitchenPage() {
                   style={{
                     marginTop: 12, width: '100%', padding: 14, borderRadius: 16,
                     fontWeight: 700, fontSize: 14,
-                    background: importText.trim() ? 'linear-gradient(135deg, #E879F9, #C026D3)' : 'rgba(67,82,56,0.06)',
+                    background: importText.trim() ? '#0F1B33' : 'rgba(15,27,51,0.06)',
                     color: importText.trim() ? '#fff' : 'var(--text-muted)',
                     border: 'none', cursor: importText.trim() ? 'pointer' : 'not-allowed',
                     fontFamily: 'inherit',
@@ -1097,7 +1097,7 @@ export default function KitchenPage() {
                     <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 8, fontWeight: 600 }}>المكونات ({parsed.ingredients.length})</p>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                       {parsed.ingredients.map((ing, i) => (
-                        <span key={i} style={{ fontSize: 12, padding: '4px 10px', borderRadius: 20, background: 'rgba(67,82,56,0.07)', color: 'var(--text-secondary)' }}>
+                        <span key={i} style={{ fontSize: 12, padding: '4px 10px', borderRadius: 20, background: 'rgba(15,27,51,0.07)', color: 'var(--text-secondary)' }}>
                           {ing}
                         </span>
                       ))}
@@ -1128,9 +1128,9 @@ export default function KitchenPage() {
                           onClick={() => setParsedMealTime((prev) => active ? prev.filter((x) => x !== mt.key) : [...prev, mt.key])}
                           style={{
                             fontSize: 13, padding: '6px 16px', borderRadius: 20, cursor: 'pointer',
-                            background: active ? 'rgba(163,177,138,0.18)' : 'var(--surface-card)',
+                            background: active ? 'rgba(201,122,102,0.10)' : 'var(--surface-card)',
                             color: active ? 'var(--accent-strong)' : 'var(--text-muted)',
-                            border: active ? '1px solid rgba(163,177,138,0.35)' : '1px solid var(--border-soft)',
+                            border: active ? '1px solid rgba(201,122,102,0.22)' : '1px solid var(--border-soft)',
                             fontFamily: 'inherit',
                           }}
                         >
@@ -1145,7 +1145,7 @@ export default function KitchenPage() {
                     onClick={() => setParsed(null)}
                     style={{
                       flex: 1, padding: 12, borderRadius: 14, fontWeight: 600,
-                      background: 'rgba(67,82,56,0.06)', color: 'var(--text-secondary)',
+                      background: 'rgba(15,27,51,0.06)', color: 'var(--text-secondary)',
                       border: '1px solid var(--border-soft)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13,
                     }}
                   >
@@ -1155,8 +1155,8 @@ export default function KitchenPage() {
                     onClick={handleImportSave}
                     style={{
                       flex: 2, padding: 12, borderRadius: 14, fontWeight: 700,
-                      background: 'linear-gradient(135deg, #E879F9, #C026D3)',
-                      color: '#fff', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 14,
+                      background: '#0F1B33',
+                      color: '#FFFDF8', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 14,
                     }}
                     className="active:scale-[0.98]"
                   >
