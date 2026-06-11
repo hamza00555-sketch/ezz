@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
+import { Mail, User, Eye, EyeOff } from 'lucide-react';
+import { EzzLogo } from '@/components/brand/EzzLogo';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -40,7 +41,6 @@ export default function SignupPage() {
       router.push('/onboarding');
     } catch (err: unknown) {
       if (err instanceof Error) {
-        // AuthApiError has status + code
         const anyErr = err as Error & { status?: number; code?: string };
         const detail = anyErr.status ? ` (${anyErr.status})` : '';
         setError(err.message + detail);
@@ -52,30 +52,39 @@ export default function SignupPage() {
     }
   }
 
+  const inputStyle = {
+    border: '1px solid var(--border-soft)',
+    color: 'var(--text-primary, #0F1B33)',
+    background: 'var(--color-bg, #F7F2EC)',
+  };
+
   return (
     <div className="w-full max-w-sm">
       {/* Logo */}
       <div className="text-center mb-8">
         <div
-          className="w-20 h-20 rounded-3xl mx-auto mb-4 flex items-center justify-center text-4xl"
-          style={{ background: 'linear-gradient(135deg, #C8922A, #A37520)', boxShadow: '0 8px 32px rgba(200,146,42,0.3)' }}
+          className="w-20 h-20 rounded-3xl mx-auto mb-4 flex items-center justify-center"
+          style={{ background: '#0F1B33', boxShadow: '0 8px 32px rgba(15,27,51,0.25)' }}
         >
-          🏡
+          <EzzLogo variant="dark" size="sm" />
         </div>
-        <h1 className="text-3xl font-black" style={{ color: '#1C1917' }}>عز</h1>
-        <p className="text-sm mt-1" style={{ color: '#78716C' }}>ابدأ رحلة إدارة بيتك</p>
+        <p className="text-sm mt-1" style={{ color: 'var(--text-muted, #6B7A8D)' }}>ابدأ رحلة إدارة بيتك</p>
       </div>
 
       <div
         className="rounded-3xl p-6"
-        style={{ background: '#FFFFFF', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', border: '1px solid var(--border)' }}
+        style={{
+          background: 'var(--surface-card, #FFFDF8)',
+          boxShadow: '0 4px 24px rgba(15,27,51,0.08)',
+          border: '1px solid var(--border-soft)',
+        }}
       >
-        <h2 className="text-xl font-bold mb-5 text-center" style={{ color: '#1C1917' }}>
+        <h2 className="text-xl font-bold mb-5 text-center" style={{ color: 'var(--text-primary, #0F1B33)' }}>
           إنشاء حساب جديد
         </h2>
 
         {error && (
-          <div className="mb-4 p-3 rounded-xl text-sm text-center" style={{ background: '#FEF2F2', color: '#DC2626' }}>
+          <div className="mb-4 p-3 rounded-xl text-sm text-center" style={{ background: 'var(--danger-soft)', color: 'var(--danger)' }}>
             {error}
           </div>
         )}
@@ -84,7 +93,7 @@ export default function SignupPage() {
           {/* Name */}
           <div className="relative">
             <div className="absolute top-3.5 end-3.5">
-              <User size={18} color="#78716C" />
+              <User size={18} color="var(--text-muted, #6B7A8D)" />
             </div>
             <input
               type="text"
@@ -92,15 +101,17 @@ export default function SignupPage() {
               onChange={(e) => setName(e.target.value)}
               placeholder="الاسم الكامل"
               required
-              className="w-full px-4 py-3.5 pe-11 rounded-xl text-sm border outline-none focus:border-[#C8922A] transition-colors"
-              style={{ border: '1px solid var(--border)', color: '#1C1917' }}
+              className="w-full px-4 py-3.5 pe-11 rounded-xl text-sm border outline-none transition-colors"
+              style={inputStyle}
+              onFocus={(e) => e.currentTarget.style.borderColor = '#C97A66'}
+              onBlur={(e) => e.currentTarget.style.borderColor = 'var(--border-soft)'}
             />
           </div>
 
           {/* Email */}
           <div className="relative">
             <div className="absolute top-3.5 end-3.5">
-              <Mail size={18} color="#78716C" />
+              <Mail size={18} color="var(--text-muted, #6B7A8D)" />
             </div>
             <input
               type="email"
@@ -109,8 +120,10 @@ export default function SignupPage() {
               placeholder="البريد الإلكتروني"
               required
               dir="ltr"
-              className="w-full px-4 py-3.5 pe-11 rounded-xl text-sm border outline-none focus:border-[#C8922A] transition-colors"
-              style={{ border: '1px solid var(--border)', color: '#1C1917' }}
+              className="w-full px-4 py-3.5 pe-11 rounded-xl text-sm border outline-none transition-colors"
+              style={inputStyle}
+              onFocus={(e) => e.currentTarget.style.borderColor = '#C97A66'}
+              onBlur={(e) => e.currentTarget.style.borderColor = 'var(--border-soft)'}
             />
           </div>
 
@@ -121,7 +134,10 @@ export default function SignupPage() {
               onClick={() => setShowPassword((p) => !p)}
               className="absolute top-3.5 end-3.5"
             >
-              {showPassword ? <EyeOff size={18} color="#78716C" /> : <Eye size={18} color="#78716C" />}
+              {showPassword
+                ? <EyeOff size={18} color="var(--text-muted, #6B7A8D)" />
+                : <Eye size={18} color="var(--text-muted, #6B7A8D)" />
+              }
             </button>
             <input
               type={showPassword ? 'text' : 'password'}
@@ -130,24 +146,26 @@ export default function SignupPage() {
               placeholder="كلمة المرور (6 أحرف على الأقل)"
               required
               dir="ltr"
-              className="w-full px-4 py-3.5 pe-11 rounded-xl text-sm border outline-none focus:border-[#C8922A] transition-colors"
-              style={{ border: '1px solid var(--border)', color: '#1C1917' }}
+              className="w-full px-4 py-3.5 pe-11 rounded-xl text-sm border outline-none transition-colors"
+              style={inputStyle}
+              onFocus={(e) => e.currentTarget.style.borderColor = '#C97A66'}
+              onBlur={(e) => e.currentTarget.style.borderColor = 'var(--border-soft)'}
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 rounded-2xl text-base font-bold text-white transition-all active:scale-[0.98] disabled:opacity-60 mt-1"
-            style={{ background: 'linear-gradient(135deg, #C8922A, #A37520)' }}
+            className="w-full py-3.5 rounded-2xl text-base font-bold transition-all active:scale-[0.98] disabled:opacity-60 mt-1"
+            style={{ background: '#0F1B33', color: '#FFFDF8', boxShadow: '0 4px 16px rgba(15,27,51,0.25)' }}
           >
             {loading ? 'جاري الإنشاء...' : 'إنشاء الحساب'}
           </button>
         </form>
 
-        <p className="text-center text-sm mt-4" style={{ color: '#78716C' }}>
+        <p className="text-center text-sm mt-4" style={{ color: 'var(--text-muted, #6B7A8D)' }}>
           عندك حساب؟{' '}
-          <Link href="/login" className="font-bold" style={{ color: '#C8922A' }}>
+          <Link href="/login" className="font-bold" style={{ color: '#C97A66' }}>
             سجّل دخولك
           </Link>
         </p>

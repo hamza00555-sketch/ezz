@@ -2,104 +2,78 @@
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Design Tokens — Azz Soft Depth UI  (Light Premium)
+   ezz Design Tokens — Navy / Clay Rose / Warm Ivory
    ═══════════════════════════════════════════════════════════════════════════ */
 :root {
-  /* ── Core Background ──────────────────────────────────────────────────── */
-  --bg-app:          #F9F6EE;
-  --bg-elevated:     #FFFDF7;
-  --surface-card:    rgba(255, 255, 255, 0.72);
-  --glass-surface:   rgba(255, 255, 255, 0.58);
-  --glass-strong:    rgba(255, 255, 255, 0.80);
+  /* ── Brand Identity ──────────────────────────────────────────────────── */
+  --color-navy:         #0F1B33;
+  --color-clay:         #C97A66;
+  --color-peach:        #F6C9B2;
+  --color-ivory:        #F7F2EC;
+  --color-ivory-white:  #FFFDF8;
 
-  /* ── Azz brand tokens ────────────────────────────────────────────────── */
-  --azz-bg-base:       #F6F2E8;
-  --azz-bg-depth:      #DDE4D2;
-  --azz-primary:       #435238;
-  --azz-primary-soft:  #A8B99A;
-  --azz-primary-dark:  #2F3A27;
-  --azz-surface-glass: rgba(255, 255, 255, 0.72);
-  --azz-surface-soft:  rgba(255, 255, 255, 0.56);
-  --azz-surface-strong:#FFFDF7;
-  --azz-text-main:     #1F211C;
-  --azz-text-secondary:#74786C;
-  --azz-text-muted:    #9A978D;
-  --azz-border-soft:   rgba(67, 82, 56, 0.14);
-  --azz-border-strong: rgba(67, 82, 56, 0.24);
-  --azz-bronze:        #B58B55;
-  --azz-success:       #5C9A68;
-  --azz-warning:       #D89A45;
-  --azz-danger:        #C76455;
-  --azz-info:          #5E7C92;
+  /* ── Semantic Backgrounds ────────────────────────────────────────────── */
+  --bg-app:             #F7F2EC;
+  --bg-elevated:        #FFFDF8;
+  --surface-card:       rgba(255, 253, 248, 0.92);
+  --glass-surface:      rgba(255, 253, 248, 0.70);
+  --glass-strong:       rgba(255, 253, 248, 0.88);
 
-  /* ── Kitchen tokens ──────────────────────────────────────────────────── */
-  --kitchen-bg:         #FBF3EA;
+  /* ── Text ────────────────────────────────────────────────────────────── */
+  --text-primary:       #0F1B33;
+  --text-secondary:     #667085;
+  --text-muted:         #98A2B3;
+
+  /* ── Accent ──────────────────────────────────────────────────────────── */
+  --accent:             #C97A66;
+  --accent-strong:      #0F1B33;
+  --accent-soft:        #F6C9B2;
+  --bronze:             #C97A66;
+
+  /* ── Borders ─────────────────────────────────────────────────────────── */
+  --border-soft:        rgba(232, 221, 211, 0.55);
+  --border-strong:      #E8DDD3;
+  --border:             #E8DDD3;
+
+  /* ── Semantic Colors ─────────────────────────────────────────────────── */
+  --success:            #72BFA3;
+  --success-soft:       rgba(114, 191, 163, 0.15);
+  --warning:            #D89A45;
+  --warning-soft:       rgba(216, 154, 69, 0.12);
+  --danger:             #D75C5C;
+  --danger-soft:        rgba(215, 92, 92, 0.12);
+  --info:               #5A7A8A;
+  --info-soft:          rgba(90, 122, 138, 0.12);
+
+  /* ── Kitchen (warm terracotta tones) ────────────────────────────────── */
+  --kitchen-bg:         #F7F0EB;
   --kitchen-blush:      #F4D9CF;
-  --kitchen-rose:       #C98272;
-  --kitchen-terracotta: #B86F58;
-  --kitchen-sage:       #A8B99A;
-  --kitchen-border:     rgba(201, 130, 114, 0.16);
+  --kitchen-rose:       #C97A66;
+  --kitchen-terracotta: #B86B52;
+  --kitchen-sage:       #8FA88A;
+  --kitchen-border:     rgba(201, 122, 102, 0.18);
 
-  /* ── Text ─────────────────────────────────────────────────────────────── */
-  --text-primary:   #1F211C;
-  --text-secondary: #74786C;
-  --text-muted:     #9A978D;
+  /* ── Legacy token aliases (keep for backward compat with components) ── */
+  --azz-primary:        #0F1B33;
+  --azz-primary-soft:   #F6C9B2;
+  --azz-primary-dark:   #07111F;
+  --azz-bg-base:        #F7F2EC;
+  --azz-bg-depth:       #EDE6DE;
+  --azz-text-main:      #0F1B33;
+  --azz-text-secondary: #667085;
+  --azz-text-muted:     #98A2B3;
+  --azz-border-soft:    rgba(232, 221, 211, 0.55);
+  --azz-border-strong:  #E8DDD3;
+  --azz-bronze:         #C97A66;
+  --azz-success:        #72BFA3;
+  --azz-warning:        #D89A45;
+  --azz-danger:         #D75C5C;
+  --azz-info:           #5A7A8A;
+  --azz-surface-glass:  rgba(255, 253, 248, 0.70);
+  --azz-surface-soft:   rgba(255, 253, 248, 0.56);
+  --azz-surface-strong: #FFFDF8;
 
-  /* ── Accent ───────────────────────────────────────────────────────────── */
-  --accent:        #A8B99A;
-  --accent-strong: #435238;
-  --bronze:        #B58B55;
-
-  /* ── Borders ──────────────────────────────────────────────────────────── */
-  --border-soft:   rgba(67, 82, 56, 0.14);
-  --border-strong: rgba(67, 82, 56, 0.24);
-
-  /* ── Semantic ─────────────────────────────────────────────────────────── */
-  --success:      #5C9A68;
-  --success-soft: rgba(92, 154, 104, 0.14);
-  --warning:      #D89A45;
-  --warning-soft: rgba(216, 154, 69, 0.14);
-  --danger:       #C76455;
-  --danger-soft:  rgba(199, 100, 85, 0.12);
-  --info:         #5E7C92;
-  --info-soft:    rgba(94, 124, 146, 0.14);
-
-  /* ── Compatibility aliases ────────────────────────────────────────────── */
-  --background:       #F9F6EE;
-  --surface:          rgba(255, 255, 255, 0.72);
-  --foreground:       #1F211C;
-  --foreground-muted: #74786C;
-  --foreground-faint: #9A978D;
-  --border:           rgba(67, 82, 56, 0.14);
-  --primary:          #A8B99A;
-  --primary-light:    rgba(168, 185, 154, 0.18);
-  --primary-dark:     #2F3A27;
-  --c-green:          #A8B99A;
-  --c-green-soft:     rgba(168, 185, 154, 0.15);
-  --c-red:            #C76455;
-  --c-red-soft:       rgba(199, 100, 85, 0.12);
-  --c-amber:          #D89A45;
-  --c-amber-soft:     rgba(216, 154, 69, 0.14);
-  --c-gold:           #B58B55;
-  --c-gold-light:     rgba(181, 139, 85, 0.14);
-  --c-muted:          #9A978D;
-  --c-dark:           #1F211C;
-
-  /* ── Layout ───────────────────────────────────────────────────────────── */
-  --bottom-nav-height: 104px;
-  --page-px:           16px;
-  --card-radius:       28px;
-  --btn-radius:        16px;
-  --section-gap:       24px;
-
-  /* ── Shadows ──────────────────────────────────────────────────────────── */
-  --shadow-card: 0 8px 32px rgba(67, 82, 56, 0.10);
-  --shadow-hero: 0 24px 60px rgba(67, 82, 56, 0.14);
-  --shadow-nav:  0 8px 40px rgba(67, 82, 56, 0.14);
-}
-
-/* ─── ezz Brand Tokens (v2 — Navy/Clay Rose identity) ────────────────────── */
-:root {
+  /* ── New brand tokens (primary API) ─────────────────────────────────── */
   --color-bg:           #F7F2EC;
   --color-surface:      #FFFDF8;
   --color-elevated:     #FFFDF8;
@@ -110,13 +84,66 @@
   --color-accent-soft:  #F6C9B2;
   --color-border:       #E8DDD3;
   --color-success:      #72BFA3;
-  --color-navy:         #0F1B33;
-  --color-peach:        #F6C9B2;
-  --ezz-font: 'Cairo', 'IBM Plex Sans Arabic', sans-serif;
+  --ezz-font:           'Cairo', 'IBM Plex Sans Arabic', sans-serif;
+
+  /* ── Compatibility aliases ────────────────────────────────────────────── */
+  --background:         #F7F2EC;
+  --surface:            rgba(255, 253, 248, 0.92);
+  --foreground:         #0F1B33;
+  --foreground-muted:   #667085;
+  --foreground-faint:   #98A2B3;
+  --primary:            #C97A66;
+  --primary-light:      rgba(201, 122, 102, 0.15);
+  --primary-dark:       #0F1B33;
+  --c-red:              #D75C5C;
+  --c-red-soft:         rgba(215, 92, 92, 0.12);
+  --c-amber:            #D89A45;
+  --c-amber-soft:       rgba(216, 154, 69, 0.12);
+  --c-gold:             #C97A66;
+  --c-gold-light:       rgba(201, 122, 102, 0.14);
+  --c-muted:            #98A2B3;
+  --c-dark:             #0F1B33;
+
+  /* ── Layout ───────────────────────────────────────────────────────────── */
+  --bottom-nav-height: 104px;
+  --page-px:           16px;
+  --card-radius:       24px;
+  --btn-radius:        16px;
+  --section-gap:       24px;
+
+  /* ── Shadows ──────────────────────────────────────────────────────────── */
+  --shadow-card: 0 8px 24px rgba(15, 27, 51, 0.07);
+  --shadow-hero: 0 20px 48px rgba(15, 27, 51, 0.10);
+  --shadow-nav:  0 -4px 24px rgba(15, 27, 51, 0.06);
 }
 
+/* ── Dark Mode ───────────────────────────────────────────────────────────── */
 @media (prefers-color-scheme: dark) {
   :root {
+    --bg-app:             #07111F;
+    --bg-elevated:        #14213A;
+    --surface-card:       rgba(16, 29, 49, 0.92);
+    --glass-surface:      rgba(20, 33, 58, 0.80);
+    --glass-strong:       rgba(20, 33, 58, 0.92);
+    --text-primary:       #FFF7EF;
+    --text-secondary:     #B8C0CC;
+    --text-muted:         #8899AA;
+    --accent:             #D18A76;
+    --accent-strong:      #FFF7EF;
+    --accent-soft:        rgba(209, 138, 118, 0.20);
+    --bronze:             #D18A76;
+    --border-soft:        rgba(255, 247, 239, 0.08);
+    --border-strong:      rgba(255, 247, 239, 0.12);
+    --border:             rgba(255, 247, 239, 0.10);
+    --azz-primary:        #FFF7EF;
+    --azz-text-main:      #FFF7EF;
+    --azz-text-secondary: #B8C0CC;
+    --azz-text-muted:     #8899AA;
+    --azz-border-soft:    rgba(255, 247, 239, 0.08);
+    --azz-border-strong:  rgba(255, 247, 239, 0.12);
+    --azz-bronze:         #D18A76;
+    --kitchen-rose:       #D18A76;
+    --kitchen-bg:         #0D1A28;
     --color-bg:           #07111F;
     --color-surface:      #101D31;
     --color-elevated:     #14213A;
@@ -124,20 +151,37 @@
     --color-text-muted:   #B8C0CC;
     --color-text-inverse: #0F1B33;
     --color-accent:       #D18A76;
-    --color-accent-soft:  rgba(201, 122, 102, 0.20);
+    --color-accent-soft:  rgba(209, 138, 118, 0.20);
     --color-border:       rgba(255, 247, 239, 0.10);
+    --shadow-card: none;
+    --shadow-hero: none;
+    --shadow-nav:  none;
+    --background:   #07111F;
+    --surface:      rgba(16, 29, 49, 0.92);
+    --foreground:   #FFF7EF;
   }
 }
 
 .dark {
+  --bg-app:             #07111F;
+  --bg-elevated:        #14213A;
+  --surface-card:       rgba(16, 29, 49, 0.92);
+  --text-primary:       #FFF7EF;
+  --text-secondary:     #B8C0CC;
+  --text-muted:         #8899AA;
+  --accent:             #D18A76;
+  --accent-strong:      #FFF7EF;
+  --accent-soft:        rgba(209, 138, 118, 0.20);
+  --bronze:             #D18A76;
+  --border-soft:        rgba(255, 247, 239, 0.08);
+  --border-strong:      rgba(255, 247, 239, 0.12);
+  --border:             rgba(255, 247, 239, 0.10);
   --color-bg:           #07111F;
   --color-surface:      #101D31;
   --color-elevated:     #14213A;
   --color-text:         #FFF7EF;
   --color-text-muted:   #B8C0CC;
-  --color-text-inverse: #0F1B33;
   --color-accent:       #D18A76;
-  --color-accent-soft:  rgba(201, 122, 102, 0.20);
   --color-border:       rgba(255, 247, 239, 0.10);
 }
 
@@ -169,91 +213,80 @@ body {
 
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(67, 82, 56, 0.18); border-radius: 2px; }
+::-webkit-scrollbar-thumb { background: rgba(201, 122, 102, 0.25); border-radius: 2px; }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   App Shell Background  — Azz Soft Depth
+   App Shell Backgrounds
    ═══════════════════════════════════════════════════════════════════════════ */
 .app-bg {
   background:
-    radial-gradient(circle at top center,   rgba(246, 201, 178, 0.18), transparent 38%),
-    radial-gradient(circle at bottom right, rgba(15,  27,  51,  0.04), transparent 32%),
-    linear-gradient(180deg, #F7F2EC 0%, #F4EFE8 50%, #EFE8DF 100%);
-  color: var(--color-text);
+    radial-gradient(ellipse at top,    rgba(246, 201, 178, 0.16) 0%, transparent 42%),
+    radial-gradient(ellipse at bottom right, rgba(15, 27, 51, 0.04) 0%, transparent 36%),
+    linear-gradient(180deg, #F7F2EC 0%, #F2EDE5 55%, #EDE6DC 100%);
+  color: var(--text-primary);
   min-height: 100dvh;
 }
 
-/* Kitchen-specific shell */
+.dark .app-bg {
+  background:
+    radial-gradient(ellipse at top, rgba(209, 138, 118, 0.06) 0%, transparent 40%),
+    linear-gradient(180deg, #07111F 0%, #060F1B 100%);
+}
+
 .kitchen-shell {
   background:
-    radial-gradient(circle at top right,  rgba(244, 217, 207, 0.55), transparent 34%),
-    radial-gradient(circle at bottom left, rgba(168, 185, 154, 0.20), transparent 30%),
-    linear-gradient(180deg, #FFF8F2 0%, #FBF3EA 52%, #F5E8DD 100%);
+    radial-gradient(ellipse at top right, rgba(246, 201, 178, 0.22), transparent 38%),
+    linear-gradient(180deg, #FAF4EF 0%, #F7EFE8 55%, #F1E5DB 100%);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    Card System
    ═══════════════════════════════════════════════════════════════════════════ */
-
-/* Premium glass card */
 .azz-card {
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(67, 82, 56, 0.14);
-  border-radius: 32px;
-  box-shadow:
-    0 24px 60px rgba(67, 82, 56, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.80);
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
+  background: rgba(255, 253, 248, 0.90);
+  border: 1px solid var(--border-strong);
+  border-radius: 28px;
+  box-shadow: var(--shadow-card);
 }
 
-/* Soft secondary card */
 .azz-card-soft {
-  background: rgba(255, 255, 255, 0.56);
-  border: 1px solid rgba(67, 82, 56, 0.10);
-  border-radius: 24px;
-  box-shadow: 0 12px 32px rgba(67, 82, 56, 0.08);
+  background: rgba(255, 253, 248, 0.72);
+  border: 1px solid var(--border-soft);
+  border-radius: 22px;
+  box-shadow: 0 6px 18px rgba(15, 27, 51, 0.05);
 }
 
-/* Kitchen warm card */
 .kitchen-card {
-  background: rgba(255, 255, 255, 0.74);
-  border: 1px solid rgba(201, 130, 114, 0.16);
-  border-radius: 32px;
-  box-shadow:
-    0 24px 60px rgba(184, 111, 88, 0.13),
-    inset 0 1px 0 rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
+  background: rgba(255, 253, 248, 0.88);
+  border: 1px solid rgba(201, 122, 102, 0.16);
+  border-radius: 28px;
+  box-shadow: 0 12px 32px rgba(15, 27, 51, 0.07);
 }
 
-/* Legacy — keep for unstyled components */
 .card {
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(67, 82, 56, 0.14);
+  background: var(--surface-card);
+  border: 1px solid var(--border-strong);
   border-radius: var(--card-radius);
   box-shadow: var(--shadow-card);
 }
 
 .lux-card {
-  background: rgba(255, 255, 255, 0.65);
-  border: 1px solid rgba(67, 82, 56, 0.12);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 28px;
-  box-shadow: 0 20px 50px rgba(67, 82, 56, 0.12);
+  background: rgba(255, 253, 248, 0.80);
+  border: 1px solid var(--border-strong);
+  border-radius: 26px;
+  box-shadow: var(--shadow-hero);
 }
 
 .hero-card {
   background: linear-gradient(
     135deg,
-    rgba(168, 185, 154, 0.22) 0%,
-    rgba(181, 139, 85, 0.10) 60%,
-    rgba(255, 253, 247, 0.85) 100%
+    rgba(201, 122, 102, 0.10) 0%,
+    rgba(246, 201, 178, 0.12) 50%,
+    rgba(255, 253, 248, 0.90) 100%
   );
-  border: 1px solid rgba(67, 82, 56, 0.14);
-  border-radius: 28px;
-  box-shadow: 0 20px 60px rgba(67, 82, 56, 0.14);
+  border: 1px solid var(--border-strong);
+  border-radius: 26px;
+  box-shadow: var(--shadow-hero);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -263,25 +296,27 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.58);
-  border: 1px solid rgba(67, 82, 56, 0.12);
-  box-shadow: 0 10px 24px rgba(67, 82, 56, 0.08);
+  border-radius: 14px;
+  background: var(--surface-card);
+  border: 1px solid var(--border-soft);
   flex-shrink: 0;
 }
-.icon-badge--large  { width: 56px; height: 56px; border-radius: 20px; }
-.icon-badge--medium { width: 44px; height: 44px; border-radius: 16px; }
-.icon-badge--small  { width: 34px; height: 34px; border-radius: 12px; }
+.icon-badge--large  { width: 56px; height: 56px; border-radius: 18px; }
+.icon-badge--medium { width: 44px; height: 44px; border-radius: 14px; }
+.icon-badge--small  { width: 34px; height: 34px; border-radius: 11px; }
 
-.icon-badge--olive   { color: var(--azz-primary);  background: rgba(168, 185, 154, 0.22); border-color: rgba(67, 82, 56, 0.14); }
-.icon-badge--bronze  { color: var(--azz-bronze);   background: rgba(181, 139, 85, 0.16);  border-color: rgba(181, 139, 85, 0.20); }
-.icon-badge--kitchen { color: var(--kitchen-rose);  background: rgba(244, 217, 207, 0.50); border-color: rgba(201, 130, 114, 0.18); }
-.icon-badge--sage    { color: var(--kitchen-sage);  background: rgba(168, 185, 154, 0.20); border-color: rgba(168, 185, 154, 0.22); }
-.icon-badge--warning { color: var(--azz-warning);   background: rgba(216, 154, 69, 0.14);  border-color: rgba(216, 154, 69, 0.18); }
-.icon-badge--danger  { color: var(--azz-danger);    background: rgba(199, 100, 85, 0.12);  border-color: rgba(199, 100, 85, 0.16); }
-.icon-badge--info    { color: var(--azz-info);      background: rgba(94, 124, 146, 0.14);  border-color: rgba(94, 124, 146, 0.16); }
-.icon-badge--success { color: var(--azz-success);   background: rgba(92, 154, 104, 0.14);  border-color: rgba(92, 154, 104, 0.16); }
-.icon-badge--purple  { color: #7C5FC4;              background: rgba(167, 130, 255, 0.14); border-color: rgba(167, 130, 255, 0.18); }
+.icon-badge--navy    { color: #0F1B33;   background: rgba(15, 27, 51, 0.08);   border-color: rgba(15, 27, 51, 0.10); }
+.icon-badge--clay    { color: #C97A66;   background: rgba(201, 122, 102, 0.12); border-color: rgba(201, 122, 102, 0.18); }
+.icon-badge--peach   { color: #A05540;   background: rgba(246, 201, 178, 0.40); border-color: rgba(201, 122, 102, 0.18); }
+.icon-badge--olive   { color: #0F1B33;   background: rgba(15, 27, 51, 0.07);   border-color: rgba(15, 27, 51, 0.10); }
+.icon-badge--bronze  { color: #C97A66;   background: rgba(201, 122, 102, 0.12); border-color: rgba(201, 122, 102, 0.18); }
+.icon-badge--kitchen { color: #C97A66;   background: rgba(246, 201, 178, 0.35); border-color: rgba(201, 122, 102, 0.16); }
+.icon-badge--sage    { color: #5A7A6A;   background: rgba(114, 191, 163, 0.15); border-color: rgba(114, 191, 163, 0.20); }
+.icon-badge--warning { color: #A0640A;   background: rgba(216, 154, 69, 0.14);  border-color: rgba(216, 154, 69, 0.20); }
+.icon-badge--danger  { color: #C03040;   background: rgba(215, 92, 92, 0.12);   border-color: rgba(215, 92, 92, 0.18); }
+.icon-badge--info    { color: #3A6070;   background: rgba(90, 122, 138, 0.12);  border-color: rgba(90, 122, 138, 0.16); }
+.icon-badge--success { color: #2D7A5F;   background: rgba(114, 191, 163, 0.15); border-color: rgba(114, 191, 163, 0.20); }
+.icon-badge--muted   { color: #667085;   background: rgba(232, 221, 211, 0.50); border-color: rgba(232, 221, 211, 0.60); }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    Badge System
@@ -290,55 +325,60 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  padding: 2px 8px;
+  padding: 2px 9px;
   border-radius: 20px;
   font-size: 11px;
   font-weight: 600;
   line-height: 1.6;
   white-space: nowrap;
+  font-family: 'Cairo', 'IBM Plex Sans Arabic', sans-serif;
 }
-.badge-danger  { background: var(--danger-soft);   color: var(--danger);   }
-.badge-warning { background: var(--warning-soft);  color: var(--warning);  }
-.badge-success { background: var(--success-soft);  color: var(--success);  }
-.badge-info    { background: var(--info-soft);      color: var(--info);     }
-.badge-accent  { background: rgba(168,185,154,0.18); color: var(--accent-strong); }
-.badge-bronze  { background: rgba(181,139,85,0.16);  color: var(--bronze);  }
-.badge-muted   { background: rgba(67,82,56,0.08);   color: var(--text-secondary); }
+.badge-danger  { background: var(--danger-soft);   color: #B02030; }
+.badge-warning { background: var(--warning-soft);  color: #8B5A10; }
+.badge-success { background: var(--success-soft);  color: #2D7A5F; }
+.badge-info    { background: var(--info-soft);     color: #3A6070; }
+.badge-accent  { background: rgba(201,122,102,0.15); color: #8B3A22; }
+.badge-bronze  { background: rgba(201,122,102,0.12); color: #8B3A22; }
+.badge-muted   { background: rgba(232,221,211,0.60); color: var(--text-secondary); }
+.badge-navy    { background: rgba(15,27,51,0.08);    color: #0F1B33; }
 
-.badge-red    { background: var(--danger-soft);  color: var(--danger);  }
-.badge-amber  { background: var(--warning-soft); color: var(--warning); }
-.badge-green  { background: var(--success-soft); color: var(--success); }
-.badge-gold   { background: rgba(181,139,85,0.16); color: var(--bronze); }
-.badge-blue   { background: var(--info-soft);    color: var(--info);    }
-.badge-dark   { background: rgba(67,82,56,0.08); color: var(--text-primary); }
+.badge-red    { background: var(--danger-soft);  color: #B02030; }
+.badge-amber  { background: var(--warning-soft); color: #8B5A10; }
+.badge-green  { background: var(--success-soft); color: #2D7A5F; }
+.badge-gold   { background: rgba(201,122,102,0.12); color: #8B3A22; }
+.badge-blue   { background: var(--info-soft);    color: #3A6070; }
+.badge-dark   { background: rgba(15,27,51,0.08); color: var(--text-primary); }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    Button System
    ═══════════════════════════════════════════════════════════════════════════ */
 .btn-primary {
-  background: var(--accent-strong);
-  color: #FFFFFF;
+  background: var(--text-primary);
+  color: #FFFDF8;
   border-radius: var(--btn-radius);
-  font-weight: 700;
+  font-weight: 600;
+  font-family: 'Cairo', 'IBM Plex Sans Arabic', sans-serif;
   transition: transform 0.12s ease, opacity 0.12s ease;
 }
-.btn-primary:active { transform: scale(0.96); opacity: 0.9; }
+.btn-primary:active { transform: scale(0.97); opacity: 0.92; }
 
 .btn-glass {
-  background: rgba(255,255,255,0.64);
-  border: 1px solid rgba(67,82,56,0.14);
+  background: rgba(255, 253, 248, 0.75);
+  border: 1px solid var(--border-strong);
   border-radius: var(--btn-radius);
   color: var(--text-primary);
   font-weight: 500;
+  font-family: 'Cairo', 'IBM Plex Sans Arabic', sans-serif;
   transition: background 0.15s ease;
 }
-.btn-glass:active { background: rgba(255,255,255,0.80); }
+.btn-glass:active { background: rgba(255, 253, 248, 0.92); }
 
 .btn-danger {
   background: var(--danger-soft);
   color: var(--danger);
   border-radius: var(--btn-radius);
   font-weight: 600;
+  font-family: 'Cairo', 'IBM Plex Sans Arabic', sans-serif;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -347,9 +387,7 @@ body {
 .interactive-card {
   transition: transform 180ms ease, box-shadow 180ms ease;
 }
-.interactive-card:active {
-  transform: scale(0.98);
-}
+.interactive-card:active { transform: scale(0.98); }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    Layout Helpers
@@ -385,10 +423,6 @@ body {
   70%  { transform: scale(0.88); }
   100% { transform: scale(1);    }
 }
-@keyframes pillGlide {
-  from { opacity: 0.7; }
-  to   { opacity: 1; }
-}
 @keyframes shimmer {
   0%   { background-position: -200% 0; }
   100% { background-position:  200% 0; }
@@ -401,16 +435,20 @@ body {
   to { transform: rotate(360deg); }
 }
 
-.slide-up     { animation: slideUp     0.32s cubic-bezier(0.22, 1, 0.36, 1) both; }
-.slide-sheet  { animation: slideSheet  0.36s cubic-bezier(0.22, 1, 0.36, 1) both; }
-.pop-in       { animation: popIn       0.24s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
-.fade-in      { animation: fadeIn      0.18s ease both; }
+.slide-up     { animation: slideUp    0.32s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.slide-sheet  { animation: slideSheet 0.36s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.pop-in       { animation: popIn      0.24s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.fade-in      { animation: fadeIn     0.18s ease both; }
 .check-bounce { animation: checkBounce 0.38s cubic-bezier(0.22, 1, 0.36, 1) both; }
 .shimmer {
-  background: linear-gradient(90deg, rgba(67,82,56,0.04) 25%, rgba(67,82,56,0.08) 50%, rgba(67,82,56,0.04) 75%);
+  background: linear-gradient(90deg,
+    rgba(201,122,102,0.04) 25%,
+    rgba(201,122,102,0.08) 50%,
+    rgba(201,122,102,0.04) 75%
+  );
   background-size: 200% 100%;
   animation: shimmer 1.8s infinite;
 }
 .urgent-pulse { animation: urgentPulse 2s ease-in-out infinite; }
 
-input[type="checkbox"] { accent-color: var(--accent-strong); }
+input[type="checkbox"] { accent-color: var(--accent); }

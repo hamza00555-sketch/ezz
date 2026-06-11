@@ -10,8 +10,8 @@ const actions = [
     label: 'مهمة',
     sub: 'جديدة',
     color: 'var(--accent-strong)',
-    bg: 'rgba(163,177,138,0.10)',
-    border: 'rgba(163,177,138,0.20)',
+    bg: 'rgba(201,122,102,0.08)',
+    border: 'rgba(201,122,102,0.18)',
   },
   {
     key: 'shortage',
@@ -37,8 +37,8 @@ const actions = [
     label: 'إعلان',
     sub: 'عائلي',
     color: 'var(--bronze)',
-    bg: 'rgba(176,141,87,0.10)',
-    border: 'rgba(176,141,87,0.22)',
+    bg: 'rgba(201,122,102,0.08)',
+    border: 'rgba(201,122,102,0.18)',
   },
 ];
 
@@ -73,7 +73,7 @@ export function DailySummary() {
                 style={{
                   width: 38, height: 38,
                   borderRadius: 12,
-                  background: `rgba(${action.color === 'var(--accent-strong)' ? '163,177,138' : '255,255,255'}, 0.10)`,
+                  background: 'rgba(15,27,51,0.06)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   flexShrink: 0,
                 }}

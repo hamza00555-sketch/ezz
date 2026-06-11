@@ -86,9 +86,9 @@ export function WishForm({ open, onClose }: WishFormProps) {
                 onClick={() => setType(t.value)}
                 className="py-2.5 rounded-xl text-xs font-medium transition-all text-center"
                 style={{
-                  background: type === t.value ? 'rgba(176,141,87,0.18)' : 'rgba(255,255,255,0.06)',
+                  background: type === t.value ? 'rgba(201,122,102,0.18)' : 'rgba(15,27,51,0.05)',
                   color: type === t.value ? 'var(--bronze)' : 'var(--text-secondary)',
-                  border: type === t.value ? '1.5px solid rgba(176,141,87,0.50)' : '1.5px solid var(--border-soft)',
+                  border: type === t.value ? '1.5px solid rgba(201,122,102,0.50)' : '1.5px solid var(--border-soft)',
                 }}
               >
                 {t.label}

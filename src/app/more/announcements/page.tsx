@@ -45,13 +45,13 @@ export default function AnnouncementsPage() {
                 style={{
                   padding: 16, borderRadius: 20,
                   background: ann.isPinned
-                    ? 'linear-gradient(135deg, rgba(176,141,87,0.14), rgba(176,141,87,0.07))'
+                    ? 'linear-gradient(135deg, rgba(201,122,102,0.14), rgba(201,122,102,0.07))'
                     : 'var(--surface-card)',
-                  border: `1px solid ${ann.isPinned ? 'rgba(176,141,87,0.30)' : 'var(--border-soft)'}`,
+                  border: `1px solid ${ann.isPinned ? 'rgba(201,122,102,0.30)' : 'var(--border-soft)'}`,
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                  <div style={{ padding: 10, borderRadius: 14, flexShrink: 0, background: ann.isPinned ? 'rgba(176,141,87,0.20)' : 'rgba(255,255,255,0.07)' }}>
+                  <div style={{ padding: 10, borderRadius: 14, flexShrink: 0, background: ann.isPinned ? 'rgba(201,122,102,0.20)' : 'rgba(15,27,51,0.06)' }}>
                     <Megaphone size={18} color={ann.isPinned ? 'var(--bronze)' : 'var(--text-muted)'} strokeWidth={1.8} />
                   </div>
                   <div style={{ flex: 1 }}>
@@ -60,7 +60,7 @@ export default function AnnouncementsPage() {
                         {ann.title}
                       </p>
                       {ann.isPinned && (
-                        <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, fontWeight: 600, flexShrink: 0, background: 'rgba(176,141,87,0.20)', color: 'var(--bronze)' }}>
+                        <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, fontWeight: 600, flexShrink: 0, background: 'rgba(201,122,102,0.20)', color: 'var(--bronze)' }}>
                           📌 مثبت
                         </span>
                       )}
@@ -100,8 +100,8 @@ export default function AnnouncementsPage() {
                       marginTop: 14, width: '100%',
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                       padding: '11px 0', borderRadius: 14,
-                      background: 'rgba(176,141,87,0.22)',
-                      border: '1px solid rgba(176,141,87,0.35)',
+                      background: 'rgba(201,122,102,0.22)',
+                      border: '1px solid rgba(201,122,102,0.35)',
                       color: 'var(--bronze)', fontSize: 13, fontWeight: 600, cursor: 'pointer',
                     }}
                     className="active:scale-[0.98]"

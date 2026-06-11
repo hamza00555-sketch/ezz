@@ -9,21 +9,21 @@ import { formatArabicDate, isOverdue, taskStatusLabels, priorityLabels, category
 import type { Task } from '@/types';
 
 const priorityConfig: Record<string, { bar: string; badge: string; badgeText: string }> = {
-  urgent: { bar: 'var(--danger)',            badge: 'var(--danger-soft)',           badgeText: 'var(--danger)'   },
-  high:   { bar: 'var(--warning)',           badge: 'var(--warning-soft)',          badgeText: 'var(--warning)'  },
-  medium: { bar: 'rgba(67,82,56,0.18)',   badge: 'rgba(67,82,56,0.07)',       badgeText: 'var(--text-secondary)' },
-  low:    { bar: 'rgba(67,82,56,0.10)',   badge: 'rgba(67,82,56,0.05)',       badgeText: 'var(--text-muted)'     },
+  urgent: { bar: 'var(--danger)',              badge: 'var(--danger-soft)',           badgeText: 'var(--danger)'         },
+  high:   { bar: 'var(--warning)',             badge: 'var(--warning-soft)',          badgeText: 'var(--warning)'        },
+  medium: { bar: 'rgba(201,122,102,0.30)',     badge: 'rgba(201,122,102,0.08)',       badgeText: 'var(--text-secondary)' },
+  low:    { bar: 'rgba(15,27,51,0.10)',        badge: 'rgba(15,27,51,0.05)',          badgeText: 'var(--text-muted)'     },
 };
 
 const statusConfig: Record<string, { badge: string; text: string }> = {
-  new:                { badge: 'rgba(67,82,56,0.07)',   text: 'var(--text-muted)'     },
+  new:                { badge: 'rgba(15,27,51,0.07)',      text: 'var(--text-muted)'     },
   pending_acceptance: { badge: 'var(--warning-soft)',      text: 'var(--warning)'        },
   accepted:           { badge: 'var(--info-soft)',         text: 'var(--info)'           },
   in_progress:        { badge: 'var(--warning-soft)',      text: 'var(--warning)'        },
   done:               { badge: 'var(--success-soft)',      text: 'var(--success)'        },
   rejected:           { badge: 'var(--danger-soft)',       text: 'var(--danger)'         },
-  postponed:          { badge: 'rgba(167,130,255,0.12)',   text: '#A782FF'               },
-  cancelled:          { badge: 'rgba(67,82,56,0.05)',   text: 'var(--text-muted)'     },
+  postponed:          { badge: 'rgba(201,122,102,0.10)',   text: 'var(--accent)'         },
+  cancelled:          { badge: 'rgba(15,27,51,0.05)',      text: 'var(--text-muted)'     },
 };
 
 interface TaskCardProps {
@@ -77,7 +77,7 @@ export function TaskCard({ task, showAssignee = true }: TaskCardProps) {
               marginTop: 2,
               width: 22, height: 22,
               borderRadius: '50%',
-              border: `2px solid ${isDone ? 'var(--success)' : overdue ? 'var(--danger)' : 'rgba(67,82,56,0.22)'}`,
+              border: `2px solid ${isDone ? 'var(--success)' : overdue ? 'var(--danger)' : 'rgba(15,27,51,0.18)'}`,
               background: isDone ? 'var(--success)' : 'transparent',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               flexShrink: 0, cursor: 'pointer',
@@ -169,9 +169,9 @@ export function TaskCard({ task, showAssignee = true }: TaskCardProps) {
                     onClick={(e) => { e.stopPropagation(); updateTaskStatus(task.id, 'postponed'); }}
                     style={{
                       fontSize: 11, fontWeight: 600, padding: '5px 12px', borderRadius: 12,
-                      background: 'rgba(167,130,255,0.08)',
-                      border: '1px solid rgba(167,130,255,0.20)',
-                      color: '#A782FF', cursor: 'pointer', fontFamily: 'inherit',
+                      background: 'rgba(15,27,51,0.06)',
+                      border: '1px solid rgba(15,27,51,0.12)',
+                      color: 'var(--text-secondary)', cursor: 'pointer', fontFamily: 'inherit',
                     }}
                   >
                     تأجيل
@@ -181,9 +181,9 @@ export function TaskCard({ task, showAssignee = true }: TaskCardProps) {
                   onClick={(e) => { e.stopPropagation(); handleToggle(); }}
                   style={{
                     fontSize: 11, fontWeight: 700, padding: '5px 14px', borderRadius: 12,
-                    background: 'rgba(163,177,138,0.14)',
-                    border: '1px solid rgba(163,177,138,0.30)',
-                    color: 'var(--accent-strong)', cursor: 'pointer', fontFamily: 'inherit',
+                    background: 'rgba(201,122,102,0.12)',
+                    border: '1px solid rgba(201,122,102,0.25)',
+                    color: 'var(--accent)', cursor: 'pointer', fontFamily: 'inherit',
                   }}
                 >
                   تم ✓

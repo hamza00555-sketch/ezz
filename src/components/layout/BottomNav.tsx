@@ -25,14 +25,14 @@ const rightItems = [
 ];
 
 const quickAddItems = [
-  { key: 'task',         icon: CheckSquare,   label: 'مهمة',    color: 'var(--accent-strong)', bg: 'rgba(168,185,154,0.20)' },
+  { key: 'task',         icon: CheckSquare,   label: 'مهمة',    color: 'var(--accent-strong)', bg: 'rgba(201,122,102,0.12)' },
   { key: 'request',      icon: MessageSquare, label: 'طلب',     color: 'var(--info)',           bg: 'var(--info-soft)'       },
   { key: 'wish',         icon: Lightbulb,     label: 'فكرة',    color: 'var(--warning)',        bg: 'var(--warning-soft)'    },
-  { key: 'home_item',    icon: Building2,     label: 'ممتلكات', color: 'var(--accent-strong)', bg: 'rgba(168,185,154,0.16)' },
+  { key: 'home_item',    icon: Building2,     label: 'ممتلكات', color: 'var(--accent-strong)', bg: 'rgba(201,122,102,0.10)' },
   { key: 'document',     icon: FileText,      label: 'وثيقة',   color: 'var(--danger)',         bg: 'var(--danger-soft)'     },
   { key: 'shortage',     icon: ShoppingCart,  label: 'نقص',     color: 'var(--kitchen-rose)',   bg: 'rgba(244,217,207,0.50)' },
-  { key: 'recipe',       icon: BookOpen,      label: 'وصفة',    color: '#8B5CF6',              bg: 'rgba(167,130,255,0.14)' },
-  { key: 'announcement', icon: Megaphone,     label: 'إعلان',   color: 'var(--bronze)',         bg: 'rgba(181,139,85,0.14)'  },
+  { key: 'recipe',       icon: BookOpen,      label: 'وصفة',    color: 'var(--accent)',         bg: 'rgba(201,122,102,0.12)' },
+  { key: 'announcement', icon: Megaphone,     label: 'إعلان',   color: 'var(--bronze)',         bg: 'rgba(201,122,102,0.12)' },
 ];
 
 type FormKey = 'task' | 'request' | 'wish' | 'home_item' | 'document' | 'shortage' | 'recipe' | 'announcement' | 'expense' | null;
@@ -61,7 +61,7 @@ function NavItem({ href, icon: Icon, label, active }: { href: string; icon: Reac
           gap: 3,
           padding: active ? '6px 18px' : '6px 4px',
           borderRadius: 20,
-          background: active ? 'rgba(67, 82, 56, 0.12)' : 'transparent',
+          background: active ? 'rgba(201, 122, 102, 0.12)' : 'transparent',
           transition: 'all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)',
         }}
       >
@@ -124,7 +124,7 @@ export function BottomNav() {
           className="fade-in"
           style={{
             position: 'fixed', inset: 0, zIndex: 28,
-            background: 'rgba(31, 33, 28, 0.40)',
+            background: 'rgba(15, 27, 51, 0.35)',
             backdropFilter: 'blur(4px)',
             WebkitBackdropFilter: 'blur(4px)',
           }}
@@ -141,13 +141,13 @@ export function BottomNav() {
             bottom: NAV_BOTTOM + NAV_HEIGHT + 12,
             left: 16,
             right: 16,
-            background: 'rgba(255, 253, 247, 0.96)',
+            background: 'rgba(247, 242, 236, 0.97)',
             backdropFilter: 'blur(28px)',
             WebkitBackdropFilter: 'blur(28px)',
             borderRadius: 28,
             padding: '16px 12px 12px',
-            border: '1px solid rgba(67, 82, 56, 0.14)',
-            boxShadow: '0 20px 60px rgba(67, 82, 56, 0.18)',
+            border: '1px solid rgba(201, 122, 102, 0.14)',
+            boxShadow: '0 20px 60px rgba(15, 27, 51, 0.12)',
             zIndex: 29,
           }}
         >
@@ -175,7 +175,7 @@ export function BottomNav() {
                     padding: '12px 4px',
                     borderRadius: 18,
                     background: item.bg,
-                    border: '1px solid rgba(67, 82, 56, 0.08)',
+                    border: '1px solid rgba(15, 27, 51, 0.06)',
                     cursor: 'pointer',
                     transition: 'transform 0.12s ease',
                   }}
@@ -201,11 +201,11 @@ export function BottomNav() {
           right: 16,
           height: NAV_HEIGHT,
           borderRadius: 28,
-          background: 'rgba(255, 253, 247, 0.88)',
+          background: 'rgba(247, 242, 236, 0.92)',
           backdropFilter: 'blur(28px)',
           WebkitBackdropFilter: 'blur(28px)',
-          border: '1px solid rgba(67, 82, 56, 0.12)',
-          boxShadow: '0 8px 40px rgba(67, 82, 56, 0.14)',
+          border: '1px solid rgba(232, 221, 211, 0.70)',
+          boxShadow: '0 8px 40px rgba(15, 27, 51, 0.10)',
           zIndex: 30,
           display: 'flex',
           alignItems: 'center',
@@ -225,14 +225,14 @@ export function BottomNav() {
             borderRadius: 22,
             flexShrink: 0,
             background: sheetOpen
-              ? 'rgba(67, 82, 56, 0.10)'
+              ? 'rgba(201, 122, 102, 0.10)'
               : 'var(--accent-strong)',
             border: sheetOpen
-              ? '1.5px solid rgba(67, 82, 56, 0.18)'
-              : '1.5px solid rgba(67, 82, 56, 0.30)',
+              ? '1.5px solid rgba(201, 122, 102, 0.20)'
+              : '1.5px solid rgba(15, 27, 51, 0.20)',
             boxShadow: sheetOpen
-              ? '0 4px 16px rgba(67,82,56,0.10)'
-              : '0 8px 32px rgba(67, 82, 56, 0.30), inset 0 1px 0 rgba(255,255,255,0.22)',
+              ? '0 4px 16px rgba(201,122,102,0.10)'
+              : '0 8px 32px rgba(15, 27, 51, 0.25), inset 0 1px 0 rgba(255,255,255,0.15)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -243,8 +243,8 @@ export function BottomNav() {
           className="active:scale-90"
         >
           {sheetOpen
-            ? <X size={22} color="var(--accent-strong)" strokeWidth={2.5} />
-            : <Plus size={27} color="#FFFFFF" strokeWidth={2.8} />
+            ? <X size={22} color="var(--accent)" strokeWidth={2.5} />
+            : <Plus size={27} color="#FFFDF8" strokeWidth={2.8} />
           }
         </button>
 

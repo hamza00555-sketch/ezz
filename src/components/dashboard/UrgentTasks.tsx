@@ -11,7 +11,7 @@ const priorityDot: Record<string, string> = {
   urgent: 'var(--danger)',
   high:   'var(--warning)',
   medium: 'rgba(255,255,255,0.25)',
-  low:    'rgba(255,255,255,0.12)',
+  low:    'rgba(15,27,51,0.08)',
 };
 
 export function UrgentTasks() {
@@ -75,7 +75,7 @@ export function UrgentTasks() {
               style={{
                 display: 'flex', alignItems: 'center', gap: 12,
                 padding: '14px 16px',
-                borderBottom: i < urgent.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none',
+                borderBottom: i < urgent.length - 1 ? '1px solid rgba(15,27,51,0.05)' : 'none',
                 textDecoration: 'none',
                 transition: 'background 0.12s ease',
               }}

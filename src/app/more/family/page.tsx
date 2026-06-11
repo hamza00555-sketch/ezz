@@ -11,8 +11,8 @@ import { useShallow } from 'zustand/react/shallow';
 import { roleLabels } from '@/lib/utils';
 
 const roleStyle: Record<string, { bg: string; color: string }> = {
-  admin:  { bg: 'rgba(199,231,123,0.15)', color: 'var(--accent-strong)' },
-  member: { bg: 'rgba(255,255,255,0.07)', color: 'var(--text-muted)'    },
+  admin:  { bg: 'rgba(201,122,102,0.12)', color: 'var(--accent-strong)' },
+  member: { bg: 'rgba(15,27,51,0.06)',    color: 'var(--text-muted)'    },
 };
 
 export default function FamilyPage() {
@@ -75,8 +75,8 @@ export default function FamilyPage() {
             style={{
               padding: '16px 18px',
               borderRadius: 22,
-              background: 'linear-gradient(135deg, rgba(176,141,87,0.10) 0%, rgba(176,141,87,0.04) 100%)',
-              border: '1px solid rgba(176,141,87,0.30)',
+              background: 'linear-gradient(135deg, rgba(201,122,102,0.08) 0%, rgba(247,242,236,0.90) 100%)',
+              border: '1px solid rgba(201,122,102,0.22)',
               marginBottom: 4,
             }}
           >
@@ -98,8 +98,8 @@ export default function FamilyPage() {
                   textAlign: 'center',
                   padding: '10px 14px',
                   borderRadius: 14,
-                  background: 'rgba(255,255,255,0.06)',
-                  border: '1px solid rgba(255,255,255,0.10)',
+                  background: 'rgba(15,27,51,0.05)',
+                  border: '1px solid rgba(15,27,51,0.08)',
                 }}
               >
                 {inviteCode}
@@ -117,8 +117,8 @@ export default function FamilyPage() {
                 style={{
                   flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                   padding: '10px 16px', borderRadius: 14,
-                  background: copied ? 'rgba(163,177,138,0.18)' : 'rgba(255,255,255,0.07)',
-                  border: `1px solid ${copied ? 'rgba(163,177,138,0.35)' : 'rgba(255,255,255,0.12)'}`,
+                  background: copied ? 'rgba(201,122,102,0.12)' : 'rgba(15,27,51,0.06)',
+                  border: `1px solid ${copied ? 'rgba(201,122,102,0.25)' : 'rgba(15,27,51,0.10)'}`,
                   cursor: 'pointer', fontFamily: 'inherit',
                   transition: 'all 0.2s ease',
                 }}
@@ -137,8 +137,8 @@ export default function FamilyPage() {
                 style={{
                   flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                   padding: '10px 16px', borderRadius: 14,
-                  background: 'rgba(176,141,87,0.15)',
-                  border: '1px solid rgba(176,141,87,0.30)',
+                  background: 'rgba(201,122,102,0.10)',
+                  border: '1px solid rgba(201,122,102,0.22)',
                   cursor: 'pointer', fontFamily: 'inherit',
                 }}
               >
@@ -160,7 +160,7 @@ export default function FamilyPage() {
               style={{
                 padding: 16, borderRadius: 20,
                 background: 'var(--surface-card)',
-                border: `1px solid ${isCurrentUser ? 'rgba(199,231,123,0.25)' : 'var(--border-soft)'}`,
+                border: `1px solid ${isCurrentUser ? 'rgba(201,122,102,0.25)' : 'var(--border-soft)'}`,
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -171,7 +171,7 @@ export default function FamilyPage() {
                       {member.name}
                     </p>
                     {isCurrentUser && (
-                      <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, fontWeight: 600, background: 'rgba(199,231,123,0.15)', color: 'var(--accent-strong)' }}>
+                      <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, fontWeight: 600, background: 'rgba(201,122,102,0.12)', color: 'var(--accent-strong)' }}>
                         أنت
                       </span>
                     )}
@@ -202,17 +202,17 @@ export default function FamilyPage() {
                   </span>
                 )}
                 {member.permissions.canManageFinance && (
-                  <span style={{ fontSize: 10, padding: '4px 10px', borderRadius: 10, background: 'rgba(176,141,87,0.15)', color: 'var(--bronze)' }}>
+                  <span style={{ fontSize: 10, padding: '4px 10px', borderRadius: 10, background: 'rgba(201,122,102,0.10)', color: 'var(--bronze)' }}>
                     إدارة المصاريف
                   </span>
                 )}
                 {member.permissions.canInviteMembers && (
-                  <span style={{ fontSize: 10, padding: '4px 10px', borderRadius: 10, background: 'rgba(167,130,255,0.12)', color: '#A782FF' }}>
+                  <span style={{ fontSize: 10, padding: '4px 10px', borderRadius: 10, background: 'rgba(15,27,51,0.08)', color: 'var(--accent-strong)' }}>
                     دعوة أفراد
                   </span>
                 )}
                 {member.permissions.canManageKitchen && (
-                  <span style={{ fontSize: 10, padding: '4px 10px', borderRadius: 10, background: 'rgba(232,121,249,0.10)', color: '#E879F9' }}>
+                  <span style={{ fontSize: 10, padding: '4px 10px', borderRadius: 10, background: 'rgba(201,122,102,0.10)', color: 'var(--accent)' }}>
                     إدارة المطبخ
                   </span>
                 )}

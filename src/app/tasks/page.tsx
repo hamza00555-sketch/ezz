@@ -105,8 +105,8 @@ export default function TasksPage() {
             style={{
               display: 'flex', alignItems: 'center', gap: 5,
               padding: '8px 14px', borderRadius: 14, marginTop: 2,
-              background: 'rgba(163,177,138,0.18)',
-              border: '1px solid rgba(163,177,138,0.32)',
+              background: 'rgba(201,122,102,0.10)',
+              border: '1px solid rgba(201,122,102,0.22)',
               color: 'var(--accent-strong)',
               fontSize: 13, fontWeight: 700,
               cursor: 'pointer', fontFamily: 'inherit',
@@ -137,8 +137,8 @@ export default function TasksPage() {
                   display: 'flex', alignItems: 'center', gap: 6,
                   padding: '7px 14px', borderRadius: 20, whiteSpace: 'nowrap',
                   minHeight: 34,
-                  background: isActive ? 'rgba(163,177,138,0.18)' : 'rgba(67,82,56,0.04)',
-                  border: `1px solid ${isActive ? 'rgba(163,177,138,0.35)' : 'rgba(67,82,56,0.10)'}`,
+                  background: isActive ? 'rgba(201,122,102,0.12)' : 'rgba(15,27,51,0.04)',
+                  border: `1px solid ${isActive ? 'rgba(201,122,102,0.22)' : 'rgba(15,27,51,0.10)'}`,
                   color: isActive ? 'var(--accent-strong)' : 'var(--text-muted)',
                   fontSize: 13, fontWeight: isActive ? 700 : 400,
                   cursor: 'pointer', fontFamily: 'inherit',
@@ -152,7 +152,7 @@ export default function TasksPage() {
                     style={{
                       fontSize: 11, fontWeight: 700,
                       padding: '1px 7px', borderRadius: 10,
-                      background: isActive ? 'rgba(163,177,138,0.28)' : 'rgba(67,82,56,0.08)',
+                      background: isActive ? 'rgba(201,122,102,0.18)' : 'rgba(15,27,51,0.08)',
                       color: isActive ? 'var(--accent-strong)' : 'var(--text-secondary)',
                       lineHeight: 1.5,
                     }}

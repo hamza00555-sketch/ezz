@@ -83,7 +83,7 @@ export default function HomeSectionPage() {
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                    <div style={{ padding: 10, borderRadius: 14, flexShrink: 0, background: 'rgba(255,255,255,0.07)' }}>
+                    <div style={{ padding: 10, borderRadius: 14, flexShrink: 0, background: 'rgba(15,27,51,0.06)' }}>
                       <Package size={20} color="var(--text-muted)" strokeWidth={1.7} />
                     </div>
                     <div style={{ flex: 1 }}>
@@ -98,7 +98,7 @@ export default function HomeSectionPage() {
                         )}
                       </div>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 6 }}>
-                        <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, background: 'rgba(255,255,255,0.07)', color: 'var(--text-muted)' }}>
+                        <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, background: 'rgba(15,27,51,0.06)', color: 'var(--text-muted)' }}>
                           {itemCategoryLabels[item.category] || item.category}
                         </span>
                         {item.location && (
@@ -162,7 +162,7 @@ export default function HomeSectionPage() {
                         <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>
                           {doc.name}
                         </p>
-                        <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, flexShrink: 0, background: 'rgba(255,255,255,0.07)', color: 'var(--text-muted)' }}>
+                        <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, flexShrink: 0, background: 'rgba(15,27,51,0.06)', color: 'var(--text-muted)' }}>
                           {docTypeLabels[doc.type]}
                         </span>
                       </div>
@@ -203,7 +203,7 @@ export default function HomeSectionPage() {
                     style={{ padding: 14, borderRadius: 20, background: 'var(--surface-card)', border: '1px solid var(--border-soft)' }}
                   >
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                      <div style={{ padding: 10, borderRadius: 14, flexShrink: 0, background: 'rgba(176,141,87,0.15)' }}>
+                      <div style={{ padding: 10, borderRadius: 14, flexShrink: 0, background: 'rgba(201,122,102,0.15)' }}>
                         <Wrench size={18} color="var(--bronze)" strokeWidth={1.7} />
                       </div>
                       <div style={{ flex: 1 }}>
@@ -231,7 +231,7 @@ export default function HomeSectionPage() {
                           )}
                         </div>
                         {m.nextReminder && (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 8, padding: '8px 10px', borderRadius: 12, background: 'rgba(176,141,87,0.12)' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 8, padding: '8px 10px', borderRadius: 12, background: 'rgba(201,122,102,0.12)' }}>
                             <AlertTriangle size={12} color="var(--bronze)" />
                             <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--bronze)' }}>
                               الصيانة القادمة: {formatArabicDate(m.nextReminder)}

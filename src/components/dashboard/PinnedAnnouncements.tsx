@@ -32,8 +32,8 @@ export function PinnedAnnouncements() {
             <div
               key={ann.id}
               style={{
-                background: 'linear-gradient(135deg, rgba(176,141,87,0.12), rgba(176,141,87,0.06))',
-                border: '1px solid rgba(176,141,87,0.25)',
+                background: 'linear-gradient(135deg, rgba(201,122,102,0.12), rgba(201,122,102,0.06))',
+                border: '1px solid rgba(201,122,102,0.25)',
                 borderRadius: 20,
                 padding: '16px',
               }}
@@ -42,7 +42,7 @@ export function PinnedAnnouncements() {
                 <div
                   style={{
                     width: 36, height: 36, borderRadius: 12, flexShrink: 0,
-                    background: 'rgba(176,141,87,0.18)',
+                    background: 'rgba(201,122,102,0.18)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}
                 >
@@ -81,8 +81,8 @@ export function PinnedAnnouncements() {
                     style={{
                       width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                       padding: '10px 0', borderRadius: 12,
-                      background: 'rgba(176,141,87,0.22)',
-                      border: '1px solid rgba(176,141,87,0.35)',
+                      background: 'rgba(201,122,102,0.22)',
+                      border: '1px solid rgba(201,122,102,0.35)',
                       color: 'var(--bronze)', fontSize: 12, fontWeight: 600, cursor: 'pointer',
                     }}
                     className="active:scale-[0.98]"
