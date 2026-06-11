@@ -35,31 +35,31 @@ export default function ExpensesPage() {
       />
 
       <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
-        {/* Monthly hero */}
+        {/* Monthly hero — solid navy, clear contrast */}
         <div
           style={{
-            padding: 20, borderRadius: 24,
-            background: 'linear-gradient(135deg, rgba(201,122,102,0.30) 0%, rgba(201,122,102,0.14) 60%, rgba(28,32,39,0.80) 100%)',
-            border: '1px solid rgba(201,122,102,0.30)',
+            padding: 22, borderRadius: 24,
+            background: '#0F1B33',
+            border: '1px solid rgba(255,247,239,0.10)',
           }}
         >
-          <p style={{ fontSize: 13, color: 'rgba(245,242,234,0.70)', marginBottom: 4 }}>إجمالي الشهر</p>
-          <p style={{ fontSize: 32, fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1 }}>
+          <p style={{ fontSize: 13, color: '#B8C0CC', marginBottom: 6 }}>إجمالي الشهر</p>
+          <p style={{ fontSize: 32, fontWeight: 900, color: '#FFFDF8', lineHeight: 1 }}>
             {formatCurrency(totalSpent)}
           </p>
-          <p style={{ fontSize: 13, color: 'rgba(245,242,234,0.60)', marginTop: 4 }}>
+          <p style={{ fontSize: 13, color: '#B8C0CC', marginTop: 6 }}>
             من {formatCurrency(totalBudget)}
           </p>
-          <div style={{ marginTop: 16, height: 6, borderRadius: 6, background: 'rgba(15,27,51,0.10)' }}>
+          <div style={{ marginTop: 16, height: 6, borderRadius: 6, background: 'rgba(255,247,239,0.12)' }}>
             <div
               style={{
                 height: 6, borderRadius: 6, transition: 'width 0.4s ease',
                 width: `${Math.min(totalPct, 100)}%`,
-                background: totalPct > 90 ? 'var(--danger)' : 'var(--accent-strong)',
+                background: totalPct > 90 ? 'var(--danger)' : '#C97A66',
               }}
             />
           </div>
-          <p style={{ fontSize: 12, color: 'rgba(245,242,234,0.60)', marginTop: 6 }}>{totalPct}% من الميزانية</p>
+          <p style={{ fontSize: 12, color: '#B8C0CC', marginTop: 8 }}>{totalPct}% من الميزانية</p>
         </div>
 
         {/* Wallets */}
@@ -114,7 +114,7 @@ export default function ExpensesPage() {
         <div>
           <p style={{ fontSize: 13, fontWeight: 700, marginBottom: 10, color: 'var(--text-primary)' }}>آخر المعاملات</p>
           {myExpenses.length === 0 ? (
-            <EmptyState icon="💳" title="لا توجد معاملات" description="أضف أول مصروف" />
+            <EmptyState illustration="empty-no-bills" title="لا توجد معاملات" description="أضف أول مصروف وابدأ بتتبع مصاريف البيت." />
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {myExpenses.slice(0, 20).map((exp) => {

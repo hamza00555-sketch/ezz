@@ -9,6 +9,7 @@ import { useAppStore } from '@/store/appStore';
 import { useShallow } from 'zustand/react/shallow';
 import { formatArabicDate } from '@/lib/utils';
 import { Package, Wrench, MapPin, Calendar, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { BrandIcon, type BrandIconName } from '@/components/brand/BrandIcon';
 
 type HomeTab = 'items' | 'documents' | 'maintenance';
 
@@ -29,13 +30,13 @@ const docTypeLabels: Record<string, string> = {
   other: 'أخرى',
 };
 
-const docTypeIcons: Record<string, string> = {
-  contract: '📄',
-  warranty: '🛡️',
-  invoice: '🧾',
-  insurance: '🔐',
-  form: '📋',
-  other: '📎',
+const docTypeIcons: Record<string, BrandIconName> = {
+  contract: 'files',
+  warranty: 'security',
+  invoice: 'bills',
+  insurance: 'privacy',
+  form: 'notes',
+  other: 'attachment',
 };
 
 export default function HomeSectionPage() {
@@ -71,7 +72,7 @@ export default function HomeSectionPage() {
         {activeTab === 'items' && (
           <>
             {items.length === 0 ? (
-              <EmptyState icon="🏠" title="لا توجد ممتلكات" description="أضف أجهزة وسيارات ومقتنيات البيت" />
+              <EmptyState brandIcon="home" title="لا توجد ممتلكات" description="أضف أجهزة، سيارات، ووثائق البيت في مكان واحد." />
             ) : (
               items.map((item) => (
                 <div
@@ -142,7 +143,7 @@ export default function HomeSectionPage() {
         {activeTab === 'documents' && (
           <>
             {docs.length === 0 ? (
-              <EmptyState icon="📁" title="لا توجد وثائق" description="احفظ عقودك وضماناتك وتأميناتك" />
+              <EmptyState brandIcon="files" title="لا توجد وثائق" description="احفظ عقودك وضماناتك وتأميناتك." />
             ) : (
               docs.map((doc) => (
                 <div
@@ -154,8 +155,8 @@ export default function HomeSectionPage() {
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                    <span style={{ fontSize: 24, flexShrink: 0, marginTop: 2 }}>
-                      {docTypeIcons[doc.type]}
+                    <span style={{ flexShrink: 0, marginTop: 2 }}>
+                      <BrandIcon name={docTypeIcons[doc.type] ?? 'files'} size={22} color="var(--accent)" />
                     </span>
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
@@ -193,7 +194,7 @@ export default function HomeSectionPage() {
         {activeTab === 'maintenance' && (
           <>
             {maintenanceRecords.length === 0 ? (
-              <EmptyState icon="🔧" title="لا توجد سجلات صيانة" description="سجّل صيانة أجهزتك وسياراتك" />
+              <EmptyState brandIcon="maintenance" title="لا توجد سجلات صيانة" description="سجّل صيانة أجهزتك وسياراتك." />
             ) : (
               maintenanceRecords.map((m) => {
                 const linkedItem = homeItems.find((i) => i.id === m.linkedItemId);

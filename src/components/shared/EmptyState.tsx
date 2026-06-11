@@ -1,13 +1,30 @@
 'use client';
 
+import { BrandIcon, type BrandIconName } from '@/components/brand/BrandIcon';
+
+type IllustrationName =
+  | 'empty-no-tasks'
+  | 'empty-no-requests'
+  | 'empty-no-reminders'
+  | 'empty-no-bills'
+  | 'empty-no-family-members'
+  | 'connection-error'
+  | 'organize-your-day'
+  | 'success-task-completed'
+  | 'invite-family-member'
+  | 'bill-reminder';
+
 interface EmptyStateProps {
-  icon?: string;
+  /** Full brand illustration (PNG) — preferred for primary empty states. */
+  illustration?: IllustrationName;
+  /** Brand line icon (SVG) — used when no matching illustration exists. */
+  brandIcon?: BrandIconName;
   title: string;
   description?: string;
   action?: React.ReactNode;
 }
 
-export function EmptyState({ icon = '📭', title, description, action }: EmptyStateProps) {
+export function EmptyState({ illustration, brandIcon, title, description, action }: EmptyStateProps) {
   return (
     <div
       style={{
@@ -15,22 +32,34 @@ export function EmptyState({ icon = '📭', title, description, action }: EmptyS
         justifyContent: 'center', padding: '56px 24px', textAlign: 'center',
       }}
     >
-      <div
-        style={{
-          width: 72, height: 72, borderRadius: 24,
-          background: 'rgba(15,27,51,0.05)',
-          border: '1px solid rgba(15,27,51,0.08)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 32, marginBottom: 16,
-        }}
-      >
-        {icon}
-      </div>
+      {illustration ? (
+        <img
+          src={`/brand/illustrations/${illustration}.png`}
+          alt=""
+          aria-hidden="true"
+          width={148}
+          height={148}
+          style={{ objectFit: 'contain', marginBottom: 18, userSelect: 'none' }}
+          draggable={false}
+        />
+      ) : (
+        <div
+          style={{
+            width: 72, height: 72, borderRadius: 24,
+            background: 'rgba(201,122,102,0.10)',
+            border: '1px solid rgba(201,122,102,0.18)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            marginBottom: 16,
+          }}
+        >
+          <BrandIcon name={brandIcon ?? 'notes'} size={32} color="var(--accent)" />
+        </div>
+      )}
       <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6 }}>
         {title}
       </h3>
       {description && (
-        <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.5 }}>
+        <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
           {description}
         </p>
       )}

@@ -12,20 +12,20 @@ interface ShortageFormProps {
 }
 
 const shortageCategories = [
-  { value: 'grains', label: 'حبوب ودقيق' },
-  { value: 'dairy', label: 'ألبان وأجبان' },
-  { value: 'protein', label: 'بروتين (لحوم/بيض)' },
-  { value: 'vegetables', label: 'خضروات وفواكه' },
-  { value: 'oils', label: 'زيوت وتوابل' },
-  { value: 'cleaning_supplies', label: 'مواد تنظيف' },
-  { value: 'other', label: 'أخرى' },
+ { value: 'grains', label: 'حبوب ودقيق' },
+ { value: 'dairy', label: 'ألبان وأجبان' },
+ { value: 'protein', label: 'بروتين (لحوم/بيض)' },
+ { value: 'vegetables', label: 'خضروات وفواكه' },
+ { value: 'oils', label: 'زيوت وتوابل' },
+ { value: 'cleaning_supplies', label: 'مواد تنظيف' },
+ { value: 'other', label: 'أخرى' },
 ];
 
 const priorities = [
-  { value: 'urgent', label: 'عاجل 🔴' },
-  { value: 'high', label: 'مهم' },
-  { value: 'medium', label: 'متوسط' },
-  { value: 'low', label: 'عادي' },
+ { value: 'urgent', label: 'عاجل' },
+ { value: 'high', label: 'مهم' },
+ { value: 'medium', label: 'متوسط' },
+ { value: 'low', label: 'عادي' },
 ];
 
 export function ShortageForm({ open, onClose }: ShortageFormProps) {

@@ -6,6 +6,7 @@ import { ChevronRight, Bell, BellOff, Loader, LogOut } from 'lucide-react';
 import { AppShell } from '@/components/layout/AppShell';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { MemberAvatar } from '@/components/shared/MemberAvatar';
+import { EzzLogo } from '@/components/brand/EzzLogo';
 import { useAppStore } from '@/store/appStore';
 import { useShallow } from 'zustand/react/shallow';
 import { roleLabels } from '@/lib/utils';
@@ -124,19 +125,34 @@ export default function SettingsPage() {
               <BellOff size={20} color="var(--text-muted)" />
             ) : (
               <button
+                role="switch"
+                aria-checked={pushState === 'subscribed'}
+                aria-label="تذكيرات المهام"
                 onClick={handleTogglePush}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: 6,
-                  padding: '8px 16px', borderRadius: 12,
-                  fontSize: 13, fontWeight: 600, cursor: 'pointer', border: 'none',
-                  background: pushState === 'subscribed' ? 'var(--danger-soft)' : 'rgba(201,122,102,0.15)',
-                  color: pushState === 'subscribed' ? 'var(--danger)' : 'var(--accent-strong)',
+                  position: 'relative',
+                  width: 48, height: 28,
+                  flexShrink: 0,
+                  borderRadius: 999,
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: 0,
+                  transition: 'background 0.2s ease',
+                  background: pushState === 'subscribed' ? 'var(--accent-strong)' : 'rgba(15,27,51,0.14)',
                 }}
               >
-                {pushState === 'subscribed'
-                  ? <><BellOff size={14} /> إيقاف</>
-                  : <><Bell size={14} /> تفعيل</>
-                }
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: 3,
+                    insetInlineStart: pushState === 'subscribed' ? 23 : 3,
+                    width: 22, height: 22,
+                    borderRadius: '50%',
+                    background: '#FFFDF8',
+                    boxShadow: '0 1px 3px rgba(15,27,51,0.25)',
+                    transition: 'inset-inline-start 0.2s cubic-bezier(0.34,1.56,0.64,1)',
+                  }}
+                />
               </button>
             )}
           </div>
@@ -171,13 +187,24 @@ export default function SettingsPage() {
           <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 14, letterSpacing: '0.04em' }}>
             عن التطبيق
           </p>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+            <img
+              src="/brand/app-icon/ezz-app-icon.svg"
+              alt="عز"
+              width={56}
+              height={56}
+              style={{ borderRadius: 16 }}
+              draggable={false}
+            />
+            <EzzLogo size="md" />
+          </div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>الإصدار</p>
             <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)' }}>1.0.0</p>
           </div>
           <div style={{ height: 1, background: 'var(--border-soft)', margin: '12px 0' }} />
           <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6, textAlign: 'center' }}>
-            عز — بيت العز يا بتنا 🏡
+            عز — بيت العز يا بتنا
           </p>
         </div>
       </div>

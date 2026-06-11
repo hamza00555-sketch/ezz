@@ -7,12 +7,12 @@ import { useShallow } from 'zustand/react/shallow';
 import { MemberAvatar } from '@/components/shared/MemberAvatar';
 
 const typeLabels: Record<string, string> = {
-  purchase:    '🛒 شراء',
-  help:        '🤝 مساعدة',
-  errand:      '🚗 مشوار',
-  maintenance: '🔧 صيانة',
-  follow_up:   '📋 متابعة',
-  other:       '💬 أخرى',
+  purchase:    'شراء',
+  help:        'مساعدة',
+  errand:      'مشوار',
+  maintenance: 'صيانة',
+  follow_up:   'متابعة',
+  other:       'أخرى',
 };
 
 export function PendingRequests() {

@@ -44,7 +44,7 @@ export function QuickShortcuts() {
       label: 'المطبخ',
       value: missingItems,
       unit: 'ناقص',
-      color: missingItems > 0 ? 'var(--warning)' : 'var(--success)',
+      color: missingItems > 0 ? 'var(--accent)' : 'var(--success)',
       sub: missingItems === 0 ? 'المطبخ فل الفل' : `${missingItems} صنف`,
     },
     {

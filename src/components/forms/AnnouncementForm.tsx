@@ -36,8 +36,6 @@ function analyzeAnnouncement(text: string): AnalysisResult {
   else if (doRe.test(text))  detectedType = 'event';
   else if (remRe.test(text)) detectedType = 'reminder';
 
-  const typeEmoji = { visit: '🚗', event: '🎉', reminder: '⏰', general: '📢' }[detectedType];
-
   // ── Day ──
   const dayNames = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
   let detectedDay = '';
@@ -84,13 +82,13 @@ function analyzeAnnouncement(text: string): AnalysisResult {
   else if (detectedType === 'event')    titleBase = detectedLocation ? `تجمع في ${detectedLocation}` : 'تجمع عائلي';
   else if (detectedType === 'reminder') titleBase = 'تذكير مهم';
   else                                  titleBase = text.split(/[.،\n]/)[0].slice(0, 30).trim();
-  const title = `${typeEmoji} ${titleBase}`;
+  const title = titleBase;
 
   // ── Structured message ──
   const infoLines: string[] = [];
-  if (detectedDay)      infoLines.push(`📅 ${detectedDay}`);
-  if (detectedTime)     infoLines.push(`🕐 ${detectedTime}`);
-  if (detectedLocation) infoLines.push(`📍 ${detectedLocation}`);
+  if (detectedDay)      infoLines.push(`التاريخ: ${detectedDay}`);
+  if (detectedTime)     infoLines.push(`الوقت: ${detectedTime}`);
+  if (detectedLocation) infoLines.push(`المكان: ${detectedLocation}`);
   const message = infoLines.length > 0
     ? infoLines.join('\n') + '\n\n' + text.trim()
     : text.trim();
@@ -108,10 +106,10 @@ function analyzeAnnouncement(text: string): AnalysisResult {
 }
 
 const typeLabels = {
-  visit:    '🚗 زيارة / رحلة',
-  event:    '🎉 تجمع / فعالية',
-  reminder: '⏰ تذكير / موعد',
-  general:  '📢 إعلان عام',
+  visit:    'زيارة / رحلة',
+  event:    'تجمع / فعالية',
+  reminder: 'تذكير / موعد',
+  general:  'إعلان عام',
 };
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -253,17 +251,17 @@ export function AnnouncementForm({ open, onClose }: AnnouncementFormProps) {
               </span>
               {analysis.detectedDay && (
                 <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: 'rgba(15,27,51,0.06)', color: 'var(--text-secondary)' }}>
-                  📅 {analysis.detectedDay}
+                  {analysis.detectedDay}
                 </span>
               )}
               {analysis.detectedTime && (
                 <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: 'rgba(15,27,51,0.06)', color: 'var(--text-secondary)' }}>
-                  🕐 {analysis.detectedTime}
+                  {analysis.detectedTime}
                 </span>
               )}
               {analysis.detectedLocation && (
                 <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: 'rgba(15,27,51,0.06)', color: 'var(--text-secondary)' }}>
-                  📍 {analysis.detectedLocation}
+                  {analysis.detectedLocation}
                 </span>
               )}
             </div>
@@ -286,7 +284,7 @@ export function AnnouncementForm({ open, onClose }: AnnouncementFormProps) {
             className="active:scale-95"
           >
             <Sparkles size={13} />
-            {analysis ? 'إعادة التحليل' : 'تحليل ✨'}
+            {analysis ? 'إعادة التحليل' : 'تحليل'}
           </button>
         </div>
 
@@ -295,7 +293,7 @@ export function AnnouncementForm({ open, onClose }: AnnouncementFormProps) {
           <Input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="مثال: 🎉 تجمع عائلي الجمعة"
+            placeholder="مثال: تجمع عائلي الجمعة"
             error={!!errors.title}
             autoFocus={!naturalText}
           />
@@ -323,7 +321,7 @@ export function AnnouncementForm({ open, onClose }: AnnouncementFormProps) {
               className="w-5 h-5"
             />
             <div>
-              <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>📌 تثبيت الإعلان</p>
+              <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>تثبيت الإعلان</p>
               <p className="text-xs" style={{ color: 'var(--text-muted)' }}>يظهر في الصفحة الرئيسية</p>
             </div>
           </label>
@@ -339,7 +337,7 @@ export function AnnouncementForm({ open, onClose }: AnnouncementFormProps) {
               className="w-5 h-5"
             />
             <div>
-              <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>✅ يتطلب تأكيد القراءة</p>
+              <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>يتطلب تأكيد القراءة</p>
               <p className="text-xs" style={{ color: 'var(--text-muted)' }}>يُظهر زر تأكيد للأفراد</p>
             </div>
           </label>

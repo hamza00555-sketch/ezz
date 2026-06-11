@@ -4,15 +4,16 @@ import { Check, X, ArrowLeftRight } from 'lucide-react';
 import { useAppStore } from '@/store/appStore';
 import { useShallow } from 'zustand/react/shallow';
 import { MemberAvatar } from '@/components/shared/MemberAvatar';
+import { BrandIcon, type BrandIconName } from '@/components/brand/BrandIcon';
 import type { Request } from '@/types';
 
-const typeConfig: Record<string, { label: string; emoji: string }> = {
-  purchase:    { label: 'شراء',    emoji: '🛒' },
-  help:        { label: 'مساعدة', emoji: '🤝' },
-  errand:      { label: 'مشوار',  emoji: '🚗' },
-  maintenance: { label: 'صيانة',  emoji: '🔧' },
-  follow_up:   { label: 'متابعة', emoji: '📋' },
-  other:       { label: 'أخرى',   emoji: '💬' },
+const typeConfig: Record<string, { label: string; icon: BrandIconName }> = {
+  purchase:    { label: 'شراء',    icon: 'shopping-list' },
+  help:        { label: 'مساعدة', icon: 'family-members' },
+  errand:      { label: 'مشوار',  icon: 'requests' },
+  maintenance: { label: 'صيانة',  icon: 'maintenance' },
+  follow_up:   { label: 'متابعة', icon: 'tasks' },
+  other:       { label: 'أخرى',   icon: 'notes' },
 };
 
 const statusStyle: Record<string, { badge: string; text: string; label: string }> = {
@@ -35,7 +36,7 @@ export function RequestCard({ request, currentUserId }: RequestCardProps) {
   const to   = members.find((m) => m.id === request.to);
   const isRecipient = request.to === currentUserId;
   const isPending   = request.status === 'pending';
-  const type = typeConfig[request.type] ?? { label: 'أخرى', emoji: '💬' };
+  const type = typeConfig[request.type] ?? { label: 'أخرى', icon: 'notes' as BrandIconName };
   const sStyle = statusStyle[request.status] ?? statusStyle.pending;
 
   return (
@@ -57,8 +58,9 @@ export function RequestCard({ request, currentUserId }: RequestCardProps) {
             borderBottom: '1px solid rgba(253,186,116,0.20)',
           }}
         >
-          <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--warning)' }}>
-            {type.emoji} طلب {type.label} من {from?.name}
+          <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 600, color: 'var(--warning)' }}>
+            <BrandIcon name={type.icon} size={14} color="var(--warning)" />
+            طلب {type.label} من {from?.name}
           </span>
         </div>
       )}
@@ -86,7 +88,10 @@ export function RequestCard({ request, currentUserId }: RequestCardProps) {
               </span>
               {!isRecipient && (
                 <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'var(--text-muted)' }}>
-                  <span>{type.emoji} {type.label}</span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                    <BrandIcon name={type.icon} size={12} color="var(--text-muted)" />
+                    {type.label}
+                  </span>
                   <ArrowLeftRight size={9} style={{ marginInline: 2 }} />
                   <span>{to?.name}</span>
                 </span>

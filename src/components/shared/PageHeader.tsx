@@ -22,7 +22,7 @@ export function PageHeader({ title, subtitle, action }: PageHeaderProps) {
             {title}
           </h1>
           {subtitle && (
-            <p style={{ fontSize: 13, marginTop: 2, color: 'var(--text-muted)' }}>
+            <p style={{ fontSize: 13, marginTop: 2, color: 'var(--text-secondary)' }}>
               {subtitle}
             </p>
           )}
