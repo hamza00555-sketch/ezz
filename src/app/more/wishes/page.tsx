@@ -58,7 +58,7 @@ export default function WishesPage() {
   return (
     <AppShell>
       <PageHeader
-        title="الأفكار والـ Wish List"
+        title="الأفكار والرغبات"
         action={
           <Link href="/more" style={{ padding: 8, display: 'block' }}>
             <ChevronRight size={20} color="var(--text-muted)" />
