@@ -1,6 +1,7 @@
 'use client';
 
-import { Megaphone, Check } from 'lucide-react';
+import { Check } from 'lucide-react';
+import { BrandIcon } from '@/components/brand/BrandIcon';
 import { useAppStore } from '@/store/appStore';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -46,7 +47,7 @@ export function PinnedAnnouncements() {
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}
                 >
-                  <Megaphone size={16} color="var(--bronze)" strokeWidth={1.8} />
+                  <BrandIcon name="announcements" size={16} color="var(--accent)" />
                 </div>
                 <div style={{ flex: 1 }}>
                   <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>

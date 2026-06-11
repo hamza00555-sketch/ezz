@@ -7,15 +7,16 @@
  */
 
 export type BrandIconName =
-  | 'add' | 'attachment' | 'bills' | 'calendar' | 'child' | 'cleaning'
-  | 'completed' | 'cooking' | 'dark-mode' | 'delete' | 'domestic-worker'
-  | 'edit' | 'electricity' | 'expenses' | 'family-members' | 'files'
-  | 'filter' | 'guest' | 'help' | 'home' | 'image' | 'in-progress'
-  | 'internet' | 'language' | 'late' | 'laundry' | 'light-mode' | 'logout'
-  | 'maintenance' | 'notes' | 'notifications' | 'priority' | 'privacy'
-  | 'profile' | 'reminders' | 'reports' | 'requests' | 'search'
-  | 'security' | 'settings' | 'shopping-list' | 'subscriptions'
-  | 'tasks' | 'time' | 'water';
+  | 'add' | 'announcements' | 'attachment' | 'bills' | 'breakfast' | 'calendar'
+  | 'child' | 'cleaning' | 'completed' | 'cooking' | 'dark-mode' | 'delete'
+  | 'dinner' | 'documents' | 'domestic-worker' | 'edit' | 'electricity'
+  | 'expenses' | 'family-members' | 'files' | 'filter' | 'groceries' | 'guest'
+  | 'help' | 'home' | 'ideas' | 'image' | 'in-progress' | 'internet'
+  | 'kitchen' | 'language' | 'late' | 'laundry' | 'light-mode' | 'logout'
+  | 'lunch' | 'maintenance' | 'meal-plan' | 'more' | 'notes' | 'notifications'
+  | 'priority' | 'privacy' | 'profile' | 'recipes' | 'reminders' | 'reports'
+  | 'requests' | 'search' | 'security' | 'settings' | 'shopping-list'
+  | 'subscriptions' | 'tasks' | 'time' | 'wallet' | 'water';
 
 interface BrandIconProps {
   name: BrandIconName;

@@ -12,8 +12,8 @@ import { wishStatusLabels, priorityLabels } from '@/lib/utils';
 import { BrandIcon, type BrandIconName } from '@/components/brand/BrandIcon';
 
 const typeIcons: Record<string, BrandIconName> = {
-  idea: 'notes',
-  need: 'shopping-list',
+  idea: 'ideas',
+  need: 'groceries',
   link: 'attachment',
   fix: 'maintenance',
 };
@@ -69,7 +69,7 @@ export default function WishesPage() {
       <div style={{ padding: '16px' }}>
         {items.length === 0 ? (
           <EmptyState
-            brandIcon="notes"
+            brandIcon="ideas"
             title="لا توجد أفكار بعد"
             description="سجّل أفكارك واحتياجاتك المستقبلية للبيت."
           />

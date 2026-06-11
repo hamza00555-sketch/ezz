@@ -1,12 +1,12 @@
 'use client';
 
-import { CheckSquare, ShoppingCart, Wallet, Megaphone } from 'lucide-react';
 import { useAppStore } from '@/store/appStore';
+import { BrandIcon, type BrandIconName } from '@/components/brand/BrandIcon';
 
-const actions = [
+const actions: { key: string; icon: BrandIconName; label: string; sub: string; color: string; bg: string; border: string }[] = [
   {
     key: 'task',
-    icon: CheckSquare,
+    icon: 'tasks',
     label: 'مهمة',
     sub: 'جديدة',
     color: 'var(--accent-strong)',
@@ -15,7 +15,7 @@ const actions = [
   },
   {
     key: 'shortage',
-    icon: ShoppingCart,
+    icon: 'groceries',
     label: 'نقص',
     sub: 'مطبخ',
     color: '#B8604E',
@@ -24,7 +24,7 @@ const actions = [
   },
   {
     key: 'expense',
-    icon: Wallet,
+    icon: 'wallet',
     label: 'مصروف',
     sub: 'تسجيل',
     color: 'var(--accent-strong)',
@@ -33,7 +33,7 @@ const actions = [
   },
   {
     key: 'announcement',
-    icon: Megaphone,
+    icon: 'announcements',
     label: 'إعلان',
     sub: 'عائلي',
     color: 'var(--accent)',
@@ -51,46 +51,43 @@ export function DailySummary() {
         إضافة سريع
       </p>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-        {actions.map((action) => {
-          const Icon = action.icon;
-          return (
-            <button
-              key={action.key}
-              onClick={() => setActiveQuickForm(action.key)}
+        {actions.map((action) => (
+          <button
+            key={action.key}
+            onClick={() => setActiveQuickForm(action.key)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 12,
+              padding: '14px 16px',
+              borderRadius: 20,
+              background: action.bg,
+              border: `1px solid ${action.border}`,
+              cursor: 'pointer',
+              transition: 'transform 0.12s ease',
+              textAlign: 'right',
+            }}
+            className="active:scale-[0.97]"
+          >
+            <div
               style={{
-                display: 'flex', alignItems: 'center', gap: 12,
-                padding: '14px 16px',
-                borderRadius: 20,
-                background: action.bg,
-                border: `1px solid ${action.border}`,
-                cursor: 'pointer',
-                transition: 'transform 0.12s ease',
-                textAlign: 'right',
+                width: 38, height: 38,
+                borderRadius: 12,
+                background: 'rgba(15,27,51,0.06)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                flexShrink: 0,
               }}
-              className="active:scale-[0.97]"
             >
-              <div
-                style={{
-                  width: 38, height: 38,
-                  borderRadius: 12,
-                  background: 'rgba(15,27,51,0.06)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  flexShrink: 0,
-                }}
-              >
-                <Icon size={18} color={action.color} strokeWidth={1.8} />
-              </div>
-              <div>
-                <p style={{ fontSize: 14, fontWeight: 700, color: action.color, lineHeight: 1.2 }}>
-                  {action.label}
-                </p>
-                <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>
-                  {action.sub}
-                </p>
-              </div>
-            </button>
-          );
-        })}
+              <BrandIcon name={action.icon} size={18} color={action.color} />
+            </div>
+            <div>
+              <p style={{ fontSize: 14, fontWeight: 700, color: action.color, lineHeight: 1.2 }}>
+                {action.label}
+              </p>
+              <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>
+                {action.sub}
+              </p>
+            </div>
+          </button>
+        ))}
       </div>
     </div>
   );

@@ -24,8 +24,7 @@ export function EzzWelcomeCard() {
           padding: 22,
         }}
       >
-        {/* Subtle brand pattern in the far corner — felt, not seen */}
-        <EzzPattern name="quiet-flow-corner" position="top-start" opacity={0.07} className="w-28 h-28" />
+        <EzzPattern name="welcome" position="top-end" opacity={0.08} className="w-56 h-40" />
 
         <div style={{ position: 'relative', zIndex: 1 }}>
           <div

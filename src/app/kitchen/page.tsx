@@ -11,7 +11,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { categoryLabels } from '@/lib/utils';
 import { getDishImage } from '@/lib/dishImages';
 import { RecipeImage } from '@/components/shared/RecipeImage';
-import { Clock, Heart, ChefHat, CheckCircle2, Circle, FileText, X, RefreshCw, Image as ImageIcon, ChevronLeft, Plus } from 'lucide-react';
+import { Clock, Heart, CheckCircle2, Circle, FileText, X, RefreshCw, Image as ImageIcon, ChevronLeft, Plus } from 'lucide-react';
 import { BrandIcon, type BrandIconName } from '@/components/brand/BrandIcon';
 import type { ShortagePriority, MealTime } from '@/types';
 
@@ -28,7 +28,7 @@ const shortagePriorityLabels: Record<ShortagePriority, string> = {
   urgent: 'عاجل', high: 'مهم', medium: 'متوسط', low: 'عادي',
 };
 const mealLabels: Record<MealSlot, string> = { breakfast: 'فطور', lunch: 'غداء', dinner: 'عشاء' };
-const mealIcons:  Record<MealSlot, BrandIconName>  = { breakfast: 'time',  lunch: 'cooking',   dinner: 'reminders'  };
+const mealIcons:  Record<MealSlot, BrandIconName>  = { breakfast: 'breakfast', lunch: 'lunch', dinner: 'dinner' };
 const dayLabels = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
 const allMealTimes: { key: MealTime; label: string }[] = [
   { key: 'breakfast', label: 'فطور' },
@@ -503,7 +503,7 @@ export default function KitchenPage() {
               return (
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, padding: '5px 12px', borderRadius: 20, background: 'rgba(15,27,51,0.06)', color: 'var(--text-secondary)', border: '1px solid var(--border-soft)' }}>
-                    <BrandIcon name="shopping-list" size={13} color="var(--text-secondary)" /> ناقص {missingCount}
+                    <BrandIcon name="groceries" size={13} color="var(--text-secondary)" /> ناقص {missingCount}
                   </span>
                   {urgentCount > 0 && (
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, padding: '5px 12px', borderRadius: 20, background: 'var(--danger-soft)', color: 'var(--danger)', border: '1px solid rgba(249,112,102,0.22)' }}>
@@ -520,7 +520,7 @@ export default function KitchenPage() {
             })()}
 
             {myShortages.length === 0 ? (
-              <EmptyState brandIcon="shopping-list" title="لا توجد نواقص" description="سجّل ما ينقصك من المطبخ." />
+              <EmptyState brandIcon="groceries" title="لا توجد نواقص" description="سجّل ما ينقصك من المطبخ." />
             ) : (() => {
               const missing = myShortages.filter((s) => s.status === 'missing');
               const provided = myShortages.filter((s) => s.status === 'provided');
@@ -656,7 +656,7 @@ export default function KitchenPage() {
               </div>
             )}
             {myRecipes.length === 0 ? (
-              <EmptyState brandIcon="cooking" title="لا توجد وصفات" description="احفظ وصفاتك المفضلة وابدأ منها لاحقًا." />
+              <EmptyState brandIcon="recipes" title="لا توجد وصفات" description="احفظ وصفاتك المفضلة وابدأ منها لاحقًا." />
             ) : (
               myRecipes.map((recipe) => {
                 return (
@@ -679,7 +679,7 @@ export default function KitchenPage() {
                       borderRadius={16}
                       border="2px solid rgba(255,255,255,0.7)"
                       boxShadow="0 4px 12px rgba(15,27,51,0.10)"
-                      fallbackIcon={<ChefHat size={20} color="rgba(255,255,255,0.85)" strokeWidth={1.7} />}
+                      fallbackIcon={<BrandIcon name="recipes" size={20} color="rgba(255,255,255,0.85)" />}
                     />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 5 }}>{recipe.name}</p>
@@ -777,7 +777,7 @@ export default function KitchenPage() {
                             borderRadius={14}
                             border="2px solid rgba(255,255,255,0.7)"
                             boxShadow="0 2px 8px rgba(15,27,51,0.08)"
-                            fallbackIcon={<ChefHat size={16} color="rgba(255,255,255,0.85)" strokeWidth={1.8} />}
+                            fallbackIcon={<BrandIcon name="recipes" size={16} color="rgba(255,255,255,0.85)" />}
                           />
                           {/* Info */}
                           <div style={{ flex: 1, minWidth: 0 }}>
@@ -908,7 +908,7 @@ export default function KitchenPage() {
                   name={r.name}
                   size={200}
                   borderRadius={0}
-                  fallbackIcon={<ChefHat size={48} color="rgba(255,255,255,0.70)" strokeWidth={1.4} />}
+                  fallbackIcon={<BrandIcon name="kitchen" size={48} color="rgba(255,255,255,0.70)" />}
                   style={{ width: '100%', height: '100%' }}
                 />
                 {/* Overlay gradient for readability */}
