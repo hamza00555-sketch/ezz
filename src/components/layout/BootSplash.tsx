@@ -44,18 +44,8 @@ export function BootSplash() {
 
       {/* Logo */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-        <span
-          style={{
-            fontFamily: '"Cairo", "IBM Plex Sans Arabic", sans-serif',
-            fontSize: 52,
-            fontWeight: 700,
-            color: 'var(--color-navy, #0F1B33)',
-            lineHeight: 1,
-            letterSpacing: '-0.01em',
-          }}
-        >
-          عز
-        </span>
+        <img src="/brand/logo/ezz-logo-light.svg" alt="عز" width={110} height={44} draggable={false} className="dark:hidden" />
+        <img src="/brand/logo/ezz-logo-dark.svg"  alt="عز" width={110} height={44} draggable={false} className="hidden dark:block" />
       </div>
 
       {/* Spinner */}
