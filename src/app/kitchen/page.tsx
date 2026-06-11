@@ -12,6 +12,7 @@ import { categoryLabels } from '@/lib/utils';
 import { getDishImage } from '@/lib/dishImages';
 import { RecipeImage } from '@/components/shared/RecipeImage';
 import { Clock, Heart, ChefHat, CheckCircle2, Circle, FileText, X, RefreshCw, Image as ImageIcon, ChevronLeft, Plus } from 'lucide-react';
+import { BrandIcon, type BrandIconName } from '@/components/brand/BrandIcon';
 import type { ShortagePriority, MealTime } from '@/types';
 
 type KitchenTab = 'today' | 'week' | 'shortages' | 'recipes';
@@ -27,7 +28,7 @@ const shortagePriorityLabels: Record<ShortagePriority, string> = {
   urgent: 'عاجل', high: 'مهم', medium: 'متوسط', low: 'عادي',
 };
 const mealLabels: Record<MealSlot, string> = { breakfast: 'فطور', lunch: 'غداء', dinner: 'عشاء' };
-const mealIcons:  Record<MealSlot, string>  = { breakfast: '🌅',  lunch: '☀️',   dinner: '🌙'  };
+const mealIcons:  Record<MealSlot, BrandIconName>  = { breakfast: 'time',  lunch: 'cooking',   dinner: 'reminders'  };
 const dayLabels = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
 const allMealTimes: { key: MealTime; label: string }[] = [
   { key: 'breakfast', label: 'فطور' },
@@ -368,7 +369,7 @@ export default function KitchenPage() {
                     borderRadius={56}
                     border="3px solid rgba(255,255,255,0.85)"
                     boxShadow="0 18px 34px rgba(184,111,88,0.20)"
-                    fallbackIcon={<span style={{ fontSize: 36, opacity: 0.85 }}>{mealIcons[meal]}</span>}
+                    fallbackIcon={<BrandIcon name={mealIcons[meal]} size={34} color="var(--accent)" />}
                     style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)' }}
                   />
                 </div>
@@ -501,17 +502,17 @@ export default function KitchenPage() {
               const providedCount = myShortages.filter((s) => s.status === 'provided').length;
               return (
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 12, padding: '5px 12px', borderRadius: 20, background: 'rgba(15,27,51,0.06)', color: 'var(--text-secondary)', border: '1px solid var(--border-soft)' }}>
-                    🛒 ناقص {missingCount}
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, padding: '5px 12px', borderRadius: 20, background: 'rgba(15,27,51,0.06)', color: 'var(--text-secondary)', border: '1px solid var(--border-soft)' }}>
+                    <BrandIcon name="shopping-list" size={13} color="var(--text-secondary)" /> ناقص {missingCount}
                   </span>
                   {urgentCount > 0 && (
-                    <span style={{ fontSize: 12, padding: '5px 12px', borderRadius: 20, background: 'var(--danger-soft)', color: 'var(--danger)', border: '1px solid rgba(249,112,102,0.22)' }}>
-                      ⚡ عاجل {urgentCount}
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, padding: '5px 12px', borderRadius: 20, background: 'var(--danger-soft)', color: 'var(--danger)', border: '1px solid rgba(249,112,102,0.22)' }}>
+                      <BrandIcon name="priority" size={13} color="var(--danger)" /> عاجل {urgentCount}
                     </span>
                   )}
                   {providedCount > 0 && (
-                    <span style={{ fontSize: 12, padding: '5px 12px', borderRadius: 20, background: 'var(--success-soft)', color: 'var(--success)', border: '1px solid rgba(134,239,172,0.22)' }}>
-                      ✓ تم توفيره {providedCount}
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, padding: '5px 12px', borderRadius: 20, background: 'var(--success-soft)', color: 'var(--success)', border: '1px solid rgba(134,239,172,0.22)' }}>
+                      <BrandIcon name="completed" size={13} color="var(--success)" /> تم توفيره {providedCount}
                     </span>
                   )}
                 </div>
@@ -519,7 +520,7 @@ export default function KitchenPage() {
             })()}
 
             {myShortages.length === 0 ? (
-              <EmptyState icon="🛒" title="لا توجد نواقص" description="سجّل ما ينقصك من المطبخ" />
+              <EmptyState brandIcon="shopping-list" title="لا توجد نواقص" description="سجّل ما ينقصك من المطبخ." />
             ) : (() => {
               const missing = myShortages.filter((s) => s.status === 'missing');
               const provided = myShortages.filter((s) => s.status === 'provided');
@@ -602,7 +603,7 @@ export default function KitchenPage() {
                   {provided.length > 0 && (
                     <div style={{ marginTop: 4 }}>
                       <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', marginBottom: 8, color: 'var(--success)' }}>
-                        ✓ تم توفيره ({provided.length})
+                        تم توفيره ({provided.length})
                       </p>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                         {provided.map((item) => renderItem(item, false))}
@@ -655,7 +656,7 @@ export default function KitchenPage() {
               </div>
             )}
             {myRecipes.length === 0 ? (
-              <EmptyState icon="👨‍🍳" title="لا توجد وصفات" description="اضغط وصفة جديدة لتبدأ" />
+              <EmptyState brandIcon="cooking" title="لا توجد وصفات" description="احفظ وصفاتك المفضلة وابدأ منها لاحقًا." />
             ) : (
               myRecipes.map((recipe) => {
                 return (
@@ -1005,7 +1006,7 @@ export default function KitchenPage() {
                     }}
                     className="active:scale-[0.98]"
                   >
-                    ✏️ تعديل الوصفة
+                    تعديل الوصفة
                   </button>
                 )}
               </div>
@@ -1074,7 +1075,7 @@ export default function KitchenPage() {
                   }}
                   className="active:scale-[0.98]"
                 >
-                  تحليل الوصفة ✨
+                  تحليل الوصفة
                 </button>
               </>
             ) : (
@@ -1160,7 +1161,7 @@ export default function KitchenPage() {
                     }}
                     className="active:scale-[0.98]"
                   >
-                    حفظ الوصفة ✓
+                    حفظ الوصفة
                   </button>
                 </div>
               </div>

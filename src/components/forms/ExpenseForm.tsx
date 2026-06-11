@@ -86,9 +86,9 @@ export function ExpenseForm({ open, onClose }: ExpenseFormProps) {
       {myWallets.length === 0 ? (
         <div className="p-5">
           <EmptyState
-            icon="💳"
+            brandIcon="expenses"
             title="لا توجد محفظة"
-            description="أضف محفظة أولاً لتسجيل المصاريف"
+            description="أضف محفظة أولاً لتسجيل المصاريف."
           />
         </div>
       ) : (

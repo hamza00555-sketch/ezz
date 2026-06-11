@@ -10,35 +10,35 @@ const actions = [
     label: 'مهمة',
     sub: 'جديدة',
     color: 'var(--accent-strong)',
-    bg: 'rgba(201,122,102,0.08)',
-    border: 'rgba(201,122,102,0.18)',
+    bg: 'rgba(15,27,51,0.06)',
+    border: 'rgba(15,27,51,0.12)',
   },
   {
     key: 'shortage',
     icon: ShoppingCart,
     label: 'نقص',
     sub: 'مطبخ',
-    color: 'var(--warning)',
-    bg: 'var(--warning-soft)',
-    border: 'rgba(253,186,116,0.25)',
+    color: '#B8604E',
+    bg: 'rgba(246,201,178,0.30)',
+    border: 'rgba(246,201,178,0.55)',
   },
   {
     key: 'expense',
     icon: Wallet,
     label: 'مصروف',
     sub: 'تسجيل',
-    color: 'var(--info)',
-    bg: 'var(--info-soft)',
-    border: 'rgba(125,211,252,0.20)',
+    color: 'var(--accent-strong)',
+    bg: 'rgba(15,27,51,0.06)',
+    border: 'rgba(15,27,51,0.12)',
   },
   {
     key: 'announcement',
     icon: Megaphone,
     label: 'إعلان',
     sub: 'عائلي',
-    color: 'var(--bronze)',
-    bg: 'rgba(201,122,102,0.08)',
-    border: 'rgba(201,122,102,0.18)',
+    color: 'var(--accent)',
+    bg: 'rgba(201,122,102,0.10)',
+    border: 'rgba(201,122,102,0.20)',
   },
 ];
 
@@ -84,7 +84,7 @@ export function DailySummary() {
                 <p style={{ fontSize: 14, fontWeight: 700, color: action.color, lineHeight: 1.2 }}>
                   {action.label}
                 </p>
-                <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+                <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>
                   {action.sub}
                 </p>
               </div>

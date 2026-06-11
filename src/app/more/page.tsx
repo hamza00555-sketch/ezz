@@ -11,12 +11,12 @@ import { useAppStore } from '@/store/appStore';
 import { useShallow } from 'zustand/react/shallow';
 
 const menuItems = [
-  { href: '/home-section',       icon: Building2, label: 'البيت',                 description: 'الممتلكات والصيانة والوثائق',     color: 'var(--accent-strong)', bg: 'rgba(201,122,102,0.10)' },
-  { href: '/more/family',        icon: Users,     label: 'العائلة والأفراد',      description: 'إدارة أفراد العائلة والصلاحيات',  color: 'var(--accent-strong)', bg: 'rgba(15,27,51,0.08)' },
-  { href: '/more/calendar',      icon: Calendar,  label: 'التقويم',               description: 'مواعيد وصيانة وضمانات',           color: 'var(--info)',    bg: 'var(--info-soft)'    },
-  { href: '/more/expenses',      icon: Wallet,    label: 'المصاريف',              description: 'محافظ وميزانيات يدوية',           color: 'var(--success)', bg: 'var(--success-soft)' },
-  { href: '/more/wishes',        icon: Lightbulb, label: 'الأفكار والـ Wish List', description: 'احتياجات وأفكار مستقبلية',        color: 'var(--warning)', bg: 'var(--warning-soft)' },
-  { href: '/more/announcements', icon: Megaphone, label: 'الإعلانات العائلية',    description: 'رسائل مثبتة ومهمة',              color: 'var(--bronze)',  bg: 'rgba(201,122,102,0.10)' },
+  { href: '/home-section',       icon: Building2, label: 'البيت',              description: 'الممتلكات والصيانة والوثائق',    color: 'var(--accent)',        bg: 'rgba(201,122,102,0.10)' },
+  { href: '/more/family',        icon: Users,     label: 'العائلة والأفراد',   description: 'إدارة أفراد العائلة والصلاحيات', color: 'var(--accent-strong)', bg: 'rgba(15,27,51,0.08)'    },
+  { href: '/more/calendar',      icon: Calendar,  label: 'التقويم',            description: 'مواعيد وصيانة وضمانات',          color: '#B8604E',              bg: 'rgba(246,201,178,0.35)' },
+  { href: '/more/expenses',      icon: Wallet,    label: 'المصاريف',           description: 'محافظ وميزانيات يدوية',          color: 'var(--accent-strong)', bg: 'rgba(15,27,51,0.08)'    },
+  { href: '/more/wishes',        icon: Lightbulb, label: 'الأفكار والرغبات',   description: 'احتياجات وأفكار مستقبلية',       color: 'var(--accent)',        bg: 'rgba(201,122,102,0.10)' },
+  { href: '/more/announcements', icon: Megaphone, label: 'الإعلانات العائلية', description: 'رسائل مثبتة ومهمة',             color: '#B8604E',              bg: 'rgba(246,201,178,0.35)' },
 ];
 
 export default function MorePage() {

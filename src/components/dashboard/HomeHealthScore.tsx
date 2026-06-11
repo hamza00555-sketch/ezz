@@ -5,6 +5,7 @@ import { ArrowLeft, Zap, Clock, MessageSquare } from 'lucide-react';
 import { useAppStore } from '@/store/appStore';
 import { useShallow } from 'zustand/react/shallow';
 import { isOverdue } from '@/lib/utils';
+import { BrandIcon } from '@/components/brand/BrandIcon';
 
 export function HomeHealthScore() {
   const { tasks, requests, currentUserId, currentFamilyGroupId } = useAppStore(
@@ -109,7 +110,7 @@ export function HomeHealthScore() {
               </span>
             )}
             {urgentCount === 0 && pendingReqs === 0 && (
-              <span className="badge badge-success">البيت مرتب 👌</span>
+              <span className="badge badge-success">البيت مرتب</span>
             )}
           </div>
         </div>
@@ -147,8 +148,9 @@ export function HomeHealthScore() {
             textAlign: 'center',
           }}
         >
-          <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--success)' }}>
-            كل المهام مكتملة 🎉
+          <p style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontSize: 13, fontWeight: 600, color: 'var(--success)' }}>
+            <BrandIcon name="completed" size={15} color="var(--success)" />
+            كل المهام مكتملة
           </p>
         </div>
       )}

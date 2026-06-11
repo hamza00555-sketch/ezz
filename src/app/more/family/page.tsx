@@ -81,7 +81,7 @@ export default function FamilyPage() {
             }}
           >
             <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--bronze)', marginBottom: 10, letterSpacing: '0.05em' }}>
-              🔗 كود دعوة البيت
+              كود دعوة البيت
             </p>
 
             {/* Code display */}

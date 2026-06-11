@@ -9,12 +9,13 @@ import { MemberAvatar } from '@/components/shared/MemberAvatar';
 import { useAppStore } from '@/store/appStore';
 import { useShallow } from 'zustand/react/shallow';
 import { wishStatusLabels, priorityLabels } from '@/lib/utils';
+import { BrandIcon, type BrandIconName } from '@/components/brand/BrandIcon';
 
-const typeIcons: Record<string, string> = {
-  idea: '💡',
-  need: '🛒',
-  link: '🔗',
-  fix: '🔧',
+const typeIcons: Record<string, BrandIconName> = {
+  idea: 'notes',
+  need: 'shopping-list',
+  link: 'attachment',
+  fix: 'maintenance',
 };
 
 const typeLabels: Record<string, string> = {
@@ -68,9 +69,9 @@ export default function WishesPage() {
       <div style={{ padding: '16px' }}>
         {items.length === 0 ? (
           <EmptyState
-            icon="💡"
+            brandIcon="notes"
             title="لا توجد أفكار بعد"
-            description="سجّل أفكارك واحتياجاتك المستقبلية للبيت"
+            description="سجّل أفكارك واحتياجاتك المستقبلية للبيت."
           />
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -99,8 +100,8 @@ export default function WishesPage() {
                           }}
                         >
                           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                            <span style={{ fontSize: 22, flexShrink: 0, marginTop: 2 }}>
-                              {typeIcons[item.type]}
+                            <span style={{ flexShrink: 0, marginTop: 2 }}>
+                              <BrandIcon name={typeIcons[item.type] ?? 'notes'} size={20} color="var(--accent)" />
                             </span>
                             <div style={{ flex: 1 }}>
                               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>

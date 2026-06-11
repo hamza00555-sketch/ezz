@@ -186,7 +186,7 @@ export function TaskCard({ task, showAssignee = true }: TaskCardProps) {
                     color: 'var(--accent)', cursor: 'pointer', fontFamily: 'inherit',
                   }}
                 >
-                  تم ✓
+                  تم
                 </button>
               </div>
             )}

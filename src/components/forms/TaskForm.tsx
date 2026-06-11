@@ -12,21 +12,21 @@ interface TaskFormProps {
 }
 
 const categories = [
-  { value: 'cleaning', label: 'تنظيف' },
-  { value: 'shopping', label: 'تسوق' },
-  { value: 'bills', label: 'فواتير' },
-  { value: 'maintenance', label: 'صيانة' },
-  { value: 'cooking', label: 'طبخ' },
-  { value: 'childcare', label: 'رعاية أطفال' },
-  { value: 'documents', label: 'وثائق' },
-  { value: 'other', label: 'أخرى' },
+ { value: 'cleaning', label: 'تنظيف' },
+ { value: 'shopping', label: 'تسوق' },
+ { value: 'bills', label: 'فواتير' },
+ { value: 'maintenance', label: 'صيانة' },
+ { value: 'cooking', label: 'طبخ' },
+ { value: 'childcare', label: 'رعاية أطفال' },
+ { value: 'documents', label: 'وثائق' },
+ { value: 'other', label: 'أخرى' },
 ];
 
 const priorities = [
-  { value: 'low', label: 'منخفضة' },
-  { value: 'medium', label: 'متوسطة' },
-  { value: 'high', label: 'عالية' },
-  { value: 'urgent', label: 'عاجلة 🔴' },
+ { value: 'low', label: 'منخفضة' },
+ { value: 'medium', label: 'متوسطة' },
+ { value: 'high', label: 'عالية' },
+ { value: 'urgent', label: 'عاجلة' },
 ];
 
 export function TaskForm({ open, onClose }: TaskFormProps) {

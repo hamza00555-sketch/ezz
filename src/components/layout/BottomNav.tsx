@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { Home, ListChecks, ChefHat, LayoutGrid, Plus, X, CheckSquare, MessageSquare, Lightbulb, Building2, FileText, ShoppingCart, BookOpen, Megaphone } from 'lucide-react';
+import { Home, ListChecks, ChefHat, LayoutGrid, Plus, X, CheckSquare, MessageSquare, Lightbulb, ShoppingCart, Megaphone, Wallet } from 'lucide-react';
 import { useAppStore } from '@/store/appStore';
 import { TaskForm } from '@/components/forms/TaskForm';
 import { RequestForm } from '@/components/forms/RequestForm';
@@ -25,14 +25,12 @@ const rightItems = [
 ];
 
 const quickAddItems = [
-  { key: 'task',         icon: CheckSquare,   label: 'مهمة',    color: 'var(--accent-strong)', bg: 'rgba(201,122,102,0.12)' },
-  { key: 'request',      icon: MessageSquare, label: 'طلب',     color: 'var(--info)',           bg: 'var(--info-soft)'       },
-  { key: 'wish',         icon: Lightbulb,     label: 'فكرة',    color: 'var(--warning)',        bg: 'var(--warning-soft)'    },
-  { key: 'home_item',    icon: Building2,     label: 'ممتلكات', color: 'var(--accent-strong)', bg: 'rgba(201,122,102,0.10)' },
-  { key: 'document',     icon: FileText,      label: 'وثيقة',   color: 'var(--danger)',         bg: 'var(--danger-soft)'     },
-  { key: 'shortage',     icon: ShoppingCart,  label: 'نقص',     color: 'var(--kitchen-rose)',   bg: 'rgba(244,217,207,0.50)' },
-  { key: 'recipe',       icon: BookOpen,      label: 'وصفة',    color: 'var(--accent)',         bg: 'rgba(201,122,102,0.12)' },
-  { key: 'announcement', icon: Megaphone,     label: 'إعلان',   color: 'var(--bronze)',         bg: 'rgba(201,122,102,0.12)' },
+  { key: 'task',         icon: CheckSquare,   label: 'مهمة',   color: 'var(--accent-strong)', bg: 'rgba(15,27,51,0.08)'    },
+  { key: 'request',      icon: MessageSquare, label: 'طلب',    color: 'var(--accent)',        bg: 'rgba(201,122,102,0.12)' },
+  { key: 'shortage',     icon: ShoppingCart,  label: 'نقص',    color: '#B8604E',              bg: 'rgba(246,201,178,0.35)' },
+  { key: 'expense',      icon: Wallet,        label: 'مصروف',  color: 'var(--accent-strong)', bg: 'rgba(15,27,51,0.08)'    },
+  { key: 'announcement', icon: Megaphone,     label: 'إعلان',  color: 'var(--accent)',        bg: 'rgba(201,122,102,0.12)' },
+  { key: 'wish',         icon: Lightbulb,     label: 'فكرة',   color: '#B8604E',              bg: 'rgba(246,201,178,0.35)' },
 ];
 
 type FormKey = 'task' | 'request' | 'wish' | 'home_item' | 'document' | 'shortage' | 'recipe' | 'announcement' | 'expense' | null;
@@ -61,21 +59,21 @@ function NavItem({ href, icon: Icon, label, active }: { href: string; icon: Reac
           gap: 3,
           padding: active ? '6px 18px' : '6px 4px',
           borderRadius: 20,
-          background: active ? 'rgba(201, 122, 102, 0.12)' : 'transparent',
+          background: active ? 'rgba(246, 201, 178, 0.35)' : 'transparent',
           transition: 'all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)',
         }}
       >
         <Icon
           size={20}
-          strokeWidth={active ? 2.2 : 1.6}
-          color={active ? 'var(--accent-strong)' : 'var(--text-muted)'}
+          strokeWidth={active ? 2.3 : 1.9}
+          color={active ? 'var(--accent-strong)' : '#8EA0B3'}
           style={{ transition: 'color 0.2s ease' }}
         />
         <span
           style={{
             fontSize: 10,
-            fontWeight: active ? 700 : 400,
-            color: active ? 'var(--accent-strong)' : 'var(--text-muted)',
+            fontWeight: active ? 700 : 500,
+            color: active ? 'var(--accent-strong)' : '#8EA0B3',
             lineHeight: 1,
             transition: 'color 0.2s ease',
             whiteSpace: 'nowrap',
@@ -141,12 +139,10 @@ export function BottomNav() {
             bottom: NAV_BOTTOM + NAV_HEIGHT + 12,
             left: 16,
             right: 16,
-            background: 'rgba(247, 242, 236, 0.97)',
-            backdropFilter: 'blur(28px)',
-            WebkitBackdropFilter: 'blur(28px)',
+            background: '#FFFDF8',
             borderRadius: 28,
             padding: '16px 12px 12px',
-            border: '1px solid rgba(201, 122, 102, 0.14)',
+            border: '1px solid var(--border-soft)',
             boxShadow: '0 20px 60px rgba(15, 27, 51, 0.12)',
             zIndex: 29,
           }}
@@ -163,7 +159,7 @@ export function BottomNav() {
           >
             ماذا تريد تضيف؟
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
             {quickAddItems.map((item) => {
               const Icon = item.icon;
               return (

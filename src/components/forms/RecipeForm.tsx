@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Plus, X, Camera, ImageIcon } from 'lucide-react';
+import { BrandIcon } from '@/components/brand/BrandIcon';
 import { BottomSheet } from '@/components/shared/BottomSheet';
 import { FormField, Input, SubmitButton } from '@/components/shared/FormField';
 import { useAppStore } from '@/store/appStore';
@@ -303,7 +304,7 @@ export function RecipeForm({ open, onClose, initialRecipe }: RecipeFormProps) {
                 <img src={previewUrl} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
                 <div style={{ width: '100%', height: '100%', background: fallbackGrad, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <span style={{ fontSize: 28, opacity: 0.35 }}>🍽️</span>
+                  <BrandIcon name="cooking" size={28} color="var(--accent)" />
                 </div>
               )}
             </div>
@@ -311,7 +312,7 @@ export function RecipeForm({ open, onClose, initialRecipe }: RecipeFormProps) {
             {/* Buttons */}
             <div style={{ flex: 1 }}>
               <p style={{ fontSize: 12, marginBottom: 8, color: hasImage ? 'var(--accent-strong)' : 'var(--text-muted)', fontWeight: hasImage ? 600 : 400 }}>
-                {compressing ? 'جاري معالجة الصورة...' : hasImage ? (isUserPhoto ? 'صورة مخصصة ✓' : 'صورة من المكتبة ✓') : 'أضف صورة للوجبة'}
+                {compressing ? 'جاري معالجة الصورة...' : hasImage ? (isUserPhoto ? 'صورة مخصصة' : 'صورة من المكتبة') : 'أضف صورة للوجبة'}
               </p>
               {errors.image && (
                 <p style={{ fontSize: 11, marginBottom: 6, color: 'var(--danger)' }}>{errors.image}</p>

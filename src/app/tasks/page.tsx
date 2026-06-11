@@ -71,12 +71,12 @@ export default function TasksPage() {
     }
   })();
 
-  const emptyMessages: Record<TaskFilter, { icon: string; title: string; desc: string }> = {
-    waiting:  { icon: '✅', title: 'البيت مرتب اليوم 👌',       desc: 'ما في مهام معلقة عليك'       },
-    urgent:   { icon: '⚡', title: 'ما في شيء عاجل',             desc: 'كل المهام في حالة جيدة'       },
-    requests: { icon: '📨', title: 'لا توجد طلبات',              desc: 'أرسل طلباً لأحد أفراد العائلة' },
-    all:      { icon: '📋', title: 'لا توجد مهام',               desc: 'أضف أول مهمة للعائلة'         },
-    done:     { icon: '🎯', title: 'لا توجد مهام منجزة بعد',     desc: 'أنهِ مهمة لتظهر هنا'          },
+  const emptyMessages: Record<TaskFilter, { illustration?: 'empty-no-tasks' | 'empty-no-requests' | 'success-task-completed'; brandIcon?: 'priority' | 'completed'; title: string; desc: string }> = {
+    waiting:  { illustration: 'success-task-completed', title: 'البيت مرتب اليوم',     desc: 'ما في مهام معلقة عليك'       },
+    urgent:   { brandIcon: 'priority',                  title: 'ما في شيء عاجل',        desc: 'كل المهام في حالة جيدة'      },
+    requests: { illustration: 'empty-no-requests',      title: 'لا توجد طلبات',         desc: 'سجّل احتياجات البيت في مكان واحد.' },
+    all:      { illustration: 'empty-no-tasks',         title: 'لا توجد مهام',          desc: 'أضف أول مهمة وخلّ يومك أوضح.' },
+    done:     { brandIcon: 'completed',                 title: 'لا توجد مهام منجزة بعد', desc: 'أنهِ مهمة لتظهر هنا'         },
   };
 
   return (
@@ -172,7 +172,7 @@ export default function TasksPage() {
         {/* Requests tab */}
         {activeTab === 'requests' && (
           myRequests.length === 0 ? (
-            <EmptyState icon="📨" title="لا توجد طلبات" description="أرسل طلباً لأحد أفراد العائلة" />
+            <EmptyState illustration="empty-no-requests" title="لا توجد طلبات" description="سجّل احتياجات البيت في مكان واحد." />
           ) : (
             <>
               {pendingIncoming.length > 0 && (
@@ -191,7 +191,8 @@ export default function TasksPage() {
         {activeTab !== 'requests' && (
           taskList.length === 0 ? (
             <EmptyState
-              icon={emptyMessages[activeTab].icon}
+              illustration={emptyMessages[activeTab].illustration}
+              brandIcon={emptyMessages[activeTab].brandIcon}
               title={emptyMessages[activeTab].title}
               description={emptyMessages[activeTab].desc}
             />

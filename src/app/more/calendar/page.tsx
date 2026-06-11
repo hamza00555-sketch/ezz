@@ -252,7 +252,7 @@ export default function CalendarPage() {
 
       <div style={{ padding: '16px' }}>
         {entries.length === 0 ? (
-          <EmptyState icon="📅" title="لا توجد أحداث" description="المهام والصيانة والضمانات ستظهر هنا" />
+          <EmptyState brandIcon="calendar" title="لا توجد أحداث" description="المواعيد والصيانة والضمانات ستظهر هنا." />
         ) : (
           <>
             {renderGroup('متأخر', overdue, 'var(--danger)', true)}

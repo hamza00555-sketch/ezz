@@ -13,12 +13,12 @@ interface DocumentFormProps {
 }
 
 const docTypes = [
-  { value: 'contract', label: '📄 عقد' },
-  { value: 'warranty', label: '🛡️ ضمان' },
-  { value: 'invoice', label: '🧾 فاتورة' },
-  { value: 'insurance', label: '🔐 تأمين' },
-  { value: 'form', label: '📋 استمارة' },
-  { value: 'other', label: '📎 أخرى' },
+ { value: 'contract', label: 'عقد' },
+ { value: 'warranty', label: 'ضمان' },
+ { value: 'invoice', label: 'فاتورة' },
+ { value: 'insurance', label: 'تأمين' },
+ { value: 'form', label: 'استمارة' },
+ { value: 'other', label: 'أخرى' },
 ];
 
 export function DocumentForm({ open, onClose }: DocumentFormProps) {

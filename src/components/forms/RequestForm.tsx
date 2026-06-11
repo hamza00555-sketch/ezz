@@ -12,12 +12,12 @@ interface RequestFormProps {
 }
 
 const requestTypes = [
-  { value: 'purchase', label: '🛒 شراء' },
-  { value: 'help', label: '🤝 مساعدة' },
-  { value: 'errand', label: '🚗 مشوار' },
-  { value: 'maintenance', label: '🔧 صيانة' },
-  { value: 'follow_up', label: '📋 متابعة' },
-  { value: 'other', label: '💬 أخرى' },
+ { value: 'purchase', label: 'شراء' },
+ { value: 'help', label: 'مساعدة' },
+ { value: 'errand', label: 'مشوار' },
+ { value: 'maintenance', label: 'صيانة' },
+ { value: 'follow_up', label: 'متابعة' },
+ { value: 'other', label: 'أخرى' },
 ];
 
 export function RequestForm({ open, onClose }: RequestFormProps) {

@@ -30,7 +30,7 @@ export default function AnnouncementsPage() {
 
       <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
         {items.length === 0 ? (
-          <EmptyState icon="📢" title="لا توجد إعلانات" description="انشر إعلاناً مهماً لأفراد العائلة" />
+          <EmptyState brandIcon="notifications" title="لا توجد إعلانات" description="أنشئ إعلانًا مهمًا لأفراد العائلة." />
         ) : (
           items.map((ann) => {
             const publisher = members.find((m) => m.id === ann.publishedBy);
@@ -61,7 +61,7 @@ export default function AnnouncementsPage() {
                       </p>
                       {ann.isPinned && (
                         <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, fontWeight: 600, flexShrink: 0, background: 'rgba(201,122,102,0.20)', color: 'var(--bronze)' }}>
-                          📌 مثبت
+                          مثبت
                         </span>
                       )}
                     </div>

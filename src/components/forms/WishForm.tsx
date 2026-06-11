@@ -12,17 +12,17 @@ interface WishFormProps {
 }
 
 const wishTypes = [
-  { value: 'idea', label: '💡 فكرة' },
-  { value: 'need', label: '🛒 احتياج' },
-  { value: 'link', label: '🔗 رابط' },
-  { value: 'fix', label: '🔧 إصلاح' },
+ { value: 'idea', label: 'فكرة' },
+ { value: 'need', label: 'احتياج' },
+ { value: 'link', label: 'رابط' },
+ { value: 'fix', label: 'إصلاح' },
 ];
 
 const priorities = [
-  { value: 'low', label: 'منخفضة' },
-  { value: 'medium', label: 'متوسطة' },
-  { value: 'high', label: 'عالية' },
-  { value: 'urgent', label: 'عاجلة' },
+ { value: 'low', label: 'منخفضة' },
+ { value: 'medium', label: 'متوسطة' },
+ { value: 'high', label: 'عالية' },
+ { value: 'urgent', label: 'عاجلة' },
 ];
 
 export function WishForm({ open, onClose }: WishFormProps) {

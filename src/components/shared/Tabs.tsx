@@ -46,8 +46,8 @@ export function Tabs({ tabs, active, onChange }: TabsProps) {
                 cursor: 'pointer',
                 border: 'none',
                 transition: 'all 0.2s ease',
-                background: isActive ? 'rgba(201,122,102,0.12)' : 'transparent',
-                color: isActive ? 'var(--accent-strong)' : 'var(--text-muted)',
+                background: isActive ? 'rgba(201,122,102,0.18)' : 'transparent',
+                color: isActive ? 'var(--accent-strong)' : 'var(--text-secondary)',
               }}
             >
               {tab.label}
