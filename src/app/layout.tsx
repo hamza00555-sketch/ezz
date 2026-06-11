@@ -22,14 +22,17 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: '#F9F6EE',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#F7F2EC' },
+    { media: '(prefers-color-scheme: dark)',  color: '#07111F' },
+  ],
   viewportFit: 'cover',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ar" dir="rtl" className="h-full" style={{ background: '#F9F6EE' }}>
-      <body className="h-full antialiased" style={{ background: '#F9F6EE' }}>
+    <html lang="ar" dir="rtl" className="h-full" style={{ background: '#F7F2EC' }}>
+      <body className="h-full antialiased" style={{ background: 'var(--color-bg, #F7F2EC)' }}>
         {children}
         <ServiceWorkerRegistrar />
       </body>
