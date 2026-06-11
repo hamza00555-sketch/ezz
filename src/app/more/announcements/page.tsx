@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { ChevronRight, Megaphone, Check, Users } from 'lucide-react';
+import { ChevronRight, Check, Users } from 'lucide-react';
+import { BrandIcon } from '@/components/brand/BrandIcon';
 import { AppShell } from '@/components/layout/AppShell';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { EmptyState } from '@/components/shared/EmptyState';
@@ -30,7 +31,7 @@ export default function AnnouncementsPage() {
 
       <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
         {items.length === 0 ? (
-          <EmptyState brandIcon="notifications" title="لا توجد إعلانات" description="أنشئ إعلانًا مهمًا لأفراد العائلة." />
+          <EmptyState brandIcon="announcements" title="لا توجد إعلانات" description="أنشئ إعلانًا مهمًا لأفراد العائلة." />
         ) : (
           items.map((ann) => {
             const publisher = members.find((m) => m.id === ann.publishedBy);
@@ -52,7 +53,7 @@ export default function AnnouncementsPage() {
               >
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
                   <div style={{ padding: 10, borderRadius: 14, flexShrink: 0, background: ann.isPinned ? 'rgba(201,122,102,0.20)' : 'rgba(15,27,51,0.06)' }}>
-                    <Megaphone size={18} color={ann.isPinned ? 'var(--bronze)' : 'var(--text-muted)'} strokeWidth={1.8} />
+                    <BrandIcon name="announcements" size={18} color={ann.isPinned ? 'var(--accent)' : 'var(--text-muted)'} />
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>

@@ -8,12 +8,12 @@ import { BrandIcon, type BrandIconName } from '@/components/brand/BrandIcon';
 import type { Request } from '@/types';
 
 const typeConfig: Record<string, { label: string; icon: BrandIconName }> = {
-  purchase:    { label: 'شراء',    icon: 'shopping-list' },
+  purchase:    { label: 'شراء',    icon: 'groceries' },
   help:        { label: 'مساعدة', icon: 'family-members' },
   errand:      { label: 'مشوار',  icon: 'requests' },
   maintenance: { label: 'صيانة',  icon: 'maintenance' },
   follow_up:   { label: 'متابعة', icon: 'tasks' },
-  other:       { label: 'أخرى',   icon: 'notes' },
+  other:       { label: 'أخرى',   icon: 'ideas' },
 };
 
 const statusStyle: Record<string, { badge: string; text: string; label: string }> = {

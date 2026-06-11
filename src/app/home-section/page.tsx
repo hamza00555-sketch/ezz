@@ -31,7 +31,7 @@ const docTypeLabels: Record<string, string> = {
 };
 
 const docTypeIcons: Record<string, BrandIconName> = {
-  contract: 'files',
+  contract: 'documents',
   warranty: 'security',
   invoice: 'bills',
   insurance: 'privacy',
@@ -143,7 +143,7 @@ export default function HomeSectionPage() {
         {activeTab === 'documents' && (
           <>
             {docs.length === 0 ? (
-              <EmptyState brandIcon="files" title="لا توجد وثائق" description="احفظ عقودك وضماناتك وتأميناتك." />
+              <EmptyState brandIcon="documents" title="لا توجد وثائق" description="احفظ عقودك وضماناتك وتأميناتك." />
             ) : (
               docs.map((doc) => (
                 <div
@@ -156,7 +156,7 @@ export default function HomeSectionPage() {
                 >
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
                     <span style={{ flexShrink: 0, marginTop: 2 }}>
-                      <BrandIcon name={docTypeIcons[doc.type] ?? 'files'} size={22} color="var(--accent)" />
+                      <BrandIcon name={docTypeIcons[doc.type] ?? 'documents'} size={22} color="var(--accent)" />
                     </span>
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>

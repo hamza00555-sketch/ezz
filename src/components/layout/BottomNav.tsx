@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { Home, ListChecks, ChefHat, LayoutGrid, Plus, X, CheckSquare, MessageSquare, Lightbulb, ShoppingCart, Megaphone, Wallet } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import { useAppStore } from '@/store/appStore';
 import { TaskForm } from '@/components/forms/TaskForm';
 import { RequestForm } from '@/components/forms/RequestForm';
@@ -14,28 +14,29 @@ import { DocumentForm } from '@/components/forms/DocumentForm';
 import { RecipeForm } from '@/components/forms/RecipeForm';
 import { AnnouncementForm } from '@/components/forms/AnnouncementForm';
 import { ExpenseForm } from '@/components/forms/ExpenseForm';
+import { BrandIcon, type BrandIconName } from '@/components/brand/BrandIcon';
 
-const leftItems = [
-  { href: '/dashboard', icon: Home,       label: 'الرئيسية' },
-  { href: '/tasks',     icon: ListChecks, label: 'المهام'   },
+const leftItems: { href: string; icon: BrandIconName; label: string }[] = [
+  { href: '/dashboard', icon: 'home',  label: 'الرئيسية' },
+  { href: '/tasks',     icon: 'tasks', label: 'المهام'   },
 ];
-const rightItems = [
-  { href: '/kitchen', icon: ChefHat,    label: 'المطبخ' },
-  { href: '/more',    icon: LayoutGrid, label: 'المزيد' },
+const rightItems: { href: string; icon: BrandIconName; label: string }[] = [
+  { href: '/kitchen', icon: 'kitchen', label: 'المطبخ' },
+  { href: '/more',    icon: 'more',    label: 'المزيد' },
 ];
 
-const quickAddItems = [
-  { key: 'task',         icon: CheckSquare,   label: 'مهمة',   color: 'var(--accent-strong)', bg: 'rgba(15,27,51,0.08)'    },
-  { key: 'request',      icon: MessageSquare, label: 'طلب',    color: 'var(--accent)',        bg: 'rgba(201,122,102,0.12)' },
-  { key: 'shortage',     icon: ShoppingCart,  label: 'نقص',    color: '#B8604E',              bg: 'rgba(246,201,178,0.35)' },
-  { key: 'expense',      icon: Wallet,        label: 'مصروف',  color: 'var(--accent-strong)', bg: 'rgba(15,27,51,0.08)'    },
-  { key: 'announcement', icon: Megaphone,     label: 'إعلان',  color: 'var(--accent)',        bg: 'rgba(201,122,102,0.12)' },
-  { key: 'wish',         icon: Lightbulb,     label: 'فكرة',   color: '#B8604E',              bg: 'rgba(246,201,178,0.35)' },
+const quickAddItems: { key: string; icon: BrandIconName; label: string; color: string; bg: string }[] = [
+  { key: 'task',         icon: 'tasks',         label: 'مهمة',   color: 'var(--accent-strong)', bg: 'rgba(15,27,51,0.08)'    },
+  { key: 'request',      icon: 'requests',      label: 'طلب',    color: 'var(--accent)',        bg: 'rgba(201,122,102,0.12)' },
+  { key: 'shortage',     icon: 'groceries',     label: 'نقص',    color: '#B8604E',              bg: 'rgba(246,201,178,0.35)' },
+  { key: 'expense',      icon: 'wallet',        label: 'مصروف',  color: 'var(--accent-strong)', bg: 'rgba(15,27,51,0.08)'    },
+  { key: 'announcement', icon: 'announcements', label: 'إعلان',  color: 'var(--accent)',        bg: 'rgba(201,122,102,0.12)' },
+  { key: 'wish',         icon: 'ideas',         label: 'فكرة',   color: '#B8604E',              bg: 'rgba(246,201,178,0.35)' },
 ];
 
 type FormKey = 'task' | 'request' | 'wish' | 'home_item' | 'document' | 'shortage' | 'recipe' | 'announcement' | 'expense' | null;
 
-function NavItem({ href, icon: Icon, label, active }: { href: string; icon: React.ElementType; label: string; active: boolean }) {
+function NavItem({ href, icon, label, active }: { href: string; icon: BrandIconName; label: string; active: boolean }) {
   return (
     <Link
       href={href}
@@ -63,11 +64,10 @@ function NavItem({ href, icon: Icon, label, active }: { href: string; icon: Reac
           transition: 'all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)',
         }}
       >
-        <Icon
+        <BrandIcon
+          name={icon}
           size={20}
-          strokeWidth={active ? 2.3 : 1.9}
           color={active ? 'var(--accent-strong)' : '#8EA0B3'}
-          style={{ transition: 'color 0.2s ease' }}
         />
         <span
           style={{
@@ -93,7 +93,6 @@ export function BottomNav() {
   const activeQuickForm = useAppStore((s) => s.activeQuickForm);
   const setActiveQuickForm = useAppStore((s) => s.setActiveQuickForm);
 
-  // Must be in useEffect — calling setState during render causes infinite loop
   useEffect(() => {
     if (activeQuickForm) {
       setActiveForm(activeQuickForm as FormKey);
@@ -160,30 +159,27 @@ export function BottomNav() {
             ماذا تريد تضيف؟
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-            {quickAddItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <button
-                  key={item.key}
-                  onClick={() => handleSelect(item.key)}
-                  style={{
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
-                    padding: '12px 4px',
-                    borderRadius: 18,
-                    background: item.bg,
-                    border: '1px solid rgba(15, 27, 51, 0.06)',
-                    cursor: 'pointer',
-                    transition: 'transform 0.12s ease',
-                  }}
-                  className="active:scale-95"
-                >
-                  <Icon size={20} color={item.color} strokeWidth={1.8} />
-                  <span style={{ fontSize: 10, fontWeight: 600, color: item.color, lineHeight: 1 }}>
-                    {item.label}
-                  </span>
-                </button>
-              );
-            })}
+            {quickAddItems.map((item) => (
+              <button
+                key={item.key}
+                onClick={() => handleSelect(item.key)}
+                style={{
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                  padding: '12px 4px',
+                  borderRadius: 18,
+                  background: item.bg,
+                  border: '1px solid rgba(15, 27, 51, 0.06)',
+                  cursor: 'pointer',
+                  transition: 'transform 0.12s ease',
+                }}
+                className="active:scale-95"
+              >
+                <BrandIcon name={item.icon} size={20} color={item.color} />
+                <span style={{ fontSize: 10, fontWeight: 600, color: item.color, lineHeight: 1 }}>
+                  {item.label}
+                </span>
+              </button>
+            ))}
           </div>
         </div>
       )}

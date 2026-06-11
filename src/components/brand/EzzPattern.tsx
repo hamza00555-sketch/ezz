@@ -1,6 +1,6 @@
 'use client';
 
-type PatternName = 'quiet-flow-corner' | 'quiet-flow-pattern' | 'quiet-flow-strip' | 'subtle-background';
+type PatternName = 'quiet-flow-corner' | 'quiet-flow-pattern' | 'quiet-flow-strip' | 'subtle-background' | 'card-bg' | 'welcome' | 'corner';
 type PatternVariant = 'light' | 'dark' | 'auto';
 type PatternPosition = 'top-end' | 'bottom-start' | 'bottom-end' | 'top-start' | 'fill';
 

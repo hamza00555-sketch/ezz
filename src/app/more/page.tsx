@@ -3,20 +3,18 @@
 import Link from 'next/link';
 import { AppShell } from '@/components/layout/AppShell';
 import { PageHeader } from '@/components/shared/PageHeader';
-import {
-  Users, Calendar, Wallet, Lightbulb, Megaphone, Settings,
-  ChevronLeft, Building2
-} from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { useAppStore } from '@/store/appStore';
 import { useShallow } from 'zustand/react/shallow';
+import { BrandIcon, type BrandIconName } from '@/components/brand/BrandIcon';
 
-const menuItems = [
-  { href: '/home-section',       icon: Building2, label: 'البيت',              description: 'الممتلكات والصيانة والوثائق',    color: 'var(--accent)',        bg: 'rgba(201,122,102,0.10)' },
-  { href: '/more/family',        icon: Users,     label: 'العائلة والأفراد',   description: 'إدارة أفراد العائلة والصلاحيات', color: 'var(--accent-strong)', bg: 'rgba(15,27,51,0.08)'    },
-  { href: '/more/calendar',      icon: Calendar,  label: 'التقويم',            description: 'مواعيد وصيانة وضمانات',          color: '#B8604E',              bg: 'rgba(246,201,178,0.35)' },
-  { href: '/more/expenses',      icon: Wallet,    label: 'المصاريف',           description: 'محافظ وميزانيات يدوية',          color: 'var(--accent-strong)', bg: 'rgba(15,27,51,0.08)'    },
-  { href: '/more/wishes',        icon: Lightbulb, label: 'الأفكار والرغبات',   description: 'احتياجات وأفكار مستقبلية',       color: 'var(--accent)',        bg: 'rgba(201,122,102,0.10)' },
-  { href: '/more/announcements', icon: Megaphone, label: 'الإعلانات العائلية', description: 'رسائل مثبتة ومهمة',             color: '#B8604E',              bg: 'rgba(246,201,178,0.35)' },
+const menuItems: { href: string; icon: BrandIconName; label: string; description: string; color: string; bg: string }[] = [
+  { href: '/home-section',       icon: 'home',          label: 'البيت',              description: 'الممتلكات والصيانة والوثائق',    color: 'var(--accent)',        bg: 'rgba(201,122,102,0.10)' },
+  { href: '/more/family',        icon: 'family-members',label: 'العائلة والأفراد',   description: 'إدارة أفراد العائلة والصلاحيات', color: 'var(--accent-strong)', bg: 'rgba(15,27,51,0.08)'    },
+  { href: '/more/calendar',      icon: 'calendar',      label: 'التقويم',            description: 'مواعيد وصيانة وضمانات',          color: '#B8604E',              bg: 'rgba(246,201,178,0.35)' },
+  { href: '/more/expenses',      icon: 'wallet',        label: 'المصاريف',           description: 'محافظ وميزانيات يدوية',          color: 'var(--accent-strong)', bg: 'rgba(15,27,51,0.08)'    },
+  { href: '/more/wishes',        icon: 'ideas',         label: 'الأفكار والرغبات',   description: 'احتياجات وأفكار مستقبلية',       color: 'var(--accent)',        bg: 'rgba(201,122,102,0.10)' },
+  { href: '/more/announcements', icon: 'announcements', label: 'الإعلانات العائلية', description: 'رسائل مثبتة ومهمة',             color: '#B8604E',              bg: 'rgba(246,201,178,0.35)' },
 ];
 
 export default function MorePage() {
@@ -43,7 +41,6 @@ export default function MorePage() {
 
       <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
         {menuItems.map((item) => {
-          const Icon = item.icon;
           const badge = badges[item.href];
           return (
             <Link
@@ -59,7 +56,7 @@ export default function MorePage() {
               }}
             >
               <div style={{ padding: 12, borderRadius: 16, flexShrink: 0, background: item.bg }}>
-                <Icon size={22} color={item.color} strokeWidth={1.8} />
+                <BrandIcon name={item.icon} size={22} color={item.color} />
               </div>
               <div style={{ flex: 1 }}>
                 <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>
@@ -101,7 +98,7 @@ export default function MorePage() {
           }}
         >
           <div style={{ padding: 12, borderRadius: 16, flexShrink: 0, background: 'rgba(15,27,51,0.06)' }}>
-            <Settings size={22} color="var(--text-secondary)" strokeWidth={1.8} />
+            <BrandIcon name="settings" size={22} color="var(--text-secondary)" />
           </div>
           <div style={{ flex: 1 }}>
             <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-secondary)' }}>
