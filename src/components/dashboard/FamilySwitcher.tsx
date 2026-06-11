@@ -31,7 +31,7 @@ export function FamilySwitcher() {
   return (
     <div
       style={{
-        padding: `max(24px, env(safe-area-inset-top, 24px)) var(--page-px) 20px`,
+        padding: `calc(env(safe-area-inset-top, 0px) + 20px) var(--page-px) 20px`,
       }}
     >
       {/* Top row: family pill + avatar/bell */}
