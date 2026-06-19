@@ -1,56 +1,46 @@
 'use client';
 
-import { useState, useEffect, type ReactNode } from 'react';
-import { dishGradient, getDishImage } from '@/lib/dishImages';
+import { useState, useEffect } from 'react';
+import { resolveImage, isIdbRef } from '@/lib/imageStore';
+import { dishGradient } from '@/lib/dishImages';
 
 interface RecipeImageProps {
-  /** Stored imageUrl: remote https URL, /library-path, linear-gradient, or undefined */
   imageUrl?: string;
-  /** Used for gradient fallback and library lookup when imageUrl is unset */
   name: string;
-  size: number;
-  borderRadius?: number;
-  border?: string;
-  boxShadow?: string;
-  fallbackIcon?: ReactNode;
+  size?: number;
+  borderRadius?: number | string;
   style?: React.CSSProperties;
 }
 
-function resolveUrl(imageUrl: string | undefined, name: string): string | undefined {
-  // Legacy idb: refs are no longer supported (images now live in Supabase Storage).
-  if (!imageUrl || imageUrl.startsWith('idb:')) return getDishImage(name);
-  return imageUrl;
-}
-
-export function RecipeImage({
-  imageUrl,
-  name,
-  size,
-  borderRadius = 16,
-  border,
-  boxShadow,
-  fallbackIcon,
-  style,
-}: RecipeImageProps) {
-  const [displayUrl, setDisplayUrl] = useState<string | undefined>(
-    () => resolveUrl(imageUrl, name)
-  );
+export function RecipeImage({ imageUrl, name, size = 56, borderRadius = 16, style }: RecipeImageProps) {
+  const [src, setSrc] = useState<string | undefined>(isIdbRef(imageUrl) ? undefined : imageUrl);
 
   useEffect(() => {
-    setDisplayUrl(resolveUrl(imageUrl, name));
-  }, [imageUrl, name]);
+    if (!isIdbRef(imageUrl)) {
+      setSrc(imageUrl);
+      return;
+    }
+    let cancelled = false;
+    resolveImage(imageUrl).then((url) => {
+      if (!cancelled) setSrc(url);
+    });
+    return () => { cancelled = true; };
+  }, [imageUrl]);
 
-  const isGradient = displayUrl?.startsWith('linear-gradient');
-  const showImg = !!displayUrl && !isGradient;
+  const isGrad = !src || src.startsWith('linear-gradient');
+  const background = isGrad ? (src || dishGradient(name)) : undefined;
 
   return (
-    <div style={{ width: size, height: size, borderRadius, overflow: 'hidden', flexShrink: 0, border, boxShadow, ...style }}>
-      {showImg ? (
-        <img src={displayUrl} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+    <div
+      style={{
+        width: size, height: size, borderRadius, overflow: 'hidden', flexShrink: 0,
+        ...style,
+      }}
+    >
+      {!isGrad ? (
+        <img src={src} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
       ) : (
-        <div style={{ width: '100%', height: '100%', background: (isGradient ? displayUrl : undefined) ?? dishGradient(name), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          {fallbackIcon}
-        </div>
+        <div style={{ width: '100%', height: '100%', background }} />
       )}
     </div>
   );

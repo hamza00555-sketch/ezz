@@ -2,42 +2,17 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Plus, X, Camera, ImageIcon } from 'lucide-react';
-import { BrandIcon } from '@/components/brand/BrandIcon';
 import { BottomSheet } from '@/components/shared/BottomSheet';
 import { FormField, Input, SubmitButton } from '@/components/shared/FormField';
 import { useAppStore } from '@/store/appStore';
 import { useShallow } from 'zustand/react/shallow';
 import { getDishImage, dishGradient, loadDishManifest } from '@/lib/dishImages';
-import { uploadRecipeImage, deleteRecipeImage } from '@/lib/supabase/db';
-import type { MealTime, Recipe } from '@/types';
-
-const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5MB
-
-/** Convert a compressed data URL back to a File for upload. */
-function dataUrlToFile(dataUrl: string, baseName: string): File {
-  const [meta, b64] = dataUrl.split(',');
-  const mime = meta.match(/data:([^;]+)/)?.[1] || 'image/jpeg';
-  const bin = atob(b64);
-  const bytes = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-  const ext = mime.split('/')[1] || 'jpg';
-  return new File([bytes], `${baseName}.${ext}`, { type: mime });
-}
-
-/** An uploaded/remote image we should preserve (Supabase Storage public URL or absolute http URL). */
-function isRemoteImage(url: string | undefined): url is string {
-  return !!url && (url.startsWith('http://') || url.startsWith('https://'));
-}
-
-/** A gradient string or a bundled dish-library path (not a user-supplied photo). */
-function isLibraryOrGradient(url: string | undefined): boolean {
-  return !!url && (url.startsWith('linear-gradient') || url.startsWith('/'));
-}
+import { saveImageToIdb, resolveImage, isIdbRef } from '@/lib/imageStore';
+import type { MealTime } from '@/types';
 
 interface RecipeFormProps {
   open: boolean;
   onClose: () => void;
-  initialRecipe?: Recipe;
 }
 
 const mealTimes = [
@@ -52,7 +27,7 @@ async function compressImage(file: File): Promise<string> {
     const img = new Image();
     const objUrl = URL.createObjectURL(file);
     img.onload = () => {
-      const MAX = 600;
+      const MAX = 700;
       let { width, height } = img;
       if (width > MAX || height > MAX) {
         if (width > height) { height = Math.round(height * MAX / width); width = MAX; }
@@ -62,94 +37,61 @@ async function compressImage(file: File): Promise<string> {
       canvas.width = width; canvas.height = height;
       canvas.getContext('2d')!.drawImage(img, 0, 0, width, height);
       URL.revokeObjectURL(objUrl);
-      // prefer WebP for smaller size, fall back to JPEG
-      const webp = canvas.toDataURL('image/webp', 0.80);
-      resolve(webp.startsWith('data:image/webp') ? webp : canvas.toDataURL('image/jpeg', 0.75));
+      const webp = canvas.toDataURL('image/webp', 0.82);
+      resolve(webp.startsWith('data:image/webp') ? webp : canvas.toDataURL('image/jpeg', 0.80));
     };
-    img.onerror = () => { URL.revokeObjectURL(objUrl); reject(new Error('failed')); };
+    img.onerror = () => { URL.revokeObjectURL(objUrl); reject(new Error('failed to load image')); };
     img.src = objUrl;
   });
 }
 
-export function RecipeForm({ open, onClose, initialRecipe }: RecipeFormProps) {
-  const { currentFamilyGroupId, currentUserId, addRecipe, updateRecipe } = useAppStore(
-    useShallow((s) => ({ currentFamilyGroupId: s.currentFamilyGroupId, currentUserId: s.currentUserId, addRecipe: s.addRecipe, updateRecipe: s.updateRecipe }))
+export function RecipeForm({ open, onClose }: RecipeFormProps) {
+  const { currentFamilyGroupId, currentUserId, addRecipe } = useAppStore(
+    useShallow((s) => ({ currentFamilyGroupId: s.currentFamilyGroupId, currentUserId: s.currentUserId, addRecipe: s.addRecipe }))
   );
-  const isEditing = !!initialRecipe;
 
   const [name, setName] = useState('');
   const [prepTime, setPrepTime] = useState('');
   const [selectedMealTimes, setSelectedMealTimes] = useState<string[]>(['lunch']);
   const [ingredients, setIngredients] = useState<string[]>(['']);
   const [steps, setSteps] = useState<string[]>(['']);
-  // imageRef: already-persisted value that goes in recipe.imageUrl
-  // (remote https URL, library /path, gradient, or undefined)
-  const [imageRef, setImageRef] = useState<string | undefined>();
-  // pendingDataUrl: a freshly-picked, compressed image not yet uploaded to Storage.
-  // When set, it takes priority and is uploaded on submit.
-  const [pendingDataUrl, setPendingDataUrl] = useState<string | undefined>();
-  // previewUrl: actual URL/data URL for display in this form session
+  // idbRef: the idb: key stored in recipe.imageUrl
+  const [idbRef, setIdbRef] = useState<string | undefined>();
+  // previewUrl: actual data URL for display (not stored in recipe)
   const [previewUrl, setPreviewUrl] = useState<string | undefined>();
+  const [libraryUrl, setLibraryUrl] = useState<string | undefined>();
   const [compressing, setCompressing] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const cameraRef = useRef<HTMLInputElement>(null);
   const galleryRef = useRef<HTMLInputElement>(null);
 
-  // Sync form state when opening
+  // Reset when form opens
   useEffect(() => {
     if (!open) return;
-    if (initialRecipe) {
-      setName(initialRecipe.name);
-      setPrepTime(initialRecipe.prepTime?.toString() ?? '');
-      setSelectedMealTimes(initialRecipe.mealTime.length ? initialRecipe.mealTime : ['lunch']);
-      setIngredients(initialRecipe.ingredients.length ? [...initialRecipe.ingredients] : ['']);
-      setSteps(initialRecipe.steps.length ? [...initialRecipe.steps] : ['']);
-      setImageRef(initialRecipe.imageUrl);
-      setPreviewUrl(initialRecipe.imageUrl);
-    } else {
-      setName(''); setPrepTime(''); setSelectedMealTimes(['lunch']);
-      setIngredients(['']); setSteps(['']);
-      setImageRef(undefined); setPreviewUrl(undefined);
-    }
-    setPendingDataUrl(undefined);
-    setSubmitting(false);
+    setName(''); setPrepTime(''); setSelectedMealTimes(['lunch']);
+    setIngredients(['']); setSteps(['']);
+    setIdbRef(undefined); setPreviewUrl(undefined); setLibraryUrl(undefined);
     setErrors({});
-  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [open]);
 
-  const isGradient = !previewUrl || previewUrl.startsWith('linear-gradient');
-  const showImg = previewUrl && !isGradient;
+  const hasUserPhoto = !!idbRef;
+  const displayUrl = previewUrl ?? libraryUrl;
+  const isGrad = !displayUrl || displayUrl.startsWith('linear-gradient');
+  const showImg = !!displayUrl && !isGrad;
   const fallbackGrad = name.trim() ? dishGradient(name.trim()) : 'linear-gradient(135deg, #F5D9A8 0%, #E8A860 50%, #D4875A 100%)';
-  const hasImage = !!previewUrl && !isGradient;
 
   async function handleNameChange(newName: string) {
     setName(newName);
-    // Keep an explicit user photo (pending upload or already-uploaded remote URL)
-    if (pendingDataUrl) return;
-    if (imageRef && !imageRef.startsWith('linear-gradient') && !isLibraryOrGradient(imageRef)) return;
+    if (idbRef) return; // keep user photo
     await loadDishManifest();
     const lib = getDishImage(newName.trim());
-    setImageRef(lib);
-    setPreviewUrl(lib);
+    setLibraryUrl(lib);
   }
 
   async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    e.target.value = '';
-
-    // Validate type and size before compressing
-    if (!file.type.startsWith('image/')) {
-      setErrors((prev) => ({ ...prev, image: 'الملف يجب أن يكون صورة' }));
-      return;
-    }
-    if (file.size > MAX_IMAGE_BYTES) {
-      setErrors((prev) => ({ ...prev, image: 'حجم الصورة يجب ألا يتجاوز 5 ميجابايت' }));
-      return;
-    }
-    setErrors((prev) => { const n = { ...prev }; delete n.image; return n; });
-
     setCompressing(true);
     try {
       let dataUrl: string;
@@ -158,28 +100,28 @@ export function RecipeForm({ open, onClose, initialRecipe }: RecipeFormProps) {
       } catch {
         dataUrl = await new Promise<string>((res, rej) => {
           const r = new FileReader();
-          r.onload = (ev) => ev.target?.result ? res(ev.target.result as string) : rej();
+          r.onload = (ev) => (ev.target?.result ? res(ev.target.result as string) : rej());
           r.onerror = rej;
           r.readAsDataURL(file);
         });
       }
-      // Hold the compressed image locally; upload to Storage happens on submit.
-      setPendingDataUrl(dataUrl);
-      setPreviewUrl(dataUrl);
+      const ref = await saveImageToIdb(dataUrl);
+      setIdbRef(ref);
+      setPreviewUrl(dataUrl); // instant display without re-reading IDB
+    } catch {
+      // Image failed to save — show the gradient fallback
+      setIdbRef(undefined);
+      setPreviewUrl(undefined);
     } finally {
       setCompressing(false);
+      e.target.value = '';
     }
   }
 
-  function clearImage() {
-    const lib = getDishImage(name.trim());
-    setPendingDataUrl(undefined);
-    setImageRef(lib);
-    setPreviewUrl(lib);
+  function clearPhoto() {
+    setIdbRef(undefined);
+    setPreviewUrl(undefined);
   }
-
-  // A user photo is either a freshly picked image (pending) or an already-uploaded remote URL.
-  const isUserPhoto = !!pendingDataUrl || (!!imageRef && isRemoteImage(imageRef));
 
   function toggleMealTime(value: string) {
     setSelectedMealTimes((prev) =>
@@ -188,22 +130,12 @@ export function RecipeForm({ open, onClose, initialRecipe }: RecipeFormProps) {
   }
 
   function addIngredient() { setIngredients((p) => [...p, '']); }
-  function updateIngredient(i: number, v: string) {
-    setIngredients((p) => p.map((x, idx) => (idx === i ? v : x)));
-  }
-  function removeIngredient(i: number) {
-    if (ingredients.length === 1) return;
-    setIngredients((p) => p.filter((_, idx) => idx !== i));
-  }
+  function updateIngredient(i: number, v: string) { setIngredients((p) => p.map((x, idx) => idx === i ? v : x)); }
+  function removeIngredient(i: number) { if (ingredients.length > 1) setIngredients((p) => p.filter((_, idx) => idx !== i)); }
 
   function addStep() { setSteps((p) => [...p, '']); }
-  function updateStep(i: number, v: string) {
-    setSteps((p) => p.map((x, idx) => (idx === i ? v : x)));
-  }
-  function removeStep(i: number) {
-    if (steps.length === 1) return;
-    setSteps((p) => p.filter((_, idx) => idx !== i));
-  }
+  function updateStep(i: number, v: string) { setSteps((p) => p.map((x, idx) => idx === i ? v : x)); }
+  function removeStep(i: number) { if (steps.length > 1) setSteps((p) => p.filter((_, idx) => idx !== i)); }
 
   function validate() {
     const e: Record<string, string> = {};
@@ -213,64 +145,29 @@ export function RecipeForm({ open, onClose, initialRecipe }: RecipeFormProps) {
     return Object.keys(e).length === 0;
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!validate() || submitting) return;
+    if (!validate()) return;
 
-    setSubmitting(true);
-    setErrors((prev) => { const n = { ...prev }; delete n.submit; return n; });
+    // Priority: user IDB photo → library image → gradient
+    const storedImageUrl = idbRef ?? libraryUrl ?? getDishImage(name.trim()) ?? dishGradient(name.trim());
 
-    let resolvedImageUrl: string | undefined;
-    let uploadedUrl: string | undefined; // track for orphan cleanup on DB failure
-
-    try {
-      if (pendingDataUrl) {
-        // Upload the freshly-picked, compressed image to Supabase Storage on submit.
-        const file = dataUrlToFile(pendingDataUrl, name.trim() || 'recipe');
-        uploadedUrl = await uploadRecipeImage(file, currentFamilyGroupId);
-        resolvedImageUrl = uploadedUrl;
-      } else {
-        // No new photo: keep existing remote/library URL, else fall back to library/gradient.
-        resolvedImageUrl = imageRef ?? getDishImage(name.trim()) ?? dishGradient(name.trim());
-      }
-    } catch (err) {
-      console.error('[RecipeForm] image upload failed', err);
-      setErrors((prev) => ({ ...prev, submit: 'فشل رفع الصورة، حاول مرة أخرى' }));
-      setSubmitting(false);
-      return; // keep form open for retry
-    }
-
-    const data = {
+    addRecipe({
+      familyGroupId: currentFamilyGroupId,
       name: name.trim(),
       ingredients: ingredients.filter((i) => i.trim()),
       steps: steps.filter((s) => s.trim()),
       prepTime: prepTime ? parseInt(prepTime) : undefined,
       mealTime: selectedMealTimes as MealTime[],
-      imageUrl: resolvedImageUrl,
-    };
-
-    // If the DB write fails, delete the orphaned uploaded image and surface an error.
-    const handleDbError = () => {
-      if (uploadedUrl) deleteRecipeImage(uploadedUrl).catch(() => {});
-      setErrors((prev) => ({ ...prev, submit: 'فشل حفظ الوصفة، حاول مرة أخرى' }));
-      setSubmitting(false);
-    };
-
-    if (isEditing) {
-      updateRecipe(initialRecipe.id, data, handleDbError);
-    } else {
-      addRecipe(
-        { ...data, familyGroupId: currentFamilyGroupId, favoritedBy: [], createdBy: currentUserId },
-        handleDbError,
-      );
-    }
-
-    // Optimistic close: the store applies the change immediately and rolls back on failure.
+      imageUrl: storedImageUrl,
+      favoritedBy: [],
+      createdBy: currentUserId,
+    });
     onClose();
   }
 
   return (
-    <BottomSheet open={open} onClose={onClose} title={isEditing ? 'تعديل الوصفة' : 'إضافة وصفة'} height="full">
+    <BottomSheet open={open} onClose={onClose} title="إضافة وصفة" height="full">
       <input ref={cameraRef} type="file" accept="image/*" capture="environment" style={{ display: 'none' }} onChange={handleFileSelect} />
       <input ref={galleryRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFileSelect} />
 
@@ -288,46 +185,41 @@ export function RecipeForm({ open, onClose, initialRecipe }: RecipeFormProps) {
         {/* Image section */}
         {name.trim() && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            {/* Preview circle */}
             <div style={{
-              width: 72, height: 72, borderRadius: 22, overflow: 'hidden', flexShrink: 0,
-              border: hasImage ? '2.5px solid rgba(201,122,102,0.60)' : '2.5px solid rgba(15,27,51,0.14)',
-              boxShadow: hasImage ? '0 6px 20px rgba(15,27,51,0.18)' : '0 2px 8px rgba(15,27,51,0.08)',
-              position: 'relative', transition: 'all 0.3s ease',
+              width: 72, height: 72, borderRadius: 22, overflow: 'hidden', flexShrink: 0, position: 'relative',
+              border: showImg ? '2.5px solid rgba(163,177,138,0.60)' : '2.5px solid rgba(67,82,56,0.14)',
+              boxShadow: showImg ? '0 6px 20px rgba(67,82,56,0.18)' : '0 2px 8px rgba(67,82,56,0.08)',
+              transition: 'all 0.3s ease',
             }}>
               {compressing && (
                 <div style={{ position: 'absolute', inset: 0, zIndex: 2, background: 'rgba(255,253,247,0.82)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <div style={{ width: 22, height: 22, borderRadius: '50%', border: '2.5px solid rgba(201,122,102,0.25)', borderTopColor: 'var(--accent-strong)', animation: 'spin 0.8s linear infinite' }} />
+                  <div style={{ width: 22, height: 22, borderRadius: '50%', border: '2.5px solid rgba(163,177,138,0.25)', borderTopColor: 'var(--accent-strong)', animation: 'spin 0.8s linear infinite' }} />
                 </div>
               )}
               {showImg ? (
-                <img src={previewUrl} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src={displayUrl} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
-                <div style={{ width: '100%', height: '100%', background: fallbackGrad, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <BrandIcon name="cooking" size={28} color="var(--accent)" />
+                <div style={{ width: '100%', height: '100%', background: isGrad ? (displayUrl || fallbackGrad) : fallbackGrad, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ fontSize: 28, opacity: 0.35 }}>🍽️</span>
                 </div>
               )}
             </div>
 
-            {/* Buttons */}
             <div style={{ flex: 1 }}>
-              <p style={{ fontSize: 12, marginBottom: 8, color: hasImage ? 'var(--accent-strong)' : 'var(--text-muted)', fontWeight: hasImage ? 600 : 400 }}>
-                {compressing ? 'جاري معالجة الصورة...' : hasImage ? (isUserPhoto ? 'صورة مخصصة' : 'صورة من المكتبة') : 'أضف صورة للوجبة'}
+              <p style={{ fontSize: 12, marginBottom: 8, color: showImg ? 'var(--accent-strong)' : 'var(--text-muted)', fontWeight: showImg ? 600 : 400 }}>
+                {compressing ? 'جاري حفظ الصورة...' : hasUserPhoto ? 'صورة مخصصة ✓' : displayUrl && !isGrad ? 'صورة من المكتبة ✓' : 'أضف صورة للوجبة'}
               </p>
-              {errors.image && (
-                <p style={{ fontSize: 11, marginBottom: 6, color: 'var(--danger)' }}>{errors.image}</p>
-              )}
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 <button type="button" onClick={() => cameraRef.current?.click()} disabled={compressing}
-                  style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 12px', borderRadius: 12, background: 'rgba(201,122,102,0.12)', border: '1px solid rgba(201,122,102,0.28)', color: 'var(--accent-strong)', fontSize: 12, fontWeight: 700, cursor: compressing ? 'wait' : 'pointer', fontFamily: 'inherit', opacity: compressing ? 0.6 : 1 }}>
+                  style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 12px', borderRadius: 12, background: 'rgba(163,177,138,0.12)', border: '1px solid rgba(163,177,138,0.28)', color: 'var(--accent-strong)', fontSize: 12, fontWeight: 700, cursor: compressing ? 'wait' : 'pointer', fontFamily: 'inherit', opacity: compressing ? 0.6 : 1 }}>
                   <Camera size={13} strokeWidth={2} />صوّر الطبق
                 </button>
                 <button type="button" onClick={() => galleryRef.current?.click()} disabled={compressing}
-                  style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 12px', borderRadius: 12, background: 'rgba(201,122,102,0.12)', border: '1px solid rgba(201,122,102,0.28)', color: 'var(--accent-strong)', fontSize: 12, fontWeight: 700, cursor: compressing ? 'wait' : 'pointer', fontFamily: 'inherit', opacity: compressing ? 0.6 : 1 }}>
+                  style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 12px', borderRadius: 12, background: 'rgba(163,177,138,0.12)', border: '1px solid rgba(163,177,138,0.28)', color: 'var(--accent-strong)', fontSize: 12, fontWeight: 700, cursor: compressing ? 'wait' : 'pointer', fontFamily: 'inherit', opacity: compressing ? 0.6 : 1 }}>
                   <ImageIcon size={13} strokeWidth={2} />من المعرض
                 </button>
-                {isUserPhoto && (
-                  <button type="button" onClick={clearImage}
+                {hasUserPhoto && (
+                  <button type="button" onClick={clearPhoto}
                     style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '7px 10px', borderRadius: 12, background: 'var(--danger-soft)', border: '1px solid transparent', color: 'var(--danger)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
                     <X size={12} strokeWidth={2.5} />إزالة
                   </button>
@@ -347,7 +239,7 @@ export function RecipeForm({ open, onClose, initialRecipe }: RecipeFormProps) {
                 <button key={t.value} type="button" onClick={() => toggleMealTime(t.value)}
                   className="px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all"
                   style={{
-                    background: selectedMealTimes.includes(t.value) ? 'rgba(201,122,102,0.20)' : 'rgba(15,27,51,0.05)',
+                    background: selectedMealTimes.includes(t.value) ? 'rgba(176,141,87,0.20)' : 'rgba(67,82,56,0.05)',
                     color: selectedMealTimes.includes(t.value) ? 'var(--bronze)' : 'var(--text-secondary)',
                     border: `1px solid ${selectedMealTimes.includes(t.value) ? 'transparent' : 'var(--border-soft)'}`,
                   }}>
@@ -380,7 +272,7 @@ export function RecipeForm({ open, onClose, initialRecipe }: RecipeFormProps) {
           <div className="flex flex-col gap-2">
             {steps.map((step, i) => (
               <div key={i} className="flex gap-2 items-start">
-                <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-3" style={{ background: 'rgba(201,122,102,0.18)', color: 'var(--bronze)' }}>
+                <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-3" style={{ background: 'rgba(176,141,87,0.18)', color: 'var(--bronze)' }}>
                   {i + 1}
                 </span>
                 <Input value={step} onChange={(e) => updateStep(i, e.target.value)} placeholder={`الخطوة ${i + 1}`} className="flex-1" />
@@ -397,14 +289,7 @@ export function RecipeForm({ open, onClose, initialRecipe }: RecipeFormProps) {
           </div>
         </FormField>
 
-        {errors.submit && (
-          <p className="text-sm text-center" style={{ color: 'var(--danger)' }}>{errors.submit}</p>
-        )}
-        <SubmitButton
-          label={isEditing ? 'حفظ التعديلات' : 'حفظ الوصفة'}
-          loading={submitting}
-          disabled={compressing}
-        />
+        <SubmitButton label="حفظ الوصفة" />
       </form>
     </BottomSheet>
   );
